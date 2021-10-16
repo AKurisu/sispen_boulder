@@ -1,0 +1,259 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".TopsisActivity"
+    android:padding="12dp">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/cvrFirst"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/cvrFirstConstraint"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="8dp">
+
+                <LinearLayout
+                    android:id="@+id/fixedCvrFirst"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:layout_constraintEnd_toEndOf="@id/cvrFirstConstraint"
+                    app:layout_constraintStart_toStartOf="@id/cvrFirstConstraint"
+                    app:layout_constraintTop_toTopOf="@id/cvrFirstConstraint">
+
+                    <com.google.android.material.button.MaterialButton
+                        style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                        android:id="@+id/cvrFirstButton"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Tabel Awal"
+                        android:textAlignment="textStart"
+                        app:icon="@drawable/ic_baseline_expand_more_24"/>
+                </LinearLayout>
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/expandCvrFirst"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:visibility="gone"
+                    app:layout_constraintEnd_toEndOf="@id/cvrFirstConstraint"
+                    app:layout_constraintStart_toStartOf="@id/cvrFirstConstraint"
+                    app:layout_constraintTop_toBottomOf="@id/fixedCvrFirst"/>
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+        </com.google.android.material.card.MaterialCardView>
+
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/cvrSecond"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/cvrFirst">
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/cvrSecondConstraint"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="8dp">
+
+                <LinearLayout
+                    android:id="@+id/fixedCvrSecond"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:layout_constraintEnd_toEndOf="@id/cvrSecondConstraint"
+                    app:layout_constraintStart_toStartOf="@id/cvrSecondConstraint"
+                    app:layout_constraintTop_toTopOf="@id/cvrSecondConstraint">
+
+                    <com.google.android.material.button.MaterialButton
+                        style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                        android:id="@+id/cvrSecondButton"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Tabel Normalisasi"
+                        android:textAlignment="textStart"
+                        app:icon="@drawable/ic_baseline_expand_more_24"/>
+                </LinearLayout>
+
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/expandCvrSecond"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:visibility="gone"
+                    app:layout_constraintEnd_toEndOf="@id/cvrSecondConstraint"
+                    app:layout_constraintStart_toStartOf="@id/cvrSecondConstraint"
+                    app:layout_constraintTop_toBottomOf="@id/fixedCvrSecond"/>
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+        </com.google.android.material.card.MaterialCardView>
+
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/cvrThird"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/cvrSecond">
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/cvrThirdConstraint"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="8dp">
+
+                <LinearLayout
+                    android:id="@+id/fixedCvrThird"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:layout_constraintEnd_toEndOf="@id/cvrThirdConstraint"
+                    app:layout_constraintStart_toStartOf="@id/cvrThirdConstraint"
+                    app:layout_constraintTop_toTopOf="@id/cvrThirdConstraint">
+
+                    <com.google.android.material.button.MaterialButton
+                        style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                        android:id="@+id/cvrThirdButton"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Tabel Prioritas Normalisasi"
+                        android:textAlignment="textStart"
+                        app:icon="@drawable/ic_baseline_expand_more_24"/>
+                </LinearLayout>
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/expandCvrThird"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:visibility="gone"
+                    app:layout_constraintEnd_toEndOf="@id/cvrThirdConstraint"
+                    app:layout_constraintStart_toStartOf="@id/cvrThirdConstraint"
+                    app:layout_constraintTop_toBottomOf="@id/fixedCvrThird"/>
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+        </com.google.android.material.card.MaterialCardView>
+
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/cvrFourth"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/cvrThird">
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/cvrFourthConstraint"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="8dp">
+
+                <LinearLayout
+                    android:id="@+id/fixedCvrFourth"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:layout_constraintEnd_toEndOf="@id/cvrFourthConstraint"
+                    app:layout_constraintStart_toStartOf="@id/cvrFourthConstraint"
+                    app:layout_constraintTop_toTopOf="@id/cvrFourthConstraint">
+
+                    <com.google.android.material.button.MaterialButton
+                        style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                        android:id="@+id/cvrFourthButton"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="D+ D-"
+                        android:textAlignment="textStart"
+                        app:icon="@drawable/ic_baseline_expand_more_24"/>
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/expandCvrFourth"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    app:layout_constraintEnd_toEndOf="@id/cvrFourthConstraint"
+                    app:layout_constraintStart_toStartOf="@id/cvrFourthConstraint"
+                    app:layout_constraintTop_toBottomOf="@id/fixedCvrFourth">
+
+                    <androidx.recyclerview.widget.RecyclerView
+                        android:id="@+id/rvFourthOne"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"/>
+
+                    <androidx.recyclerview.widget.RecyclerView
+                        android:id="@+id/rvFourthTwo"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"/>
+
+                </LinearLayout>
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+
+
+        </com.google.android.material.card.MaterialCardView>
+
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/cvrFifth"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/cvrFourth">
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/cvrFifthConstraint"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="8dp">
+
+                <LinearLayout
+                    android:id="@+id/fixedCvrFifth"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:layout_constraintEnd_toEndOf="@id/cvrFifthConstraint"
+                    app:layout_constraintStart_toStartOf="@id/cvrFifthConstraint"
+                    app:layout_constraintTop_toTopOf="@id/cvrFifthConstraint">
+
+                    <com.google.android.material.button.MaterialButton
+                        style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                        android:id="@+id/cvrFifthButton"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Tabel Preferensi"
+                        android:textAlignment="textStart"
+                        app:icon="@drawable/ic_baseline_expand_more_24"/>
+                </LinearLayout>
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/expandCvrFifth"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:visibility="gone"
+                    app:layout_constraintEnd_toEndOf="@id/cvrFifthConstraint"
+                    app:layout_constraintStart_toStartOf="@id/cvrFifthConstraint"
+                    app:layout_constraintTop_toBottomOf="@id/fixedCvrFifth"/>
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+        </com.google.android.material.card.MaterialCardView>
+
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</ScrollView>

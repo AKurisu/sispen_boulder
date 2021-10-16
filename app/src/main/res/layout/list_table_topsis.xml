@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<TableLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:stretchColumns="*">
+    <TableRow
+        android:id="@+id/headrow"
+        android:padding="3dp">
+        <TextView
+            android:id="@+id/headrow1"
+            android:text=""/>
+        <TextView
+            android:id="@+id/headrow2"
+            android:text="@string/top"/>
+        <TextView
+            android:id="@+id/headrow3"
+            android:text="@string/at"/>
+        <TextView
+            android:id="@+id/headrow4"
+            android:text="@string/bonus"/>
+        <TextView
+            android:id="@+id/headrow5"
+            android:text="@string/ab"/>
+    </TableRow>
+    <TableRow
+        android:padding="3dp">
+        <TextView
+            android:id="@+id/row1"
+            tools:text="hallo"/>
+        <TextView
+            android:id="@+id/row2"
+            tools:text="hallo"/>
+        <TextView
+            android:id="@+id/row3"
+            tools:text="hallo"/>
+        <TextView
+            android:id="@+id/row4"
+            tools:text="hallo"/>
+        <TextView
+            android:id="@+id/row5"
+            tools:text="hallo"/>
+    </TableRow>
+
+</TableLayout>

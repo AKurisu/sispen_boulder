@@ -1,0 +1,16 @@
+<resources>
+    <style name="ShapeAppearanceOverlay.Button.Circle" parent="">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSize">50%</item>
+    </style>
+    <style name="EditTextNumber" parent="">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:inputType">numberDecimal</item>
+        <item name="android:hint">@string/alt_default</item>
+        <item name="android:ems">2</item>
+        <item name="android:textSize">28sp</item>
+        <item name="android:maxLength">4</item>
+        <item name="android:gravity">center</item>
+    </style>
+</resources>

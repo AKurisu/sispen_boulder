@@ -1,0 +1,593 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        tools:context=".CriteriaResultActivity"
+        android:padding="12dp">
+
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/cvrFirst"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/cvrFirstConstraint"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="8dp">
+
+                <LinearLayout
+                    android:id="@+id/fixedCvrFirst"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:layout_constraintEnd_toEndOf="@id/cvrFirstConstraint"
+                    app:layout_constraintStart_toStartOf="@id/cvrFirstConstraint"
+                    app:layout_constraintTop_toTopOf="@id/cvrFirstConstraint">
+                    <com.google.android.material.button.MaterialButton
+                        style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                        android:id="@+id/cvrFirstButton"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Tabel Awal"
+                        android:textAlignment="textStart"
+                        app:icon="@drawable/ic_baseline_expand_more_24"/>
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/expandCvrFirst"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:visibility="gone"
+                    app:layout_constraintEnd_toEndOf="@id/cvrFirstConstraint"
+                    app:layout_constraintStart_toStartOf="@id/cvrFirstConstraint"
+                    app:layout_constraintTop_toBottomOf="@id/fixedCvrFirst">
+
+                    <TableLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:stretchColumns="*"
+                        >
+                        <TableRow
+                            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                            android:padding="3dp">
+                            <TextView
+                                android:text=""/>
+                            <TextView
+                                android:text="@string/top"/>
+                            <TextView
+                                android:text="@string/at"/>
+                            <TextView
+                                android:text="@string/bonus"/>
+                            <TextView
+                                android:text="@string/ab"/>
+                        </TableRow>
+                        <TableRow
+                            android:padding="3dp">
+                            <TextView
+                                android:text="@string/top"/>
+                            <TextView
+                                android:id="@+id/criteriaDataFirst1"
+                                android:text="1"/>
+                            <TextView
+                                android:id="@+id/criteriaDataFirst2"
+                                android:text="2"/>
+                            <TextView
+                                android:id="@+id/criteriaDataFirst3"
+                                android:text="3"/>
+                            <TextView
+                                android:id="@+id/criteriaDataFirst4"
+                                android:text="4"/>
+                        </TableRow>
+                        <TableRow
+                            android:padding="3dp">
+                            <TextView
+                                android:text="@string/at"/>
+                            <TextView
+                                android:id="@+id/criteriaDataFirst5"
+                                android:text="1"/>
+                            <TextView
+                                android:id="@+id/criteriaDataFirst6"
+                                android:text="2"/>
+                            <TextView
+                                android:id="@+id/criteriaDataFirst7"
+                                android:text="3"/>
+                            <TextView
+                                android:id="@+id/criteriaDataFirst8"
+                                android:text="4"/>
+                        </TableRow>
+                        <TableRow
+                            android:padding="3dp">
+                            <TextView
+                                android:text="@string/bonus"/>
+                            <TextView
+                                android:id="@+id/criteriaDataFirst9"
+                                android:text="1"/>
+                            <TextView
+                                android:id="@+id/criteriaDataFirst10"
+                                android:text="2"/>
+                            <TextView
+                                android:id="@+id/criteriaDataFirst11"
+                                android:text="3"/>
+                            <TextView
+                                android:id="@+id/criteriaDataFirst12"
+                                android:text="4"/>
+                        </TableRow>
+                        <TableRow
+                            android:padding="3dp">
+                            <TextView
+                                android:text="@string/ab"/>
+                            <TextView
+                                android:id="@+id/criteriaDataFirst13"
+                                android:text="1"/>
+                            <TextView
+                                android:id="@+id/criteriaDataFirst14"
+                                android:text="2"/>
+                            <TextView
+                                android:id="@+id/criteriaDataFirst15"
+                                android:text="3"/>
+                            <TextView
+                                android:id="@+id/criteriaDataFirst16"
+                                android:text="4"/>
+                        </TableRow>
+                        <TableRow
+                            android:padding="3dp">
+                            <TextView
+                                android:text="@string/jumlah"/>
+                            <TextView
+                                android:id="@+id/criteriaResultFirst1"
+                                android:text="1"/>
+                            <TextView
+                                android:id="@+id/criteriaResultFirst2"
+                                android:text="2"/>
+                            <TextView
+                                android:id="@+id/criteriaResultFirst3"
+                                android:text="3"/>
+                            <TextView
+                                android:id="@+id/criteriaResultFirst4"
+                                android:text="4"/>
+                        </TableRow>
+                    </TableLayout>
+                </LinearLayout>
+            </androidx.constraintlayout.widget.ConstraintLayout>
+        </com.google.android.material.card.MaterialCardView>
+
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/cvrSecond"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/cvrFirst">
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/cvrSecondConstraint"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="8dp">
+
+                <LinearLayout
+                    android:id="@+id/fixedCvrSecond"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:layout_constraintEnd_toEndOf="@id/cvrSecondConstraint"
+                    app:layout_constraintStart_toStartOf="@id/cvrSecondConstraint"
+                    app:layout_constraintTop_toTopOf="@id/cvrSecondConstraint">
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/cvrSecondButton"
+                        style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Tabel Normalisasi"
+                        android:textAlignment="textStart"
+                        app:icon="@drawable/ic_baseline_expand_more_24" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/expandCvrSecond"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:visibility="gone"
+                    app:layout_constraintEnd_toEndOf="@id/cvrSecondConstraint"
+                    app:layout_constraintStart_toStartOf="@id/cvrSecondConstraint"
+                    app:layout_constraintTop_toBottomOf="@id/fixedCvrSecond">
+
+                    <TableLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:stretchColumns="*">
+
+                        <TableRow
+                            android:padding="3dp">
+
+                            <TextView android:text="" />
+
+                            <TextView android:text="@string/top" />
+
+                            <TextView android:text="@string/at" />
+
+                            <TextView android:text="@string/bonus" />
+
+                            <TextView android:text="@string/ab" />
+
+                            <TextView android:text="@string/jumlah" />
+
+                            <TextView android:text="@string/prioritas" />
+                        </TableRow>
+
+                        <TableRow android:padding="3dp">
+
+                            <TextView android:text="@string/top"/>
+
+                            <TextView
+                                android:id="@+id/criteriaDataSecond1"
+                                android:text="1" />
+
+                            <TextView
+                                android:id="@+id/criteriaDataSecond2"
+                                android:text="2" />
+
+                            <TextView
+                                android:id="@+id/criteriaDataSecond3"
+                                android:text="3" />
+
+                            <TextView
+                                android:id="@+id/criteriaDataSecond4"
+                                android:text="4" />
+
+                            <TextView
+                                android:id="@+id/criteriaResultSecond1"
+                                android:text="4" />
+
+                            <TextView
+                                android:id="@+id/criteriaResultSecond5"
+                                android:text="4" />
+                        </TableRow>
+
+                        <TableRow android:padding="3dp">
+
+                            <TextView android:text="@string/at"/>
+
+                            <TextView
+                                android:id="@+id/criteriaDataSecond5"
+                                android:text="1" />
+
+                            <TextView
+                                android:id="@+id/criteriaDataSecond6"
+                                android:text="2" />
+
+                            <TextView
+                                android:id="@+id/criteriaDataSecond7"
+                                android:text="3" />
+
+                            <TextView
+                                android:id="@+id/criteriaDataSecond8"
+                                android:text="4" />
+
+                            <TextView
+                                android:id="@+id/criteriaResultSecond2"
+                                android:text="4" />
+
+                            <TextView
+                                android:id="@+id/criteriaResultSecond6"
+                                android:text="4" />
+                        </TableRow>
+
+                        <TableRow android:padding="3dp">
+
+                            <TextView android:text="@string/bonus"/>
+
+                            <TextView
+                                android:id="@+id/criteriaDataSecond9"
+                                android:text="1" />
+
+                            <TextView
+                                android:id="@+id/criteriaDataSecond10"
+                                android:text="2" />
+
+                            <TextView
+                                android:id="@+id/criteriaDataSecond11"
+                                android:text="3" />
+
+                            <TextView
+                                android:id="@+id/criteriaDataSecond12"
+                                android:text="4" />
+
+                            <TextView
+                                android:id="@+id/criteriaResultSecond3"
+                                android:text="4" />
+
+                            <TextView
+                                android:id="@+id/criteriaResultSecond7"
+                                android:text="4" />
+                        </TableRow>
+
+                        <TableRow android:padding="3dp">
+
+                            <TextView android:text="@string/ab"  />
+
+                            <TextView
+                                android:id="@+id/criteriaDataSecond13"
+                                android:text="1" />
+
+                            <TextView
+                                android:id="@+id/criteriaDataSecond14"
+                                android:text="2" />
+
+                            <TextView
+                                android:id="@+id/criteriaDataSecond15"
+                                android:text="3" />
+
+                            <TextView
+                                android:id="@+id/criteriaDataSecond16"
+                                android:text="4" />
+
+                            <TextView
+                                android:id="@+id/criteriaResultSecond4"
+                                android:text="4" />
+
+                            <TextView
+                                android:id="@+id/criteriaResultSecond8"
+                                android:text="4" />
+                        </TableRow>
+                    </TableLayout>
+                </LinearLayout>
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+        </com.google.android.material.card.MaterialCardView>
+
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/cvrThird"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/cvrSecond">
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/cvrThirdConstraint"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="8dp">
+
+                <LinearLayout
+                    android:id="@+id/fixedCvrThird"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:layout_constraintEnd_toEndOf="@id/cvrThirdConstraint"
+                    app:layout_constraintStart_toStartOf="@id/cvrThirdConstraint"
+                    app:layout_constraintTop_toTopOf="@id/cvrThirdConstraint">
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/cvrThirdButton"
+                        style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Tabel Konsistensi"
+                        android:textAlignment="textStart"
+                        app:icon="@drawable/ic_baseline_expand_more_24" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/expandCvrThird"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:visibility="gone"
+                    app:layout_constraintEnd_toEndOf="@id/cvrThirdConstraint"
+                    app:layout_constraintStart_toStartOf="@id/cvrThirdConstraint"
+                    app:layout_constraintTop_toBottomOf="@id/fixedCvrThird">
+
+                    <TableLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:stretchColumns="*">
+
+                        <TableRow
+                            android:padding="3dp">
+
+                            <TextView android:text="" />
+
+                            <TextView android:text="@string/top" />
+
+                            <TextView android:text="@string/at" />
+
+                            <TextView android:text="@string/bonus" />
+
+                            <TextView android:text="@string/ab" />
+
+                            <TextView android:text="@string/jumlah" />
+                        </TableRow>
+
+                        <TableRow android:padding="3dp">
+
+                            <TextView android:text="@string/top"/>
+
+                            <TextView
+                                android:id="@+id/criteriaDataThird1"
+                                android:text="1" />
+
+                            <TextView
+                                android:id="@+id/criteriaDataThird2"
+                                android:text="2" />
+
+                            <TextView
+                                android:id="@+id/criteriaDataThird3"
+                                android:text="3" />
+
+                            <TextView
+                                android:id="@+id/criteriaDataThird4"
+                                android:text="4" />
+
+                            <TextView
+                                android:id="@+id/criteriaResultThird1"
+                                android:text="4" />
+                        </TableRow>
+
+                        <TableRow android:padding="3dp">
+
+                            <TextView android:text="@string/at"/>
+
+                            <TextView
+                                android:id="@+id/criteriaDataThird5"
+                                android:text="1" />
+
+                            <TextView
+                                android:id="@+id/criteriaDataThird6"
+                                android:text="2" />
+
+                            <TextView
+                                android:id="@+id/criteriaDataThird7"
+                                android:text="3" />
+
+                            <TextView
+                                android:id="@+id/criteriaDataThird8"
+                                android:text="4" />
+
+                            <TextView
+                                android:id="@+id/criteriaResultThird2"
+                                android:text="4" />
+                        </TableRow>
+
+                        <TableRow android:padding="3dp">
+
+                            <TextView android:text="@string/bonus"/>
+
+                            <TextView
+                                android:id="@+id/criteriaDataThird9"
+                                android:text="1" />
+
+                            <TextView
+                                android:id="@+id/criteriaDataThird10"
+                                android:text="2" />
+
+                            <TextView
+                                android:id="@+id/criteriaDataThird11"
+                                android:text="3" />
+
+                            <TextView
+                                android:id="@+id/criteriaDataThird12"
+                                android:text="4" />
+
+                            <TextView
+                                android:id="@+id/criteriaResultThird3"
+                                android:text="4" />
+                        </TableRow>
+
+                        <TableRow android:padding="3dp">
+
+                            <TextView android:text="@string/ab"  />
+
+                            <TextView
+                                android:id="@+id/criteriaDataThird13"
+                                android:text="1" />
+
+                            <TextView
+                                android:id="@+id/criteriaDataThird14"
+                                android:text="2" />
+
+                            <TextView
+                                android:id="@+id/criteriaDataThird15"
+                                android:text="3" />
+
+                            <TextView
+                                android:id="@+id/criteriaDataThird16"
+                                android:text="4" />
+
+                            <TextView
+                                android:id="@+id/criteriaResultThird4"
+                                android:text="4" />
+                        </TableRow>
+                    </TableLayout>
+                </LinearLayout>
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+        </com.google.android.material.card.MaterialCardView>
+
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/cvrFourth"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="12dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/cvrThird">
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/cvrFourthConstraint"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="8dp">
+
+                <LinearLayout
+                    android:id="@+id/fixedCvrFourth"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:layout_constraintEnd_toEndOf="@id/cvrFourthConstraint"
+                    app:layout_constraintStart_toStartOf="@id/cvrFourthConstraint"
+                    app:layout_constraintTop_toTopOf="@id/cvrFourthConstraint">
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/cvrFourthButton"
+                        style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Hasil"
+                        android:textAlignment="textStart"
+                        app:icon="@drawable/ic_baseline_expand_more_24" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/expandCvrFourth"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:visibility="gone"
+                    app:layout_constraintEnd_toEndOf="@id/cvrFourthConstraint"
+                    app:layout_constraintStart_toStartOf="@id/cvrFourthConstraint"
+                    app:layout_constraintTop_toBottomOf="@id/fixedCvrFourth">
+
+                    <TextView
+                        android:id="@+id/cvrFourthResult1"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/ahp_eigen"/>
+
+                    <TextView
+                        android:id="@+id/cvrFourthResult2"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/ahp_ci"/>
+
+                    <TextView
+                        android:id="@+id/cvrFourthResult3"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/ahp_cr"/>
+
+                    <TextView
+                        android:id="@+id/cvrFourthResult4"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        tools:text="Konsisten"/>
+
+                </LinearLayout>
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+        </com.google.android.material.card.MaterialCardView>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</ScrollView>

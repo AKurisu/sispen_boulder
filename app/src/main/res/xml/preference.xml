@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <Preference
+        app:key="penilaian_kriteria"
+        app:title="Penilaian Kriteria"
+        app:summary="Mengubah nilai preferensi kriteria algoritma AHP">
+
+        <intent android:action="untad.aldochristopher.sispenboulder.criteriaactivity"/>
+
+    </Preference>
+
+    <Preference
+        app:key="hasil_penilaian_kriteria"
+        app:title="Hasil Penilaian Kriteria"
+        app:summary="Hasil perhitungan algoritma AHP">
+
+        <intent android:action="untad.aldochristopher.sispenboulder.criteriaresultactivity"/>
+    </Preference>
+
+    <Preference
+        app:key="logout"
+        app:title="Log Out Aplikasi">
+        <intent android:action="untad.aldochristopher.sispenboulder.startactivity"/>
+    </Preference>
+
+</PreferenceScreen>
