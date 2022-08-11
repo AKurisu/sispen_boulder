@@ -36,7 +36,7 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
         setContentView(activityMainBinding.root)
 
         viewModel.user.observe(this){ user ->
-            fabIntent = if (user.type == "Juri"){
+            fabIntent = if (user.type == "Panitia"){
                 Intent(this@MainActivity, AddEventActivity::class.java)
             } else {
                 Intent(this@MainActivity, SignUpActivity::class.java)

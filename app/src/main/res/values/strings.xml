@@ -10,7 +10,7 @@
     <string name="txt_ab">AB</string>
     <string name="alt_default">0</string>
     <string name="btn_konfirmasi">Konfirmasi</string>
-    <string name="type_detail">Pastikan tipe akun anda sesuai, karena pilihan tipe hanya dapat dilakukan sekali.</string>
+    <string name="type_detail">Pastikan tipe akun anda sesuai, karena hanya dapat dipilih sekali.</string>
     <string name="tanggal_event">Tanggal Event</string>
     <string name="waktu_event">Waktu Event</string>
     <string name="lokasi_event">Lokasi Event</string>

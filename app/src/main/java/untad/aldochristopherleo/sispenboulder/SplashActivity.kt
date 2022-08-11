@@ -34,10 +34,12 @@ class SplashActivity : AppCompatActivity() {
         Handler().postDelayed({
             if (user!=null){
                 val dashboardIntent = Intent(this, MainActivity::class.java)
+                dashboardIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
                 startActivity(dashboardIntent)
                 finish()
             } else {
                 val signInIntent = Intent(this, StartActivity::class.java)
+                signInIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
                 startActivity(signInIntent)
                 finish()
             }

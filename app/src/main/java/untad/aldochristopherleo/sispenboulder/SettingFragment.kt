@@ -25,7 +25,7 @@ class SettingFragment : PreferenceFragmentCompat(){
         setPreferencesFromResource(R.xml.preference, rootKey)
     }
 
-    override fun onPreferenceTreeClick(preference: Preference?): Boolean {
+    override fun onPreferenceTreeClick(preference: Preference): Boolean {
         Toast.makeText(preference?.context, preference?.key.toString(), Toast.LENGTH_SHORT).show()
         if (preference?.key.toString() == "logout"){
             Firebase.auth.signOut()

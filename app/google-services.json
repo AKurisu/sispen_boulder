@@ -1,26 +1,19 @@
 {
   "project_info": {
     "project_number": "847898764363",
+    "firebase_url": "https://sispen-boulder-default-rtdb.firebaseio.com",
     "project_id": "sispen-boulder",
     "storage_bucket": "sispen-boulder.appspot.com"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:847898764363:android:da714929a95cb5138ad9ce",
+        "mobilesdk_app_id": "1:847898764363:android:0bc87f113765f76e8ad9ce",
         "android_client_info": {
           "package_name": "untad.aldochristopherleo.sispenboulder"
         }
       },
       "oauth_client": [
-        {
-          "client_id": "847898764363-fvfornjaf51te6c4e0h2igki39cgb5mt.apps.googleusercontent.com",
-          "client_type": 1,
-          "android_info": {
-            "package_name": "untad.aldochristopherleo.sispenboulder",
-            "certificate_hash": "0ca9fdf63cb49868b9d3c7f612cb9a671dcad741"
-          }
-        },
         {
           "client_id": "847898764363-anft0vu2tqca08551cib4clpor886sff.apps.googleusercontent.com",
           "client_type": 3

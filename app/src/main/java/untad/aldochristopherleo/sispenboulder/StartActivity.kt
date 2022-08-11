@@ -69,6 +69,7 @@ class StartActivity : AppCompatActivity() {
         startActivityForResult(signInIntent, RC_SIGN_IN)
     }
 
+    @Deprecated("Deprecated in Java")
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
 
@@ -131,6 +132,7 @@ class StartActivity : AppCompatActivity() {
     override fun onBackPressed() {
         if (backPressedTime + 2000 > System.currentTimeMillis()){
             backToast.cancel()
+            finish()
             super.onBackPressed()
             return
         } else {

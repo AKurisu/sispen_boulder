@@ -69,10 +69,6 @@ class HomeFragment : Fragment() {
 
     private fun setHomeDisplay(user: User) {
         binding.mainUsername.text = user.name
-        if (user.type == "Juri"){
-            binding.cardView.visibility = View.GONE
-
-        }
         binding.scrollView2.visibility = View.VISIBLE
         binding.homeProgressBar.visibility = View.GONE
     }

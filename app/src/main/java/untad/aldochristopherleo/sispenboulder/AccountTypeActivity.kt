@@ -3,6 +3,7 @@ package untad.aldochristopherleo.sispenboulder
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.view.View
 import android.widget.ArrayAdapter
 import android.widget.AutoCompleteTextView
 import android.widget.Toast
@@ -24,15 +25,23 @@ class AccountTypeActivity : AppCompatActivity() {
         bind = ActivityAccountTypeBinding.inflate(layoutInflater)
         setContentView(bind.root)
 
+        bind.textInputLayout2.visibility = View.GONE
+
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
         mAuth = FirebaseAuth.getInstance()
         val user = mAuth.currentUser
         database = Firebase.database.reference
 
-        val items = listOf("Juri", "Manajer")
+        val items = listOf("Panitia", "Presiden Juri", "Juri Lapangan", "Manajer")
         val adapter = ArrayAdapter(this, R.layout.list_type, items)
         (bind.dropdownType as? AutoCompleteTextView)?.setAdapter(adapter)
+
+        bind.dropdownType.setOnItemClickListener { adapterView, view, i, l ->
+            if (bind.dropdownType.text.toString() == "Manajer"){
+                bind.textInputLayout2.visibility = View.VISIBLE
+            } else bind.textInputLayout2.visibility = View.GONE
+        }
 
         val inputText = bind.dropdownType.text.isNullOrEmpty()
         bind.btnTypeConfirm.setOnClickListener {

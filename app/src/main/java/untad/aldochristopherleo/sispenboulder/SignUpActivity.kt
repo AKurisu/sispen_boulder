@@ -12,6 +12,7 @@ import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
 import untad.aldochristopherleo.sispenboulder.data.Alternative
+import untad.aldochristopherleo.sispenboulder.data.Participant
 import untad.aldochristopherleo.sispenboulder.databinding.ActivitySignUpBinding
 import untad.aldochristopherleo.sispenboulder.util.MainViewModel
 
@@ -19,7 +20,8 @@ class SignUpActivity : AppCompatActivity() {
 
     private lateinit var bind: ActivitySignUpBinding
     private lateinit var database: DatabaseReference
-    private var totalData = 0
+    private lateinit var group: String
+    private val viewModel: MainViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -29,15 +31,11 @@ class SignUpActivity : AppCompatActivity() {
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
         setTitle("Tambah Peserta")
 
-        database = Firebase.database.reference
-        database.child("participant").child("total").get().addOnSuccessListener {
-            totalData = it.value.toString().toInt()
-            val input = totalData + 1
-            bind.edtEntrynumber.editText?.setText(input.toString())
-            Toast.makeText(this, "Berhasil", Toast.LENGTH_SHORT).show()
-        }.addOnFailureListener {
-            bind.edtEntrynumber.editText?.setText("1")
-            Toast.makeText(this, "Gagal", Toast.LENGTH_SHORT).show()
+        viewModel.user.observe(this){
+            if (it.group != null){
+                group = it.group
+                bind.edtGroupname.editText?.setText(group)
+            }
         }
 
         bind.edtName.editText?.doOnTextChanged { text, start, before, count ->
@@ -47,22 +45,13 @@ class SignUpActivity : AppCompatActivity() {
                 bind.edtName.error = null
             }
         }
-        bind.edtTelephone.editText?.doOnTextChanged { text, start, before, count ->
-            if (bind.edtTelephone.editText?.text.isNullOrBlank()){
-                bind.edtTelephone.error = "Text"
-            } else {
-                bind.edtTelephone.error = null
-            }
-        }
 
         bind.btnConfirmationSignUp.setOnClickListener {
-            val telephone = bind.edtTelephone.editText?.text
             val name = bind.edtName.editText?.text
-            if (!telephone.isNullOrBlank() &&
-                !name.isNullOrBlank()){
+            if (!name.isNullOrBlank()){
                 MaterialAlertDialogBuilder(this)
                     .setTitle("Apakah Anda Yakin Telah Benar?")
-                    .setMessage(name.toString() + ' ' + telephone.toString())
+                    .setMessage(name.toString())
                     .setPositiveButton("Ya"){ _, _ ->
                         setUserDb()
                         Toast.makeText(this, "Berhasil", Toast.LENGTH_SHORT).show()
@@ -80,17 +69,14 @@ class SignUpActivity : AppCompatActivity() {
 
     private fun setUserDb() {
 
-        val entry = bind.edtEntrynumber.editText?.text.toString().toInt()
+        val groupName = bind.edtGroupname.editText?.text.toString()
         val name = bind.edtName.editText?.text.toString()
-        val phone = bind.edtTelephone.editText?.text.toString().trim().toInt()
-        val mUid = FirebaseAuth.getInstance().currentUser!!.uid
-        val alternative = Alternative(name, phone)
+        val participant = Participant(name, groupName)
         val key = database.child("participant").push().key
         if (key == null){
             Log.w("TAG", "Couldn't get push key for posts")
             return
         }
-        database.child("participant").child(mUid).child(key).setValue(alternative)
-        database.child("participant").child("total").setValue(entry)
+        database.child("participant").child(key).setValue(participant)
     }
 }

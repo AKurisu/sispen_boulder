@@ -11,4 +11,6 @@ data class Event(val name: String = "",
                  val location: String = "",
                  val finished: Boolean = false,
                  val totalParticipant: Int = 0,
+                 val president: String = "",
+                 val judges: ArrayList<String>? = null,
                  val participant:HashMap<String, Participant>? = null): Parcelable
