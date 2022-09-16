@@ -38,8 +38,13 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
         viewModel.user.observe(this){ user ->
             fabIntent = if (user.type == "Panitia"){
                 Intent(this@MainActivity, AddEventActivity::class.java)
-            } else {
+            } else if (user.type == "Manajer") {
                 Intent(this@MainActivity, SignUpActivity::class.java)
+            } else {
+                Intent()
+            }
+            if (user.type == "Juri Lapangan" || user.type == "Presiden Juri"){
+                activityMainBinding.fab.visibility = View.GONE
             }
         }
 

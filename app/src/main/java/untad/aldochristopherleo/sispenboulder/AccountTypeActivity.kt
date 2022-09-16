@@ -47,7 +47,10 @@ class AccountTypeActivity : AppCompatActivity() {
         bind.btnTypeConfirm.setOnClickListener {
             if (inputText){
                 val uid = user?.uid
-                val currentUser = User(user?.displayName, user?.email, bind.dropdownType.text.toString())
+                val group = if (!bind.textInputLayout2.editText?.text.isNullOrEmpty()){
+                    bind.textInputLayout2.editText?.text.toString()
+                } else null
+                val currentUser = User(user?.displayName, user?.email, bind.dropdownType.text.toString(), group)
                 val currentUserValue = currentUser.toMap()
 
                 val update = hashMapOf<String, Any>(

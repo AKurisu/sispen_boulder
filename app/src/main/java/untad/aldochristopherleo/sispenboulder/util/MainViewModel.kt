@@ -36,8 +36,10 @@ class MainViewModel: ViewModel() {
 
         ref.addValueEventListener(object: ValueEventListener{
             override fun onDataChange(snapshot: DataSnapshot) {
-                val currentUserData = snapshot.getValue<User>()
-                _user.postValue(currentUserData)
+                if (snapshot.exists()){
+                    val currentUserData = snapshot.getValue<User>()
+                    _user.postValue(currentUserData!!)
+                }
             }
 
             override fun onCancelled(error: DatabaseError) {
@@ -47,7 +49,7 @@ class MainViewModel: ViewModel() {
     }
 
     fun getAllParticipants(): DatabaseReference =
-        Firebase.database.reference.child("participant/${getUserId()?.uid}")
+        Firebase.database.reference.child("participant")
 
     fun getEvents(): DatabaseReference {
         //        val userList = mutableListOf<UserId?>()

@@ -69,6 +69,8 @@ class SignUpActivity : AppCompatActivity() {
 
     private fun setUserDb() {
 
+        database = Firebase.database.reference
+
         val groupName = bind.edtGroupname.editText?.text.toString()
         val name = bind.edtName.editText?.text.toString()
         val participant = Participant(name, groupName)

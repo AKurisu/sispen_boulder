@@ -103,8 +103,7 @@ class StartActivity : AppCompatActivity() {
                     Log.d(TAG, "signInWithCredential:success")
                     val user = mAuth.currentUser
                     database = Firebase.database.reference
-                    val new = task.result.additionalUserInfo?.isNewUser
-                    if (new == true){
+                    if (task.result.additionalUserInfo?.isNewUser == true){
                         writeNewUser(database, user)
                         val typeActivity = Intent(this, AccountTypeActivity::class.java)
                         startActivity(typeActivity)

@@ -1,17 +1,24 @@
 package untad.aldochristopherleo.sispenboulder
 
+import android.app.Activity
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import untad.aldochristopherleo.sispenboulder.databinding.ActivityAddEventBinding
 import android.text.format.DateFormat
+import android.widget.ArrayAdapter
+import android.widget.AutoCompleteTextView
 import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
 import com.google.android.material.datepicker.CalendarConstraints
 import com.google.android.material.datepicker.DateValidatorPointForward
 import com.google.android.material.datepicker.MaterialDatePicker
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.timepicker.MaterialTimePicker
 import com.google.android.material.timepicker.TimeFormat
+import com.google.firebase.database.DataSnapshot
+import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.DatabaseReference
+import com.google.firebase.database.ValueEventListener
 import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
 import untad.aldochristopherleo.sispenboulder.data.Event
@@ -31,6 +38,8 @@ class AddEventActivity : AppCompatActivity() {
     private var minute = 0
     private var displayMinute = ""
     private var date : Long = 0
+    private lateinit var alertBuilder : AlertDialog.Builder
+    private lateinit var adapter: ArrayAdapter<String>
 
     private lateinit var database: DatabaseReference
 
@@ -42,7 +51,32 @@ class AddEventActivity : AppCompatActivity() {
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
         setTitle("Tambah Event")
 
+        alertBuilder = AlertDialog.Builder(this)
+        alertBuild()
+
+        val judgesList = ArrayList<String>()
+        val adapter = ArrayAdapter(this, R.layout.list_type, judgesList)
+
         database = Firebase.database.reference
+        database.child("users").orderByChild("type").equalTo("Presiden Juri").addValueEventListener(object: ValueEventListener{
+            override fun onDataChange(snapshot: DataSnapshot) {
+                if (snapshot.exists()){
+                    for (i in snapshot.children){
+                        judgesList.add(i.child("type").value.toString())
+
+                    }
+                    (bind.edtPresidentList as? AutoCompleteTextView)?.setAdapter(adapter)
+                }
+                else {
+                    alertBuilder.show()
+                }
+            }
+
+            override fun onCancelled(error: DatabaseError) {
+                TODO("Not yet implemented")
+            }
+
+        })
 
         bind.edtTime.editText?.setOnClickListener {
             openTimePicker()
@@ -57,7 +91,8 @@ class AddEventActivity : AppCompatActivity() {
             val date = bind.edtDate.editText?.text.isNullOrEmpty()
             val time = bind.edtTime.editText?.text.isNullOrEmpty()
             val location = bind.edtLocation.editText?.text.isNullOrEmpty()
-            if (name || date || time || location){
+            val president = bind.edtPresident.editText?.text.isNullOrEmpty()
+            if (name || date || time || location || president){
                 Toast.makeText(this, "Lengkapi Data Anda", Toast.LENGTH_SHORT).show()
             } else {
                 MaterialAlertDialogBuilder(this)
@@ -75,11 +110,21 @@ class AddEventActivity : AppCompatActivity() {
         }
     }
 
+    private fun alertBuild() {
+        alertBuilder.setTitle("Juri Belum Ada")
+        alertBuilder.setMessage("Belum ada Presiden Juri yang terdaftar pada aplikasi!")
+        alertBuilder.setNegativeButton("Tutup") {_, _ ->
+            finish()
+        }
+    }
+
+
     private fun setEventDb() {
         val name = bind.edtName.editText?.text.toString().trim()
         val location = bind.edtLocation.editText?.text.toString().trim()
         val time = bind.edtTime.editText?.text.toString().trim()
         var dateStr = bind.edtDate.editText?.text.toString().trim()
+        val president = bind.edtPresident.editText?.text.toString().trim()
 
         dateStr = "$dateStr $time"
 
@@ -87,7 +132,7 @@ class AddEventActivity : AppCompatActivity() {
         Toast.makeText(this,dateStr,Toast.LENGTH_SHORT).show()
         val date = l.toInstant(ZoneId.systemDefault().rules.getOffset(l)).toEpochMilli()
 
-        val event = Event(name, date, location, false, 0)
+        val event = Event(name, date, location, false, 0, president, status = "Pendaftaran Peserta")
 
         database.child("events").child(name).setValue(event)
     }

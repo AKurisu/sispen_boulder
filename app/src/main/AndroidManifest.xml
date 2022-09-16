@@ -14,6 +14,9 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Fab_Bottom_app_bar">
         <activity
+            android:name=".AddJudgesActivity"
+            android:exported="true" />
+        <activity
             android:name=".TopsisActivity"
             android:exported="true" />
         <activity

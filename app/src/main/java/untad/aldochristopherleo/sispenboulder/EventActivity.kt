@@ -47,6 +47,8 @@ class EventActivity : AppCompatActivity() {
     private lateinit var adapter : ListParticipantAdapter
     private lateinit var event : Event
     private lateinit var topsis : Topsis
+    private lateinit var allParticipant : ArrayList<Participant>
+    private lateinit var allParticipantKey : ArrayList<String>
 
     override fun onCreate(savedInstanceState: Bundle?) {
 
@@ -63,8 +65,8 @@ class EventActivity : AppCompatActivity() {
         event = intent.getParcelableExtra<Event>(EXTRA_EVENT) as Event
         val participantList = ArrayList<Alternative>()
         val allParticipantList = ArrayList<String>()
-        val allParticipant = ArrayList<Participant>()
-        val allParticipantKey = ArrayList<String>()
+        allParticipant = ArrayList()
+        allParticipantKey = ArrayList()
         val checkedItems = ArrayList<Boolean>()
         var choosenParticipant = ArrayList<Participant>()
         var choosenKey = ArrayList<String>()
@@ -137,8 +139,9 @@ class EventActivity : AppCompatActivity() {
         })
 
         viewModel.user.observe(this) {
-            bind.btnEventEdit.text = if (it.type == "Manajer")
-                "Tambah Peserta" else "Nilai Peserta"
+            bind.btnEventEdit.text = if (it.type == "Panitia")
+                "Tambah Peserta" else if (it.type == "Juri Lapangan")
+                    "Nilai Peserta" else ""
             userType = it.type
         }
 
@@ -153,41 +156,51 @@ class EventActivity : AppCompatActivity() {
         bind.eventTotalParticipant.text = event.totalParticipant.toString()
 
         bind.btnEventEdit.setOnClickListener{
-            if (userType == "Manajer"){
-                val saveChoosenParticipant = choosenParticipant
-                val saveChoosenKey = choosenKey
-                MaterialAlertDialogBuilder(this)
-                    .setTitle("Tambah Peserta")
-                    .setNeutralButton("Cancel") { dialog, which ->
-                        choosenParticipant = saveChoosenParticipant
-                        choosenKey = saveChoosenKey
-                    }
-                    .setPositiveButton("OK") { dialog, which ->
-                        viewModel.getParticipant(event.name).removeValue()
-                        for (index in choosenParticipant.indices){
-                            database.child("events/${event.name}/participant/${choosenKey[index]}")
-                                .setValue(choosenParticipant[index])
-                        }
-                        database.child("events/${event.name}/totalParticipant")
-                            .setValue(choosenParticipant.size)
-                        adapter.notifyDataSetChanged()
-                    }
-                    .setMultiChoiceItems(stringArray, booleanArray) { dialog, which, checked ->
-                        if (checked){
-                            choosenParticipant.add(allParticipant[which])
-                            choosenKey.add(allParticipantKey[which])
-                        } else {
-                            choosenParticipant.remove(allParticipant[which])
-                            choosenKey.remove(allParticipantKey[which])
-                        }
-                    }
-                    .show()
-            } else {
+            if (userType == "Panitia"){
+                setButtonAction(choosenParticipant, choosenKey)
+            } else if (userType == "Juri Lapangan"){
                 val intent = Intent(this, GradingActivity::class.java)
                 intent.putExtra(GradingActivity.EXTRA_EVENT, event)
                 startActivity(intent)
             }
         }
+
+    }
+
+    private fun setButtonAction(
+        participant: ArrayList<Participant>,
+        key: ArrayList<String>
+    ) {
+        var choosenParticipant = participant
+        var choosenKey = key
+            val saveChoosenParticipant = choosenParticipant
+            val saveChoosenKey = choosenKey
+            MaterialAlertDialogBuilder(this)
+                .setTitle("Tambah Peserta")
+                .setNeutralButton("Cancel") { dialog, which ->
+                    choosenParticipant = saveChoosenParticipant
+                    choosenKey = saveChoosenKey
+                }
+                .setPositiveButton("OK") { dialog, which ->
+                    viewModel.getParticipant(event.name).removeValue()
+                    for (index in choosenParticipant.indices){
+                        database.child("events/${event.name}/participant/${choosenKey[index]}")
+                            .setValue(choosenParticipant[index])
+                    }
+                    database.child("events/${event.name}/totalParticipant")
+                        .setValue(choosenParticipant.size)
+                    adapter.notifyDataSetChanged()
+                }
+                .setMultiChoiceItems(stringArray, booleanArray) { dialog, which, checked ->
+                    if (checked){
+                        choosenParticipant.add(allParticipant[which])
+                        choosenKey.add(allParticipantKey[which])
+                    } else {
+                        choosenParticipant.remove(allParticipant[which])
+                        choosenKey.remove(allParticipantKey[which])
+                    }
+                }
+                .show()
     }
 
     private fun setPosition(size: Long) {
