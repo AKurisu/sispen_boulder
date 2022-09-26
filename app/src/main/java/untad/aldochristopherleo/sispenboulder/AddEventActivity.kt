@@ -9,6 +9,7 @@ import android.widget.ArrayAdapter
 import android.widget.AutoCompleteTextView
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
+import com.google.android.gms.tasks.OnSuccessListener
 import com.google.android.material.datepicker.CalendarConstraints
 import com.google.android.material.datepicker.DateValidatorPointForward
 import com.google.android.material.datepicker.MaterialDatePicker
@@ -58,12 +59,12 @@ class AddEventActivity : AppCompatActivity() {
         val adapter = ArrayAdapter(this, R.layout.list_type, judgesList)
 
         database = Firebase.database.reference
-        database.child("users").orderByChild("type").equalTo("Presiden Juri").addValueEventListener(object: ValueEventListener{
+        database.child("users").orderByChild("type").equalTo("Presiden Juri").
+        addValueEventListener(object: ValueEventListener{
             override fun onDataChange(snapshot: DataSnapshot) {
                 if (snapshot.exists()){
                     for (i in snapshot.children){
-                        judgesList.add(i.child("type").value.toString())
-
+                        judgesList.add(i.child("name").value.toString())
                     }
                     (bind.edtPresidentList as? AutoCompleteTextView)?.setAdapter(adapter)
                 }
@@ -93,17 +94,16 @@ class AddEventActivity : AppCompatActivity() {
             val location = bind.edtLocation.editText?.text.isNullOrEmpty()
             val president = bind.edtPresident.editText?.text.isNullOrEmpty()
             if (name || date || time || location || president){
-                Toast.makeText(this, "Lengkapi Data Anda", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, "Mohon Lengkapi Data Anda", Toast.LENGTH_SHORT).show()
             } else {
                 MaterialAlertDialogBuilder(this)
                     .setTitle("Apakah Anda Yakin Telah Benar?")
                     .setPositiveButton("Ya"){ _, _ ->
                         setEventDb()
-                        Toast.makeText(this, "Berhasil", Toast.LENGTH_SHORT).show()
-                        finish()
+
                     }
                     .setNegativeButton("Tidak"){ _, _ ->
-                        Toast.makeText(this, "Berhasil", Toast.LENGTH_SHORT).show()
+//                        Toast.makeText(this, "Berhasil", Toast.LENGTH_SHORT).show()
                     }
                     .show()
             }
@@ -118,7 +118,6 @@ class AddEventActivity : AppCompatActivity() {
         }
     }
 
-
     private fun setEventDb() {
         val name = bind.edtName.editText?.text.toString().trim()
         val location = bind.edtLocation.editText?.text.toString().trim()
@@ -132,9 +131,14 @@ class AddEventActivity : AppCompatActivity() {
         Toast.makeText(this,dateStr,Toast.LENGTH_SHORT).show()
         val date = l.toInstant(ZoneId.systemDefault().rules.getOffset(l)).toEpochMilli()
 
-        val event = Event(name, date, location, false, 0, president, status = "Pendaftaran Peserta")
+        val event = Event(name, date, location, false, 0, president, status = "Persiapan")
 
-        database.child("events").child(name).setValue(event)
+        database.child("events").child(name).setValue(event).addOnSuccessListener {
+            Toast.makeText(this, "Lomba Berhasil Ditambahkan", Toast.LENGTH_SHORT).show()
+            finish()
+        }.addOnFailureListener {
+            Toast.makeText(this, "Lomba Gagal Ditambahkan", Toast.LENGTH_SHORT).show()
+        }
     }
 
     private fun openEditPicker() {

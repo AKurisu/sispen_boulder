@@ -1,5 +1,6 @@
 package untad.aldochristopherleo.sispenboulder
 
+import android.os.Build
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
@@ -43,36 +44,43 @@ class GradingActivity : AppCompatActivity() {
         _bind = ActivityGradingBinding.inflate(layoutInflater)
         setContentView(bind.root)
 
-        val event = intent.getParcelableExtra<Event>(EXTRA_EVENT) as Event
+        val event = if (Build.VERSION.SDK_INT >= 33){
+            intent.getParcelableExtra("EXTRA_EVENT", Event::class.java)
+        } else {
+            intent.getParcelableExtra<Event>("EXTRA_EVENT") as Event
+        }
+//        val event = intent.getParcelableExtra<Event>("EXTRA_EVENT") as Event
         database = Firebase.database.reference
 
         bind.layoutHide.visibility = View.GONE
         bind.btnConfirmGrading.visibility = View.GONE
 
-        viewModel.getParticipant(event.name).addValueEventListener(object : ValueEventListener {
-            override fun onDataChange(snapshot: DataSnapshot) {
-                val arrayList = ArrayList<String>()
-                for (item in snapshot.children){
-                    arrayList.add(item.child("name").value.toString())
-                }
-                val checkList = ArrayList<String>()
-                database.child("result/${event.name}").get().addOnSuccessListener {
-                    for (index in arrayList.indices){
-                        if (!it.hasChild(arrayList[index])){
-                            checkList.add(arrayList[index])
-                        }
+        if (event != null) {
+            viewModel.getParticipant(event .name).addValueEventListener(object : ValueEventListener {
+                override fun onDataChange(snapshot: DataSnapshot) {
+                    val arrayList = ArrayList<String>()
+                    for (item in snapshot.children){
+                        arrayList.add(item.child("name").value.toString())
                     }
-                    if (checkList.size == 0){
-                        closeDialog()
-                    } else populateSpinner(checkList)
+                    val checkList = ArrayList<String>()
+                    database.child("result/${event.name}").get().addOnSuccessListener {
+                        for (index in arrayList.indices){
+                            if (!it.hasChild(arrayList[index])){
+                                checkList.add(arrayList[index])
+                            }
+                        }
+                        if (checkList.size == 0){
+                            closeDialog()
+                        } else populateSpinner(checkList)
 
+                    }
                 }
-            }
 
-            override fun onCancelled(error: DatabaseError) {
-                Log.w("TAG", "loadPost:onCancelled", error.toException())
-            }
-        })
+                override fun onCancelled(error: DatabaseError) {
+                    Log.w("TAG", "loadPost:onCancelled", error.toException())
+                }
+            })
+        }
 
         bind.btnTopMinus.setOnClickListener { setTopValue(it) }
         bind.btnTopPlus.setOnClickListener { setTopValue(it) }
@@ -90,7 +98,9 @@ class GradingActivity : AppCompatActivity() {
                 .setNegativeButton("Tidak"){ dialog, which ->
                 }
                 .setPositiveButton("Yakin"){ dialog, which ->
-                    setResult(event, participant)
+                    if (event != null) {
+                        setResult(event, participant)
+                    }
                 }
                 .show()
         }

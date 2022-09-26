@@ -51,37 +51,11 @@ class MainViewModel: ViewModel() {
     fun getAllParticipants(): DatabaseReference =
         Firebase.database.reference.child("participant")
 
-    fun getEvents(): DatabaseReference {
-        //        val userList = mutableListOf<UserId?>()
-////        val event = mutableListOf<Event>()
-////
-//        database.addValueEventListener(object : ValueEventListener {
-//            override fun onDataChange(dataSnapshot: DataSnapshot) {
-//                // Get Post object and use the values to update the UI
-//
-//                for (item in dataSnapshot.children){
-//                    val name = item.key.toString()
-//                    val date = item.child(name).child("date").value.toString()
-//                    val location = item.child(name).child("location").value.toString()
-//                    val time = item.child(name).child("time").value.toString()
-////                    userList.add(item.child("participant").getValue(UserId::class.java))
-////                    val oneEvent = Event(name, date, time, location, null)
-//
-//                }
-//                // ...
-//            }
-//
-//            override fun onCancelled(databaseError: DatabaseError) {
-//                // Getting Post failed, log a message
-//                Log.w(TAG, "loadPost:onCancelled", databaseError.toException())
-//            }
-//        })
-        return Firebase.database.reference.child("events")
-    }
+    fun getEvents(): DatabaseReference =
+        Firebase.database.reference.child("events")
 
-    fun getParticipant(eventName : String): DatabaseReference{
-        return Firebase.database.reference.child("events/$eventName/participant")
-    }
+    fun getParticipant(eventName : String): DatabaseReference =
+        Firebase.database.reference.child("events/$eventName/participant")
 
     fun getResult(eventName: String): DatabaseReference =
         Firebase.database.reference.child("result/$eventName")

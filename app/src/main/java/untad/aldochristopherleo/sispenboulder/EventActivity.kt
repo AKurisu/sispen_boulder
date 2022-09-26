@@ -162,9 +162,29 @@ class EventActivity : AppCompatActivity() {
                 val intent = Intent(this, GradingActivity::class.java)
                 intent.putExtra(GradingActivity.EXTRA_EVENT, event)
                 startActivity(intent)
+            } else if (userType == "Presiden Juri"){
+                val intent = Intent(this, AddJudgesActivity::class.java)
+                intent.putExtra("EXTRA_EVENT", event)
             }
         }
 
+    }
+
+    private fun checkEventStatus(): String{
+        var status = "NULL"
+        database.child("events/${event.name}/status").addListenerForSingleValueEvent(
+            object : ValueEventListener{
+                override fun onDataChange(snapshot: DataSnapshot) {
+                    status = snapshot.value.toString()
+                }
+
+                override fun onCancelled(error: DatabaseError) {
+                    Log.e("STATUS", error.toString())
+                }
+
+            }
+        )
+        return status
     }
 
     private fun setButtonAction(
