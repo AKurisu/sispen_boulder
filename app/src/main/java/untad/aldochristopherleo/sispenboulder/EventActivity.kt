@@ -10,6 +10,8 @@ import android.view.View
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
@@ -28,6 +30,10 @@ import kotlin.collections.ArrayList
 import kotlin.collections.LinkedHashMap
 
 class EventActivity : AppCompatActivity() {
+
+    init {
+
+    }
 
     companion object {
         const val EXTRA_EVENT = "extra_event"
@@ -49,6 +55,14 @@ class EventActivity : AppCompatActivity() {
     private lateinit var topsis : Topsis
     private lateinit var allParticipant : ArrayList<Participant>
     private lateinit var allParticipantKey : ArrayList<String>
+    private lateinit var swipeRefreshLayout: SwipeRefreshLayout
+    private lateinit var rv: RecyclerView
+    private lateinit var refreshListener: SwipeRefreshLayout.OnRefreshListener
+    private val participantList = ArrayList<Alternative>()
+    private val allParticipantList = ArrayList<String>()
+    private val checkedItems = ArrayList<Boolean>()
+    private val choosenParticipant = ArrayList<Participant>()
+    private val choosenKey = ArrayList<String>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
 
@@ -61,15 +75,11 @@ class EventActivity : AppCompatActivity() {
 
         bind.layoutHide.visibility = View.GONE
         bind.progressBar.visibility = View.VISIBLE
+        swipeRefreshLayout = bind.eventRefresh
 
         event = intent.getParcelableExtra<Event>(EXTRA_EVENT) as Event
-        val participantList = ArrayList<Alternative>()
-        val allParticipantList = ArrayList<String>()
         allParticipant = ArrayList()
         allParticipantKey = ArrayList()
-        val checkedItems = ArrayList<Boolean>()
-        var choosenParticipant = ArrayList<Participant>()
-        var choosenKey = ArrayList<String>()
 
         result = LinkedHashMap()
         sortedResult = ArrayList()
@@ -78,35 +88,15 @@ class EventActivity : AppCompatActivity() {
 
         database = Firebase.database.reference
 
-        val rv = bind.participantRv
+        rv = bind.participantRv
         adapter = ListParticipantAdapter(sortedResult)
-        viewModel.getParticipant(event.name).addValueEventListener(object : ValueEventListener {
-            override fun onDataChange(snapshot: DataSnapshot) {
-                participantList.clear()
-                for (item in snapshot.children) {
-                    val user = item.getValue(Participant::class.java)
-                    participantList.add(Alternative(user?.name))
+        checkEventParticipant()
 
-                    viewModel.getResult(event.name).get().addOnSuccessListener {
-                        var data = Result()
-                        if(it.hasChild(user?.name!!)){
-                            result.put(user.name,
-                                it.child(user.name).getValue(Result::class.java)!!
-                            )
-                            data = it.child(user.name).getValue(Result::class.java)!!
-                        } else result.put(user.name, Result())
-
-                        resultArray.addAll(data.toArrayList())
-
-                        setPosition(snapshot.childrenCount)
-                    }
-                }
-            }
-
-            override fun onCancelled(error: DatabaseError) {
-                Log.w("TAG", "loadPost:onCancelled", error.toException())
-            }
-        })
+        refreshListener = SwipeRefreshLayout.OnRefreshListener {
+            swipeRefreshLayout.isRefreshing = true
+            checkEventParticipant()
+            swipeRefreshLayout.isRefreshing = false
+        }
 
         rv.layoutManager = LinearLayoutManager(this)
         rv.adapter = adapter
@@ -114,14 +104,16 @@ class EventActivity : AppCompatActivity() {
         viewModel.getAllParticipants().addValueEventListener(object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
                 for (item in snapshot.children) {
+                    val group = item.getValue(Participant::class.java)
                     val nama = item.child("name").value.toString()
                     var compareList = false
+                    Log.d("ADDPART", group?.name.toString())
                     allParticipantKey.add(item.key.toString())
-                    allParticipant.add(Participant(nama))
-                    allParticipantList.add(nama)
+                    allParticipant.add(group!!)
+                    allParticipantList.add(nama+" ("+ group.group +")")
                     for (itemlist in participantList){
                         if (itemlist.name == nama){
-                            choosenParticipant.add(Participant(nama))
+                            choosenParticipant.add(group)
                             choosenKey.add(item.key.toString())
                             Log.d("Event", itemlist.name)
                             compareList = true
@@ -139,9 +131,10 @@ class EventActivity : AppCompatActivity() {
         })
 
         viewModel.user.observe(this) {
+            if (it.type == "Manajer") bind.btnEventEdit.visibility = View.GONE
             bind.btnEventEdit.text = if (it.type == "Panitia")
                 "Tambah Peserta" else if (it.type == "Juri Lapangan")
-                    "Nilai Peserta" else ""
+                    "Nilai Peserta" else "Pilih Juri Lapangan"
             userType = it.type
         }
 
@@ -168,6 +161,47 @@ class EventActivity : AppCompatActivity() {
             }
         }
 
+        swipeRefreshLayout.setOnRefreshListener(refreshListener)
+
+    }
+
+    private fun checkEventParticipant() {
+        Log.d("CheckFirst", sortedResult.size.toString())
+
+        viewModel.getParticipant(event.name).addListenerForSingleValueEvent(
+            object : ValueEventListener {
+                override fun onDataChange(snapshot: DataSnapshot) {
+                    sortedResult.clear()
+                    sortedResultSend.clear()
+                    participantList.clear()
+                    result.clear()
+                    for (item in snapshot.children) {
+                        val participant = item.getValue(Participant::class.java)
+                        participantList.add(Alternative(participant?.name))
+
+                        viewModel.getResult(event.name).get().addOnSuccessListener {
+                            var data = Result()
+                            if(it.hasChild(participant?.name!!)){
+                                result.put(participant.name,
+                                    it.child(participant.name).getValue(Result::class.java)!!
+                                )
+                                data = it.child(participant.name).getValue(Result::class.java)!!
+                            } else result.put(participant.name, Result())
+
+                            resultArray.addAll(data.toArrayList())
+                            Log.d("OnDataChange",(snapshot.childrenCount * 4).toString() +" "+ resultArray.size.toLong().toString())
+
+                            if ((snapshot.childrenCount * 4) == resultArray.size.toLong()){
+                                setPosition(snapshot.childrenCount)
+                            }
+                        }
+                    }
+                }
+
+                override fun onCancelled(error: DatabaseError) {
+                    Log.w("TAG", "loadPost:onCancelled", error.toException())
+                }
+            })
     }
 
     private fun checkEventStatus(): String{
@@ -203,13 +237,17 @@ class EventActivity : AppCompatActivity() {
                 }
                 .setPositiveButton("OK") { dialog, which ->
                     viewModel.getParticipant(event.name).removeValue()
-                    for (index in choosenParticipant.indices){
-                        database.child("events/${event.name}/participant/${choosenKey[index]}")
-                            .setValue(choosenParticipant[index])
+                    if (choosenParticipant.isNotEmpty()){
+                        for (index in choosenParticipant.indices){
+                            database.child("events/${event.name}/participant/${choosenKey[index]}")
+                                .setValue(choosenParticipant[index])
+                        }
                     }
                     database.child("events/${event.name}/totalParticipant")
                         .setValue(choosenParticipant.size)
-                    adapter.notifyDataSetChanged()
+
+
+                    swipeRefreshLayout.setOnRefreshListener(refreshListener)
                 }
                 .setMultiChoiceItems(stringArray, booleanArray) { dialog, which, checked ->
                     if (checked){
@@ -233,15 +271,23 @@ class EventActivity : AppCompatActivity() {
                 var index = 0
 
                 for (item in result.keys){
+                    Log.d("CHECK", result.size.toString())
                     sortedResult.add(SortedResult(item, resultTopsis[index], result[item]))
-                    sortedResultSend.add(SortedResult(item, resultTopsis[index], result[item]))
                     index++
                 }
 
                 sortedResult.sortByDescending { it.preferenceValue }
+                sortedResultSend= sortedResult
+                resultArray.clear()
 
-                adapter.notifyDataSetChanged()
+
+//                adapter.clearData()
+                Log.d("ADAPTEREvent", sortedResult.size.toString())
+                adapter.addAll(sortedResult)
+
+                swipeRefreshLayout.isRefreshing = false
             }
+
         }
     }
 

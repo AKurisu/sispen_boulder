@@ -1,10 +1,12 @@
 package untad.aldochristopherleo.sispenboulder.adapter
 
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TableLayout
 import android.widget.TextView
+import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.firebase.ui.database.FirebaseRecyclerAdapter
 import com.firebase.ui.database.FirebaseRecyclerOptions
@@ -14,8 +16,9 @@ import untad.aldochristopherleo.sispenboulder.data.Event
 import untad.aldochristopherleo.sispenboulder.data.Result
 import untad.aldochristopherleo.sispenboulder.data.SortedResult
 import untad.aldochristopherleo.sispenboulder.databinding.ItemParticipantListBinding
+import untad.aldochristopherleo.sispenboulder.util.ResultDiffCallback
 
-class ListParticipantAdapter(private val list: ArrayList<SortedResult>): RecyclerView.Adapter<ListParticipantAdapter.ListViewHolder>() {
+class ListParticipantAdapter(private var list: ArrayList<SortedResult>): RecyclerView.Adapter<ListParticipantAdapter.ListViewHolder>() {
     class ListViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         var name : TextView = itemView.findViewById(R.id.txt_nama)
         var top : TextView = itemView.findViewById(R.id.txt_topResult)
@@ -52,4 +55,25 @@ class ListParticipantAdapter(private val list: ArrayList<SortedResult>): Recycle
     }
 
     override fun getItemCount(): Int = list.size
+
+//    fun refreshData(newList: ArrayList<SortedResult>){
+//        val diffCallback = ResultDiffCallback(list, newList)
+//        val diffResult = DiffUtil.calculateDiff(diffCallback)
+//
+//        list.clear()
+//        list.addAll(newList)
+//
+//        diffResult.dispatchUpdatesTo(this)
+//    }
+
+    fun clearData() {
+        list.clear()
+        notifyDataSetChanged()
+    }
+
+    fun addAll(newList: ArrayList<SortedResult>){
+        list = newList
+        Log.d("ADAPTER", newList.size.toString())
+        notifyDataSetChanged()
+    }
 }
