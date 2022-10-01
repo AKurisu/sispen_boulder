@@ -125,9 +125,10 @@ class AddJudgesActivity : AppCompatActivity() {
                     break@loop
                 }
             }
+            saveData(wallsAdded)
         }
 
-        saveData(wallsAdded)
+
     }
 
     private fun saveData(wallsAdded: Int) {
@@ -138,7 +139,7 @@ class AddJudgesActivity : AppCompatActivity() {
         }
 
         if (eventData != null){
-            database.child("events/${eventData!!.name}").setValue(juri)
+            database.child("events/${eventData!!.name}/jury").setValue(juri)
             Toast.makeText(this, "Data Berhasil Ditambahkan", Toast.LENGTH_SHORT).show()
             finish()
         } else Toast.makeText(this, "Terjadi Masalah Koneksi", Toast.LENGTH_SHORT).show()

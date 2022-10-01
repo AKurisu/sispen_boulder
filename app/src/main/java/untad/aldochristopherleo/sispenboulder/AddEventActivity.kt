@@ -49,7 +49,7 @@ class AddEventActivity : AppCompatActivity() {
         _bind = ActivityAddEventBinding.inflate(layoutInflater)
         setContentView(bind.root)
 
-        supportActionBar?.setDisplayHomeAsUpEnabled(true)
+        supportActionBar?.setDisplayHomeAsUpEnabled(false)
         setTitle("Tambah Event")
 
         alertBuilder = AlertDialog.Builder(this)
@@ -74,7 +74,6 @@ class AddEventActivity : AppCompatActivity() {
             }
 
             override fun onCancelled(error: DatabaseError) {
-                TODO("Not yet implemented")
             }
 
         })
@@ -131,7 +130,7 @@ class AddEventActivity : AppCompatActivity() {
         Toast.makeText(this,dateStr,Toast.LENGTH_SHORT).show()
         val date = l.toInstant(ZoneId.systemDefault().rules.getOffset(l)).toEpochMilli()
 
-        val event = Event(name, date, location, false, 0, president, status = "Persiapan")
+        val event = Event(name, date, location, false, 0, president, status = "PERSIAPAN")
 
         database.child("events").child(name).setValue(event).addOnSuccessListener {
             Toast.makeText(this, "Lomba Berhasil Ditambahkan", Toast.LENGTH_SHORT).show()
@@ -199,5 +198,24 @@ class AddEventActivity : AppCompatActivity() {
         } catch (e: Exception) {
             return e.toString()
         }
+    }
+
+    @Deprecated("Deprecated in Java")
+    override fun onBackPressed() {
+        if (bind.edtName.editText!!.text.isNotEmpty()
+            || bind.edtDate.editText!!.text.isNotEmpty()
+            || bind.edtTime.editText!!.text.isNotEmpty()
+            || bind.edtLocation.editText!!.text.isNotEmpty()
+            || bind.edtPresident.editText!!.text.isNotEmpty()) {
+            MaterialAlertDialogBuilder(this,
+            com.google.android.material.R.style.MaterialAlertDialog_Material3)
+                .setMessage("Apakah Anda Yakin Ingin Kembali?")
+                .setNegativeButton("Ya") {_,_ ->
+                    super.onBackPressed()
+//                    finish()
+                }
+                .setPositiveButton("Tidak"){_,_ ->}
+                .show()
+        } else super.onBackPressed()
     }
 }

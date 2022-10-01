@@ -28,4 +28,5 @@
     <string name="ahp_cr">Consistency Ratio = %s</string>
     <string name="txt_ahp">AHP</string>
     <string name="txt_topsis">TOPSIS</string>
+    <string name="txt_jumlah_peserta">Jumlah Peserta : %s</string>
 </resources>

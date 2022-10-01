@@ -40,10 +40,12 @@ class EventActivity : AppCompatActivity() {
     }
 
     var userType : String? = null
+    var userName : String? = null
     private var _bind : ActivityEventBinding? = null
     private val bind get() = _bind!!
     private val viewModel: MainViewModel by viewModels()
     private lateinit var result : LinkedHashMap<String, Result>
+    private lateinit var statusEvent : String
     private lateinit var booleanArray: BooleanArray
     private lateinit var stringArray: Array<String>
     private lateinit var resultArray: ArrayList<Double>
@@ -85,6 +87,10 @@ class EventActivity : AppCompatActivity() {
         sortedResult = ArrayList()
         sortedResultSend = ArrayList()
         resultArray = ArrayList()
+
+        statusEvent = if (event.status != null) event.status!! else "KOSONG"
+
+
 
         database = Firebase.database.reference
 
@@ -136,7 +142,11 @@ class EventActivity : AppCompatActivity() {
                 "Tambah Peserta" else if (it.type == "Juri Lapangan")
                     "Nilai Peserta" else "Pilih Juri Lapangan"
             userType = it.type
+            userName = it.name
+            checkEventStatus()
         }
+
+
 
         if (event.finished){
             bind.btnEventEdit.visibility = View.GONE
@@ -146,7 +156,7 @@ class EventActivity : AppCompatActivity() {
         val date = DateConverter(event.date)
         bind.eventDate.text = date.getDetailDateTime()
         bind.eventLocation.text = event.location
-        bind.eventTotalParticipant.text = event.totalParticipant.toString()
+        bind.eventTotalParticipant.text = getString(R.string.txt_jumlah_peserta, event.totalParticipant.toString())
 
         bind.btnEventEdit.setOnClickListener{
             if (userType == "Panitia"){
@@ -158,6 +168,7 @@ class EventActivity : AppCompatActivity() {
             } else if (userType == "Presiden Juri"){
                 val intent = Intent(this, AddJudgesActivity::class.java)
                 intent.putExtra("EXTRA_EVENT", event)
+                startActivity(intent)
             }
         }
 
@@ -182,11 +193,11 @@ class EventActivity : AppCompatActivity() {
                         viewModel.getResult(event.name).get().addOnSuccessListener {
                             var data = Result()
                             if(it.hasChild(participant?.name!!)){
-                                result.put(participant.name,
+                                result.put(participant.name + " ("+ participant.group + ")",
                                     it.child(participant.name).getValue(Result::class.java)!!
                                 )
                                 data = it.child(participant.name).getValue(Result::class.java)!!
-                            } else result.put(participant.name, Result())
+                            } else result.put(participant.name + " ("+ participant.group + ")", Result())
 
                             resultArray.addAll(data.toArrayList())
                             Log.d("OnDataChange",(snapshot.childrenCount * 4).toString() +" "+ resultArray.size.toLong().toString())
@@ -204,21 +215,25 @@ class EventActivity : AppCompatActivity() {
             })
     }
 
-    private fun checkEventStatus(): String{
-        var status = "NULL"
-        database.child("events/${event.name}/status").addListenerForSingleValueEvent(
-            object : ValueEventListener{
-                override fun onDataChange(snapshot: DataSnapshot) {
-                    status = snapshot.value.toString()
+    private fun checkEventStatus(){
+        if (statusEvent == "KOSONG") {
+            MaterialAlertDialogBuilder(this)
+                .setTitle("Event Bermasalah")
+                .setMessage("Mohon Hubungi Panitia Event")
+                .setPositiveButton("OK"){_,_ ->
+                    finish()
                 }
-
-                override fun onCancelled(error: DatabaseError) {
-                    Log.e("STATUS", error.toString())
+        } else if (statusEvent == "PERSIAPAN") {
+            if (userType == "Juri Lapangan") bind.btnEventEdit.visibility = View.GONE
+        } else {
+            event.judges?.forEach { (_, value) ->
+                if (value.name == userName && userType == "Juri Lapangan"){
+                    bind.btnEventEdit.visibility = View.VISIBLE
+                    finish()
                 }
-
+                bind.btnEventEdit.visibility = View.GONE
             }
-        )
-        return status
+        }
     }
 
     private fun setButtonAction(
@@ -238,16 +253,22 @@ class EventActivity : AppCompatActivity() {
                 .setPositiveButton("OK") { dialog, which ->
                     viewModel.getParticipant(event.name).removeValue()
                     if (choosenParticipant.isNotEmpty()){
+                        val listChoosenParticipant = HashMap<String, Participant>()
                         for (index in choosenParticipant.indices){
-                            database.child("events/${event.name}/participant/${choosenKey[index]}")
-                                .setValue(choosenParticipant[index])
+                            listChoosenParticipant.put(choosenKey[index],choosenParticipant[index])
+
+//                            database.child("events/${event.name}/participant/${choosenKey[index]}")
+//                                .setValue(choosenParticipant[index])
+                            //Simpan Data Participant
                         }
+                        database.child("events/${event.name}/participant}")
+                            .setValue(listChoosenParticipant)
                     }
                     database.child("events/${event.name}/totalParticipant")
                         .setValue(choosenParticipant.size)
 
-
-                    swipeRefreshLayout.setOnRefreshListener(refreshListener)
+                    checkEventParticipant()
+//                    swipeRefreshLayout.setOnRefreshListener(refreshListener)
                 }
                 .setMultiChoiceItems(stringArray, booleanArray) { dialog, which, checked ->
                     if (checked){
@@ -279,7 +300,6 @@ class EventActivity : AppCompatActivity() {
                 sortedResult.sortByDescending { it.preferenceValue }
                 sortedResultSend= sortedResult
                 resultArray.clear()
-
 
 //                adapter.clearData()
                 Log.d("ADAPTEREvent", sortedResult.size.toString())

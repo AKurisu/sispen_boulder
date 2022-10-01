@@ -24,6 +24,10 @@ class ProfileFragment : Fragment() {
         viewModel.user.observe(viewLifecycleOwner) { user ->
             binding.profileName.text = user.name
             binding.profileType.text = user.type
+
+            if (user.type == "Manajer") {
+
+            }
         }
 
         return binding.root
