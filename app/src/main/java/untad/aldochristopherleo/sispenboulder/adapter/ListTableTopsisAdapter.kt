@@ -8,7 +8,6 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import untad.aldochristopherleo.sispenboulder.R
 import untad.aldochristopherleo.sispenboulder.data.SortedResult
-import untad.aldochristopherleo.sispenboulder.util.Topsis
 import java.math.BigDecimal
 import java.math.RoundingMode
 
