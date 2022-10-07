@@ -1,15 +1,12 @@
 package untad.aldochristopherleo.sispenboulder
 
-import android.app.Activity
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import untad.aldochristopherleo.sispenboulder.databinding.ActivityAddEventBinding
 import android.text.format.DateFormat
 import android.widget.ArrayAdapter
 import android.widget.AutoCompleteTextView
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
-import com.google.android.gms.tasks.OnSuccessListener
+import androidx.appcompat.app.AppCompatActivity
 import com.google.android.material.datepicker.CalendarConstraints
 import com.google.android.material.datepicker.DateValidatorPointForward
 import com.google.android.material.datepicker.MaterialDatePicker
@@ -23,8 +20,8 @@ import com.google.firebase.database.ValueEventListener
 import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
 import untad.aldochristopherleo.sispenboulder.data.Event
+import untad.aldochristopherleo.sispenboulder.databinding.ActivityAddEventBinding
 import java.text.SimpleDateFormat
-import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
@@ -50,7 +47,7 @@ class AddEventActivity : AppCompatActivity() {
         setContentView(bind.root)
 
         supportActionBar?.setDisplayHomeAsUpEnabled(false)
-        setTitle("Tambah Event")
+        title = "Tambah Event"
 
         alertBuilder = AlertDialog.Builder(this)
         alertBuild()

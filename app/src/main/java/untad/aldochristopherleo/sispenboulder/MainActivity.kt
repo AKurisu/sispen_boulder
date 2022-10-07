@@ -1,20 +1,15 @@
 package untad.aldochristopherleo.sispenboulder
 
 import android.content.Intent
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.util.Log
 import android.view.View
 import android.widget.Toast
 import androidx.activity.viewModels
-import androidx.fragment.app.viewModels
-import androidx.lifecycle.ViewModelProvider
+import androidx.appcompat.app.AppCompatActivity
 import androidx.navigation.findNavController
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
-import com.google.android.material.dialog.MaterialAlertDialogBuilder
-import untad.aldochristopherleo.sispenboulder.adapter.ListEventsAdapter
 import untad.aldochristopherleo.sispenboulder.databinding.ActivityMainBinding
 import untad.aldochristopherleo.sispenboulder.util.ConnectionLiveData
 import untad.aldochristopherleo.sispenboulder.util.MainViewModel
@@ -49,13 +44,13 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
         }
 
         connectionLiveData = ConnectionLiveData(this)
-        connectionLiveData.observe(this){ status ->
-            if (status == false){
-//                Toast.makeText(this, "hola",Toast.LENGTH_SHORT).show()
-            } else {
-//                Toast.makeText(this, "hello",Toast.LENGTH_SHORT).show()
-            }
-        }
+//        connectionLiveData.observe(this){ status ->
+//            if (status == false){
+////                Toast.makeText(this, "hola",Toast.LENGTH_SHORT).show()
+//            } else {
+////                Toast.makeText(this, "hello",Toast.LENGTH_SHORT).show()
+//            }
+//        }
 
         activityMainBinding.bottomNavView.background = null
         activityMainBinding.bottomNavView.menu.getItem(2).isEnabled = false

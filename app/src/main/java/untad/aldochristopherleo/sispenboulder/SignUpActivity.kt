@@ -1,17 +1,15 @@
 package untad.aldochristopherleo.sispenboulder
 
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import android.widget.Toast
 import androidx.activity.viewModels
+import androidx.appcompat.app.AppCompatActivity
 import androidx.core.widget.doOnTextChanged
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
-import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
-import untad.aldochristopherleo.sispenboulder.data.Alternative
 import untad.aldochristopherleo.sispenboulder.data.Participant
 import untad.aldochristopherleo.sispenboulder.databinding.ActivitySignUpBinding
 import untad.aldochristopherleo.sispenboulder.util.MainViewModel
@@ -29,7 +27,7 @@ class SignUpActivity : AppCompatActivity() {
         setContentView(bind.root)
 
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
-        setTitle("Tambah Peserta")
+        title = "Tambah Peserta"
 
         viewModel.user.observe(this){
             if (it.group != null){

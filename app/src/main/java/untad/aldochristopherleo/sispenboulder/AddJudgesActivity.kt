@@ -19,12 +19,10 @@ import untad.aldochristopherleo.sispenboulder.data.User
 import untad.aldochristopherleo.sispenboulder.databinding.ActivityAddJudgesBinding
 import java.util.*
 import kotlin.collections.ArrayList
+import kotlin.collections.HashMap
 
 class AddJudgesActivity : AppCompatActivity() {
 
-    companion object {
-        const val EXTRA_EVENT = "extra_event"
-    }
 
     private var _bind : ActivityAddJudgesBinding? = null
     private val bind get() = _bind!!
@@ -45,6 +43,8 @@ class AddJudgesActivity : AppCompatActivity() {
             intent.getParcelableExtra<Event>("EXTRA_EVENT") as Event
         }
 
+        setEventList()
+
         wallsList = ArrayList()
         judges = ArrayList()
 
@@ -56,7 +56,7 @@ class AddJudgesActivity : AppCompatActivity() {
                 override fun onDataChange(snapshot: DataSnapshot) {
                     if (snapshot.exists()) {
                         for (value in snapshot.children) {
-                            val key = snapshot.key
+//                            val key = snapshot.key
                             val user = value.getValue(User::class.java)
                             judges.add(user?.name.toString())
                             Log.d("AddJudge", user.toString())
@@ -93,6 +93,15 @@ class AddJudgesActivity : AppCompatActivity() {
         }
     }
 
+    private fun setEventList() {
+        Log.d("ADDJUDGE", eventData?.judges.isNullOrEmpty().toString())
+        if (!eventData?.judges.isNullOrEmpty()){
+            eventData?.judges?.forEach{ (key, value) ->
+                Log.d("ADDJUDGE", key + " + " + value.name)
+            }
+        }
+    }
+
     private fun alertBuild(title: String, message: String) {
         alertBuilder.setTitle(title)
         alertBuilder.setMessage(message)
@@ -113,33 +122,31 @@ class AddJudgesActivity : AppCompatActivity() {
     private fun confirmJudges() {
         val wallsAdded = bind.edtEntrynumber.editText?.text.toString().toInt() - 1
 
-        loop@ for (i in 0..wallsAdded){
+        for (i in 0..wallsAdded){
             if (wallsList[i].editText?.text.isNullOrEmpty()) {
                 Toast.makeText(this, "Pastikan semua dinding telah ada juri", Toast.LENGTH_SHORT).show()
-                break
+                return
             }
             for (ii in (i+1)..wallsAdded){
                 if (i == wallsAdded) break
                 if(wallsList[i].editText?.text.toString() == wallsList[ii].editText?.text.toString()){
                     Toast.makeText(this, "Juri Lapangan Tidak Boleh Lebih Dari 1 Dinding", Toast.LENGTH_SHORT).show()
-                    break@loop
+                    return
                 }
             }
-            saveData(wallsAdded)
         }
-
-
+        saveData(wallsAdded)
     }
 
     private fun saveData(wallsAdded: Int) {
-        val juri = ArrayList<Judge>()
+        val juri = HashMap<String, Judge>()
         for (i in 0..wallsAdded){
-            juri.add(Judge(wallsList[i].editText?.text.toString()))
-            Log.d("SAVE", juri[i].name.toString())
+            juri["Dinding " + i+1.toString()] = Judge(wallsList[i].editText?.text.toString())
+//            juri.add(Judge(wallsList[i].editText?.text.toString()))
         }
 
         if (eventData != null){
-            database.child("events/${eventData!!.name}/jury").setValue(juri)
+            database.child("events/${eventData!!.name}/judges").setValue(juri)
             Toast.makeText(this, "Data Berhasil Ditambahkan", Toast.LENGTH_SHORT).show()
             finish()
         } else Toast.makeText(this, "Terjadi Masalah Koneksi", Toast.LENGTH_SHORT).show()

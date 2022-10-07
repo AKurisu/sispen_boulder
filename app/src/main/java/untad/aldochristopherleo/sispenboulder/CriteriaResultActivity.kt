@@ -1,25 +1,18 @@
 package untad.aldochristopherleo.sispenboulder
 
-import android.graphics.drawable.Drawable
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.View
-import android.widget.EditText
 import android.widget.TextView
 import androidx.activity.viewModels
-import androidx.fragment.app.viewModels
-import androidx.transition.AutoTransition
+import androidx.appcompat.app.AppCompatActivity
 import androidx.transition.ChangeBounds
 import androidx.transition.TransitionManager
-import untad.aldochristopherleo.sispenboulder.databinding.ActivityCriteriaBinding
 import untad.aldochristopherleo.sispenboulder.databinding.ActivityCriteriaResultBinding
 import untad.aldochristopherleo.sispenboulder.util.Ahp
 import untad.aldochristopherleo.sispenboulder.util.MainViewModel
-import untad.aldochristopherleo.sispenboulder.util.Topsis
 import java.math.BigDecimal
 import java.math.RoundingMode
 import java.util.*
-import kotlin.collections.ArrayList
 
 class CriteriaResultActivity : AppCompatActivity() {
 
@@ -124,9 +117,12 @@ class CriteriaResultActivity : AppCompatActivity() {
                 txtResult3[index].text = BigDecimal(consResult[index]).setScale(2, RoundingMode.HALF_EVEN).toPlainString()
             }
 
-            bind.cvrFourthResult1.setText(getString(R.string.ahp_ci, BigDecimal(ahp.getResults(1)).setScale(2, RoundingMode.HALF_EVEN).toPlainString()))
-            bind.cvrFourthResult2.setText(getString(R.string.ahp_ci, BigDecimal(ahp.getResults(2)).setScale(2, RoundingMode.HALF_EVEN).toPlainString()))
-            bind.cvrFourthResult3.setText((getString(R.string.ahp_ci, BigDecimal(ahp.getResults(3)).setScale(2, RoundingMode.HALF_EVEN).toPlainString())))
+            bind.cvrFourthResult1.text =
+                getString(R.string.ahp_ci, BigDecimal(ahp.getResults(1)).setScale(2, RoundingMode.HALF_EVEN).toPlainString())
+            bind.cvrFourthResult2.text =
+                getString(R.string.ahp_ci, BigDecimal(ahp.getResults(2)).setScale(2, RoundingMode.HALF_EVEN).toPlainString())
+            bind.cvrFourthResult3.text =
+                (getString(R.string.ahp_ci, BigDecimal(ahp.getResults(3)).setScale(2, RoundingMode.HALF_EVEN).toPlainString()))
             val consistency = if (ahp.getResults(3) < 0.1) "Konsisten" else "Tidak Konsisten"
             bind.cvrFourthResult4.text = consistency
 

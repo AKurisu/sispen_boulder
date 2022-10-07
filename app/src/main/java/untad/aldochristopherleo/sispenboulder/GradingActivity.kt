@@ -7,6 +7,7 @@ import android.util.Log
 import android.view.View
 import android.widget.ArrayAdapter
 import android.widget.AutoCompleteTextView
+import android.widget.Toast
 import androidx.activity.viewModels
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.firebase.database.DataSnapshot
@@ -14,16 +15,19 @@ import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.ValueEventListener
 import com.google.firebase.database.ktx.database
+import com.google.firebase.database.ktx.getValue
 import com.google.firebase.ktx.Firebase
 import untad.aldochristopherleo.sispenboulder.data.Event
 import untad.aldochristopherleo.sispenboulder.data.Result
 import untad.aldochristopherleo.sispenboulder.databinding.ActivityGradingBinding
 import untad.aldochristopherleo.sispenboulder.util.MainViewModel
 
+@Suppress("DEPRECATION")
 class GradingActivity : AppCompatActivity() {
 
     companion object {
         const val EXTRA_EVENT = "extra_event"
+        const val EXTRA_KEY = "extra_key"
     }
 
     private var _bind : ActivityGradingBinding? = null
@@ -35,6 +39,11 @@ class GradingActivity : AppCompatActivity() {
 
     private val viewModel: MainViewModel by viewModels()
 
+    private lateinit var total: Result
+    private lateinit var event: Event
+    private lateinit var userKey: String
+    private lateinit var selectedKeyParticipant: String
+    private lateinit var keyParticipant: ArrayList<String>
     private lateinit var stringArray: Array<String>
     private lateinit var database: DatabaseReference
 
@@ -44,10 +53,11 @@ class GradingActivity : AppCompatActivity() {
         _bind = ActivityGradingBinding.inflate(layoutInflater)
         setContentView(bind.root)
 
-        val event = if (Build.VERSION.SDK_INT >= 33){
-            intent.getParcelableExtra("EXTRA_EVENT", Event::class.java)
+        userKey = intent.getStringExtra(EXTRA_KEY).toString()
+        if (Build.VERSION.SDK_INT >= 33){
+            event = intent.getParcelableExtra(EXTRA_EVENT, Event::class.java)!!
         } else {
-            intent.getParcelableExtra<Event>("EXTRA_EVENT") as Event
+            event = intent.getParcelableExtra<Event>(EXTRA_EVENT) as Event
         }
 //        val event = intent.getParcelableExtra<Event>("EXTRA_EVENT") as Event
         database = Firebase.database.reference
@@ -55,25 +65,37 @@ class GradingActivity : AppCompatActivity() {
         bind.layoutHide.visibility = View.GONE
         bind.btnConfirmGrading.visibility = View.GONE
 
+        selectedKeyParticipant = ""
+
         if (event != null) {
-            viewModel.getParticipant(event .name).addValueEventListener(object : ValueEventListener {
+            viewModel.getParticipant(event.name).addValueEventListener(object : ValueEventListener {
                 override fun onDataChange(snapshot: DataSnapshot) {
-                    val arrayList = ArrayList<String>()
+                    val nameList = ArrayList<String>()
+                    val keyList = ArrayList<String>()
                     for (item in snapshot.children){
-                        arrayList.add(item.child("name").value.toString())
+                        nameList.add(item.child("name").value.toString())
+                        item.key?.let {
+                            keyList.add(it)
+                        }
                     }
                     val checkList = ArrayList<String>()
+                    keyParticipant = ArrayList()
                     database.child("result/${event.name}").get().addOnSuccessListener {
-                        for (index in arrayList.indices){
-                            if (!it.hasChild(arrayList[index])){
-                                checkList.add(arrayList[index])
+                        for (index in keyList.indices){
+                            if (!it.hasChild(keyList[index])){
+                                checkList.add(nameList[index])
+                                keyParticipant.add(keyList[index])
                             }
                         }
-                        if (checkList.size == 0){
+                        if (checkList.size == 0 && nameList.size == 0){
                             closeDialog()
-                        } else populateSpinner(checkList)
-
+                        } else {
+                            populateSpinner(checkList)
+                            total = Result()
+                            setResultValue()
+                        }
                     }
+
                 }
 
                 override fun onCancelled(error: DatabaseError) {
@@ -82,6 +104,37 @@ class GradingActivity : AppCompatActivity() {
             })
         }
 
+        setValue()
+
+
+        bind.btnConfirmGrading.setOnClickListener {
+            val participant = bind.txtParticipantChoose.editText?.text.toString()
+            MaterialAlertDialogBuilder(this)
+                .setTitle("Apakah Data Yang Dimasukkan Sudah Benar?")
+                .setMessage("Peserta yang dinilai : $participant")
+                .setNegativeButton("Tidak"){ _, _ ->
+                }
+                .setPositiveButton("Yakin"){ _, _ ->
+                    if (event != null) {
+                        setResult(participant)
+                    }
+                }
+                .show()
+        }
+    }
+
+    private fun setResultValue() {
+        database.child("result/${event.name}/$selectedKeyParticipant/Total").get().addOnSuccessListener {
+            if (it.value != null){
+                total = it.getValue(Result::class.java)!!
+                Toast.makeText(this, it.toString(), Toast.LENGTH_SHORT).show()
+            }
+        }.addOnFailureListener{
+            Toast.makeText(this, total.ab.toString(), Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    private fun setValue() {
         bind.btnTopMinus.setOnClickListener { setTopValue(it) }
         bind.btnTopPlus.setOnClickListener { setTopValue(it) }
         bind.btnAtMinus.setOnClickListener { setAtValue(it) }
@@ -90,26 +143,17 @@ class GradingActivity : AppCompatActivity() {
         bind.btnBonusPlus.setOnClickListener { setBonusValue(it) }
         bind.btnAbMinus.setOnClickListener { setAbValue(it) }
         bind.btnAbPlus.setOnClickListener { setAbValue(it) }
-        bind.btnConfirmGrading.setOnClickListener {
-            val participant = bind.txtParticipantChoose.editText?.text.toString()
-            MaterialAlertDialogBuilder(this)
-                .setTitle("Apakah Data Yang Dimasukkan Sudah Benar?")
-                .setMessage("Peserta yang dinilai : $participant")
-                .setNegativeButton("Tidak"){ dialog, which ->
-                }
-                .setPositiveButton("Yakin"){ dialog, which ->
-                    if (event != null) {
-                        setResult(event, participant)
-                    }
-                }
-                .show()
-        }
     }
 
-    private fun setResult(event: Event, participant: String) {
+    private fun setResult(participant: String) {
         val result = Result(topValue.toDouble(), atValue.toDouble(), bonusValue.toDouble(), abValue.toDouble())
-        database.child("result/${event.name}/$participant").setValue(result).addOnSuccessListener {
-            finish()
+        val resultTotal =
+            Result(result.top + total.top, result.at + total.at, result.bonus + total.bonus, result.ab + total.ab)
+        database.child("result/${event.name}/$selectedKeyParticipant/$userKey").setValue(result).addOnSuccessListener {
+            database.child("result/${event.name}/$selectedKeyParticipant/Total").setValue(resultTotal).addOnSuccessListener {
+                Toast.makeText(this, "Data Berhasil Diinput", Toast.LENGTH_SHORT).show()
+                finish()
+            }
         }
     }
 
@@ -175,14 +219,20 @@ class GradingActivity : AppCompatActivity() {
     private fun populateSpinner(allParticipant: ArrayList<String>) {
         stringArray = allParticipant.toArray(arrayOfNulls<String>(allParticipant.size))
 
+        Toast.makeText(this@GradingActivity, stringArray.size.toString(), Toast.LENGTH_SHORT).show()
+
         val adapter = ArrayAdapter(this, R.layout.list_type, stringArray)
 
         val spinner = bind.txtParticipantChoose.editText as? AutoCompleteTextView
         spinner?.setAdapter(adapter)
-        spinner?.setOnItemClickListener { adapterView, view, i, l ->
+        spinner?.setOnItemClickListener { _, _, pos, _ ->
+            selectedKeyParticipant = keyParticipant[pos]
             bind.txtParticipantChoose.isEnabled = false
             bind.layoutHide.visibility = View.VISIBLE
             bind.btnConfirmGrading.visibility = View.VISIBLE
+            total = Result()
+
+            setResultValue()
         }
     }
 }

@@ -1,8 +1,6 @@
 package untad.aldochristopherleo.sispenboulder.util
 
-import java.lang.Math.sqrt
 import java.util.*
-import kotlin.collections.ArrayList
 import kotlin.math.pow
 
 class Topsis (ahpPriority: ArrayList<Double>, climberScore: ArrayList<Double>) {
@@ -46,10 +44,10 @@ class Topsis (ahpPriority: ArrayList<Double>, climberScore: ArrayList<Double>) {
                 }
             }
         }
-        rootNorm1 = sqrt(rootNorm1)
-        rootNorm2 = sqrt(rootNorm2)
-        rootNorm3 = sqrt(rootNorm3)
-        rootNorm4 = sqrt(rootNorm4)
+        rootNorm1 = kotlin.math.sqrt(rootNorm1)
+        rootNorm2 = kotlin.math.sqrt(rootNorm2)
+        rootNorm3 = kotlin.math.sqrt(rootNorm3)
+        rootNorm4 = kotlin.math.sqrt(rootNorm4)
 
         climberScore.indices.forEach { index ->
             when {
@@ -104,8 +102,8 @@ class Topsis (ahpPriority: ArrayList<Double>, climberScore: ArrayList<Double>) {
             sumNeg += (priorityNorms[index] - negativeAlt[indexPosNeg]).pow(2)
             if (index % 4 == 3){
                 indexPosNeg = 0
-                dPlus.add(sqrt(sumPlus))
-                dNega.add(sqrt(sumNeg))
+                dPlus.add(kotlin.math.sqrt(sumPlus))
+                dNega.add(kotlin.math.sqrt(sumNeg))
                 sumPlus = 0.0
                 sumNeg = 0.0
             } else indexPosNeg += 1

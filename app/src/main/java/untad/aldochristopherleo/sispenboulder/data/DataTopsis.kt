@@ -5,5 +5,4 @@ import kotlinx.parcelize.Parcelize
 
 @Parcelize
 data class DataTopsis(val norms: ArrayList<Double>? = null, val priorityNorms: ArrayList<Double>? = null,
-val dPos: ArrayList<Double>? = null, val dNeg: ArrayList<Double>? = null): Parcelable {
-}
+val dPos: ArrayList<Double>? = null, val dNeg: ArrayList<Double>? = null): Parcelable

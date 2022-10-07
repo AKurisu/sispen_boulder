@@ -1,12 +1,14 @@
 package untad.aldochristopherleo.sispenboulder
 
 import android.content.Intent
+import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import android.view.Menu
 import android.view.MenuInflater
 import android.view.MenuItem
 import android.view.View
+import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -18,30 +20,31 @@ import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.ValueEventListener
 import com.google.firebase.database.ktx.database
+import com.google.firebase.database.ktx.getValue
 import com.google.firebase.ktx.Firebase
 import untad.aldochristopherleo.sispenboulder.adapter.ListParticipantAdapter
 import untad.aldochristopherleo.sispenboulder.data.*
 import untad.aldochristopherleo.sispenboulder.databinding.ActivityEventBinding
 import untad.aldochristopherleo.sispenboulder.util.Ahp
-import untad.aldochristopherleo.sispenboulder.util.DateConverter
 import untad.aldochristopherleo.sispenboulder.util.MainViewModel
 import untad.aldochristopherleo.sispenboulder.util.Topsis
+import java.text.SimpleDateFormat
+import java.util.*
 import kotlin.collections.ArrayList
+import kotlin.collections.HashMap
 import kotlin.collections.LinkedHashMap
 
+@Suppress("DEPRECATION")
 class EventActivity : AppCompatActivity() {
-
-    init {
-
-    }
 
     companion object {
         const val EXTRA_EVENT = "extra_event"
     }
 
-    var userType : String? = null
-    var userName : String? = null
+    private var userType : String? = null
+    private var userName : String? = null
     private var _bind : ActivityEventBinding? = null
+    private val database = Firebase.database.reference
     private val bind get() = _bind!!
     private val viewModel: MainViewModel by viewModels()
     private lateinit var result : LinkedHashMap<String, Result>
@@ -51,7 +54,6 @@ class EventActivity : AppCompatActivity() {
     private lateinit var resultArray: ArrayList<Double>
     private lateinit var sortedResult: ArrayList<SortedResult>
     private lateinit var sortedResultSend: ArrayList<SortedResult>
-    private lateinit var database: DatabaseReference
     private lateinit var adapter : ListParticipantAdapter
     private lateinit var event : Event
     private lateinit var topsis : Topsis
@@ -60,6 +62,7 @@ class EventActivity : AppCompatActivity() {
     private lateinit var swipeRefreshLayout: SwipeRefreshLayout
     private lateinit var rv: RecyclerView
     private lateinit var refreshListener: SwipeRefreshLayout.OnRefreshListener
+    private lateinit var judgeKey: String
     private val participantList = ArrayList<Alternative>()
     private val allParticipantList = ArrayList<String>()
     private val checkedItems = ArrayList<Boolean>()
@@ -73,7 +76,7 @@ class EventActivity : AppCompatActivity() {
         setContentView(bind.root)
 
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
-        setTitle("Detail Event")
+        title = "Detail Event"
 
         bind.layoutHide.visibility = View.GONE
         bind.progressBar.visibility = View.VISIBLE
@@ -90,9 +93,16 @@ class EventActivity : AppCompatActivity() {
 
         statusEvent = if (event.status != null) event.status!! else "KOSONG"
 
+        database.child("events/${event.name}/status").addValueEventListener(object : ValueEventListener{
+            override fun onDataChange(snapshot: DataSnapshot) {
+                statusEvent = snapshot.value.toString()
+                checkEventStatus()
+            }
 
+            override fun onCancelled(error: DatabaseError) {
+            }
 
-        database = Firebase.database.reference
+        })
 
         rv = bind.participantRv
         adapter = ListParticipantAdapter(sortedResult)
@@ -127,6 +137,7 @@ class EventActivity : AppCompatActivity() {
                     }
                     checkedItems.add(compareList)
                 }
+                checkEventStatus()
                 populateSpinner(allParticipantList, checkedItems)
             }
 
@@ -138,9 +149,11 @@ class EventActivity : AppCompatActivity() {
 
         viewModel.user.observe(this) {
             if (it.type == "Manajer") bind.btnEventEdit.visibility = View.GONE
-            bind.btnEventEdit.text = if (it.type == "Panitia")
-                "Tambah Peserta" else if (it.type == "Juri Lapangan")
-                    "Nilai Peserta" else "Pilih Juri Lapangan"
+            bind.btnEventEdit.text = when (it.type) {
+                "Juri Lapangan" -> "Nilai Peserta"
+                "Presiden Juri" -> "Pilih Juri Lapangan"
+                else -> " "
+            }
             userType = it.type
             userName = it.name
             checkEventStatus()
@@ -152,28 +165,64 @@ class EventActivity : AppCompatActivity() {
             bind.btnEventEdit.visibility = View.GONE
         }
 
-        bind.eventName.text = event.name
-        val date = DateConverter(event.date)
-        bind.eventDate.text = date.getDetailDateTime()
-        bind.eventLocation.text = event.location
-        bind.eventTotalParticipant.text = getString(R.string.txt_jumlah_peserta, event.totalParticipant.toString())
+        bind.eventName.text = event.name + " (" + event.location + ")"
+
+        setViewText()
+
 
         bind.btnEventEdit.setOnClickListener{
-            if (userType == "Panitia"){
-                setButtonAction(choosenParticipant, choosenKey)
-            } else if (userType == "Juri Lapangan"){
-                val intent = Intent(this, GradingActivity::class.java)
-                intent.putExtra(GradingActivity.EXTRA_EVENT, event)
-                startActivity(intent)
-            } else if (userType == "Presiden Juri"){
-                val intent = Intent(this, AddJudgesActivity::class.java)
-                intent.putExtra("EXTRA_EVENT", event)
-                startActivity(intent)
+            when (userType) {
+                "Panitia" -> {
+                    if (bind.btnEventEdit.text.toString() == "Mulai Perlombaan"){
+                        MaterialAlertDialogBuilder(this)
+                            .setTitle("Apakah Lomba Siap Dimulai")
+                            .setMessage("Jumlah Peserta" + participantList.size.toString())
+                            .setPositiveButton("Ya"){_,_ ->
+                                database.child("events/${event.name}/status")
+                                    .setValue("LOMBA")
+                                    .addOnSuccessListener {
+                                        checkEventStatus()
+                                    }
+                            }
+                            .show()
+                    } else {
+                        setButtonAction(choosenParticipant, choosenKey)
+                    }
+                }
+                "Juri Lapangan" -> {
+                    val intent = Intent(this, GradingActivity::class.java)
+                    intent.putExtra(GradingActivity.EXTRA_EVENT, event)
+                    intent.putExtra(GradingActivity.EXTRA_KEY, judgeKey)
+                    startActivity(intent)
+                }
+                "Presiden Juri" -> {
+                    val intent = Intent(this, AddJudgesActivity::class.java)
+                    intent.putExtra("EXTRA_EVENT", event)
+                    startActivity(intent)
+                }
             }
         }
 
         swipeRefreshLayout.setOnRefreshListener(refreshListener)
 
+    }
+
+    private fun setViewText() {
+        val locale = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N){
+            getResources().getConfiguration().getLocales().get(0);
+        } else{
+            //noinspection deprecation
+            getResources().getConfiguration().locale;
+        }
+        val date = Date(event.date)
+        val dateFormat = SimpleDateFormat("E, dd-MM-yyyy", locale)
+        val timeFormat = SimpleDateFormat("HH:mm", locale)
+        val dateText = dateFormat.format(date)
+        val timeText = timeFormat.format(date)
+
+        bind.eventDate.text = dateText
+        bind.eventTime.text = timeText
+        bind.eventTotalParticipant.text = getString(R.string.txt_jumlah_peserta, event.totalParticipant.toString())
     }
 
     private fun checkEventParticipant() {
@@ -188,16 +237,21 @@ class EventActivity : AppCompatActivity() {
                     result.clear()
                     for (item in snapshot.children) {
                         val participant = item.getValue(Participant::class.java)
+                        val participantKey = item.key
                         participantList.add(Alternative(participant?.name))
 
                         viewModel.getResult(event.name).get().addOnSuccessListener {
                             var data = Result()
-                            if(it.hasChild(participant?.name!!)){
-                                result.put(participant.name + " ("+ participant.group + ")",
-                                    it.child(participant.name).getValue(Result::class.java)!!
-                                )
-                                data = it.child(participant.name).getValue(Result::class.java)!!
-                            } else result.put(participant.name + " ("+ participant.group + ")", Result())
+                            if(it.hasChild(participantKey!!)){
+                                if (participant != null) {
+                                    Log.d("CHECKPART",it.toString())
+                                    result[participant.name + " ("+ participant.group + ")"] =
+                                        it.child("$participantKey/Total").getValue(Result::class.java)!!
+                                    data = it.child("$participantKey/Total").getValue(Result::class.java)!!
+                                }
+                            } else if (participant != null) {
+                                result[participant.name + " ("+ participant.group + ")"] = Result()
+                            }
 
                             resultArray.addAll(data.toArrayList())
                             Log.d("OnDataChange",(snapshot.childrenCount * 4).toString() +" "+ resultArray.size.toLong().toString())
@@ -224,14 +278,26 @@ class EventActivity : AppCompatActivity() {
                     finish()
                 }
         } else if (statusEvent == "PERSIAPAN") {
-            if (userType == "Juri Lapangan") bind.btnEventEdit.visibility = View.GONE
-        } else {
-            event.judges?.forEach { (_, value) ->
-                if (value.name == userName && userType == "Juri Lapangan"){
-                    bind.btnEventEdit.visibility = View.VISIBLE
-                    finish()
-                }
+            if (userType == "Juri Lapangan") {
                 bind.btnEventEdit.visibility = View.GONE
+            } else if (userType == "Panitia") {
+                if (!event.judges.isNullOrEmpty()){
+                    if (event.judges!!.size == 4 && participantList.size >= 8){
+                        bind.btnEventEdit.text = "Mulai Perlombaan"
+                        Toast.makeText(this, "Mulai Perlombaan", Toast.LENGTH_SHORT).show()
+                        checkEventStatus()
+                    } else bind.btnEventEdit.text = "Tambah Peserta"
+                } else bind.btnEventEdit.text = "Tambah Peserta"
+            }
+        } else if (statusEvent == "LOMBA"){
+            run stop@{
+                event.judges?.forEach { (key, value) ->
+                    if (value.name == userName && userType == "Juri Lapangan"){
+                        judgeKey = key
+                        bind.btnEventEdit.visibility = View.VISIBLE
+                        return@stop
+                    } else bind.btnEventEdit.visibility = View.GONE
+                }
             }
         }
     }
@@ -246,22 +312,22 @@ class EventActivity : AppCompatActivity() {
             val saveChoosenKey = choosenKey
             MaterialAlertDialogBuilder(this)
                 .setTitle("Tambah Peserta")
-                .setNeutralButton("Cancel") { dialog, which ->
+                .setNeutralButton("Cancel") { _, _ ->
                     choosenParticipant = saveChoosenParticipant
                     choosenKey = saveChoosenKey
                 }
-                .setPositiveButton("OK") { dialog, which ->
+                .setPositiveButton("Ya") { _, _ ->
                     viewModel.getParticipant(event.name).removeValue()
                     if (choosenParticipant.isNotEmpty()){
                         val listChoosenParticipant = HashMap<String, Participant>()
                         for (index in choosenParticipant.indices){
-                            listChoosenParticipant.put(choosenKey[index],choosenParticipant[index])
+                            listChoosenParticipant[choosenKey[index]] = choosenParticipant[index]
 
 //                            database.child("events/${event.name}/participant/${choosenKey[index]}")
 //                                .setValue(choosenParticipant[index])
                             //Simpan Data Participant
                         }
-                        database.child("events/${event.name}/participant}")
+                        database.child("events/${event.name}/participant")
                             .setValue(listChoosenParticipant)
                     }
                     database.child("events/${event.name}/totalParticipant")
@@ -270,7 +336,7 @@ class EventActivity : AppCompatActivity() {
                     checkEventParticipant()
 //                    swipeRefreshLayout.setOnRefreshListener(refreshListener)
                 }
-                .setMultiChoiceItems(stringArray, booleanArray) { dialog, which, checked ->
+                .setMultiChoiceItems(stringArray, booleanArray) { _, which, checked ->
                     if (checked){
                         choosenParticipant.add(allParticipant[which])
                         choosenKey.add(allParticipantKey[which])
@@ -289,12 +355,10 @@ class EventActivity : AppCompatActivity() {
                 val ahp = Ahp(priority)
                 topsis = Topsis(ahp.getConsistencySum(), resultArray)
                 val resultTopsis = topsis.getPreference()
-                var index = 0
 
-                for (item in result.keys){
+                for ((index, item) in result.keys.withIndex()){
                     Log.d("CHECK", result.size.toString())
                     sortedResult.add(SortedResult(item, resultTopsis[index], result[item]))
-                    index++
                 }
 
                 sortedResult.sortByDescending { it.preferenceValue }
@@ -329,6 +393,23 @@ class EventActivity : AppCompatActivity() {
                 }
                 true
             }
+            R.id.menu_hapus_event -> {
+                MaterialAlertDialogBuilder(this)
+                    .setMessage("Apakah Anda Yakin Ingin Menghapus Ini?")
+                    .setPositiveButton("Ya"){_,_ ->
+                        database.child("events/${event.name}").removeValue().addOnSuccessListener {
+                            Toast.makeText(this, "Event berhasil dihapus", Toast.LENGTH_SHORT).show()
+                            finish()
+                        }
+                    }
+                    .setNegativeButton("Tidak"){_,_ ->
+                    }
+
+                true
+            }
+            R.id.menu_edit_event -> {
+                true
+            }
             else -> super.onOptionsItemSelected(item)
         }
     }
@@ -343,6 +424,24 @@ class EventActivity : AppCompatActivity() {
 
         bind.layoutHide.visibility = View.VISIBLE
         bind.progressBar.visibility = View.GONE
+    }
+
+    override fun onPrepareOptionsMenu(menu: Menu?): Boolean {
+        val menuAhp = menu?.findItem(R.id.menu_ahp)
+        val menuTopsis = menu?.findItem(R.id.menu_topsis)
+
+        val menuUbah = menu?.findItem(R.id.menu_edit_event)
+        val menuHapus = menu?.findItem(R.id.menu_hapus_event)
+
+        if (userType != "Admin") {
+            menuAhp?.isVisible = false
+            menuTopsis?.isVisible = false
+        }
+        if (userType != "Panitia"){
+            menuUbah?.isVisible = false
+            menuHapus?.isVisible = false
+        }
+        return super.onPrepareOptionsMenu(menu)
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {

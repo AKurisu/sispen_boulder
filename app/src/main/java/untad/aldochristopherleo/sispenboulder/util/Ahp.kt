@@ -1,8 +1,6 @@
 package untad.aldochristopherleo.sispenboulder.util
 
-import android.util.Log
 import java.util.*
-import kotlin.collections.ArrayList
 
 class Ahp(value: ArrayList<Double>){
 

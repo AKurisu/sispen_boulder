@@ -1,22 +1,19 @@
 package untad.aldochristopherleo.sispenboulder
 
 import android.os.Bundle
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.transition.ChangeBounds
 import androidx.transition.TransitionManager
-import com.firebase.ui.database.FirebaseRecyclerOptions
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.ValueEventListener
 import untad.aldochristopherleo.sispenboulder.adapter.ListEventDetailAdapter
-import untad.aldochristopherleo.sispenboulder.adapter.ListEventsAdapter
 import untad.aldochristopherleo.sispenboulder.data.Event
-import untad.aldochristopherleo.sispenboulder.databinding.FragmentHomeBinding
 import untad.aldochristopherleo.sispenboulder.databinding.FragmentListBinding
 import untad.aldochristopherleo.sispenboulder.util.MainViewModel
 
@@ -27,14 +24,6 @@ class ListFragment : Fragment() {
     private lateinit var adapterUpcoming : ListEventDetailAdapter
     private lateinit var binding: FragmentListBinding
     private val viewModel: MainViewModel by viewModels()
-
-    override fun onStart() {
-        super.onStart()
-    }
-
-    override fun onStop() {
-        super.onStop()
-    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,

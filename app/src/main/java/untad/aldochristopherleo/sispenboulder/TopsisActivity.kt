@@ -1,22 +1,16 @@
 package untad.aldochristopherleo.sispenboulder
 
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.view.Menu
-import android.view.MenuInflater
 import android.view.View
+import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.transition.ChangeBounds
 import androidx.transition.TransitionManager
-import untad.aldochristopherleo.sispenboulder.adapter.ListParticipantAdapter
 import untad.aldochristopherleo.sispenboulder.adapter.ListTableTopsisAdapter
 import untad.aldochristopherleo.sispenboulder.data.DataTopsis
-import untad.aldochristopherleo.sispenboulder.data.Event
 import untad.aldochristopherleo.sispenboulder.data.Result
 import untad.aldochristopherleo.sispenboulder.data.SortedResult
-import untad.aldochristopherleo.sispenboulder.databinding.ActivityGradingBinding
 import untad.aldochristopherleo.sispenboulder.databinding.ActivityTopsisBinding
-import untad.aldochristopherleo.sispenboulder.util.Topsis
 
 class TopsisActivity : AppCompatActivity() {
 

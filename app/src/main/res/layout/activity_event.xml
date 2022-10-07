@@ -7,6 +7,7 @@
     tools:context=".EventActivity"
     android:id="@+id/eventRefresh">
 
+
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent">
@@ -30,15 +31,16 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent">
 
+
             <TextView
-                android:id="@+id/eventLocation"
+                android:id="@+id/eventTime"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginStart="12dp"
                 android:textSize="16sp"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/eventDate"
                 tools:text="Palu" />
-
 
             <TextView
                 android:id="@+id/eventDate"
@@ -53,7 +55,9 @@
                 android:id="@+id/eventName"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textSize="28sp"
+                android:layout_marginStart="12dp"
+                android:layout_marginTop="4dp"
+                android:textSize="24sp"
                 android:textStyle="bold"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
@@ -63,9 +67,11 @@
                 android:id="@+id/eventTotalParticipant"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textSize="16sp"
+                android:layout_marginStart="12dp"
+                android:layout_marginTop="16dp"
+                android:textSize="12sp"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/eventLocation"
+                app:layout_constraintTop_toBottomOf="@+id/eventTime"
                 tools:text="Jumlah Peserta : 0" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
@@ -98,12 +104,15 @@
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btn_eventEdit"
+            style="@style/ThemeOverlay.Material3.Button.TextButton"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_margin="12dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent" />
+            app:layout_constraintStart_toStartOf="parent"
+            tools:text="CEK"
+            tools:visibility="visible" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

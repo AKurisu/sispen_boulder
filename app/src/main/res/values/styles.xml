@@ -13,4 +13,17 @@
         <item name="android:maxLength">4</item>
         <item name="android:gravity">center</item>
     </style>
+
+
+    <style name="CustomRoundedButton">
+        <item name="android:layout_width">70dp</item>
+        <item name="android:layout_height">70dp</item>
+        <item name="android:insetLeft">0dp</item>
+        <item name="android:insetRight">0dp</item>
+        <item name="android:insetTop">0dp</item>
+        <item name="android:insetBottom">0dp</item>
+        <item name="iconPadding">0dp</item>
+        <item name="iconSize">36dp</item>
+        <item name="shapeAppearanceOverlay">@style/ShapeAppearanceOverlay.Button.Circle</item>
+    </style>
 </resources>

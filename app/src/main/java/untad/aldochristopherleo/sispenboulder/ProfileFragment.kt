@@ -6,13 +6,11 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
 import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.ValueEventListener
-import com.google.firebase.database.ktx.getValue
 import untad.aldochristopherleo.sispenboulder.adapter.ListUserParticipant
 import untad.aldochristopherleo.sispenboulder.data.Participant
 import untad.aldochristopherleo.sispenboulder.databinding.FragmentProfileBinding
@@ -39,6 +37,7 @@ class ProfileFragment : Fragment() {
             binding.profileType.text = user.type
 
             if (user.type == "Manajer") {
+                binding.profileTxt1.visibility = View.VISIBLE
                 recyclerView.layoutManager = LinearLayoutManager(context)
                 viewModel.getAllParticipants().orderByChild("group").equalTo(user.group)
                     .addValueEventListener(object: ValueEventListener{
@@ -51,11 +50,14 @@ class ProfileFragment : Fragment() {
                                 }
                                 val adapter = ListUserParticipant(itemList, itemKey)
                                 recyclerView.adapter = adapter
+                            } else {
+                                val adapter = ListUserParticipant(null, ArrayList())
+                                recyclerView.adapter = adapter
                             }
                         }
 
                         override fun onCancelled(error: DatabaseError) {
-                            Log.d("PROCANCELLED", error.toString())
+                            Log.d("onCancelled: ", error.toString())
                         }
 
                     })

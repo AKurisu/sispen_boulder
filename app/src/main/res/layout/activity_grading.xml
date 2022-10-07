@@ -1,38 +1,38 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:aapt="http://schemas.android.com/aapt"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:padding="12dp"
-    tools:context=".GradingActivity">
+    android:padding="12dp">
 
     <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/txt_participantChoose"
-        android:hint="Peserta"
+        style="@style/Widget.MaterialComponents.TextInputLayout.FilledBox.ExposedDropdownMenu"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:startIconDrawable="@drawable/ic_baseline_person_24"
+        android:hint="Peserta"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        style="@style/Widget.MaterialComponents.TextInputLayout.FilledBox.ExposedDropdownMenu">
+        app:startIconDrawable="@drawable/ic_baseline_person_24">
 
         <AutoCompleteTextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:inputType="none"/>
-
+            android:inputType="none" />
     </com.google.android.material.textfield.TextInputLayout>
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/layout_hide"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:padding="12dp"
+        android:visibility="gone"
+        app:layout_constraintBottom_toTopOf="@+id/btn_confirmGrading"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="1.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/txt_participantChoose">
+        app:layout_constraintTop_toBottomOf="@+id/txt_participantChoose"
+        tools:visibility="visible">
 
         <TextView
             android:id="@+id/text_criteria1"
@@ -40,20 +40,22 @@
             android:layout_height="wrap_content"
             android:text="TOP"
             android:textSize="24sp"
-            app:layout_constraintEnd_toEndOf="@+id/materialCardView"
+            app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
         <com.google.android.material.card.MaterialCardView
             android:id="@+id/materialCardView"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginStart="10dp"
+            android:layout_marginEnd="10dp"
             app:cardElevation="2dp"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/text_criteria1">
+            app:layout_constraintTop_toBottomOf="@+id/text_criteria1">
 
             <LinearLayout
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:gravity="center"
                 android:orientation="horizontal"
@@ -61,68 +63,54 @@
 
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/btn_topMinus"
-                    style="@style/Widget.MaterialComponents.Button.OutlinedButton.Icon"
-                    android:layout_width="40dp"
-                    android:layout_height="40dp"
-                    android:insetLeft="0dp"
-                    android:insetTop="0dp"
-                    android:insetRight="0dp"
-                    android:insetBottom="0dp"
-                    android:padding="0dp"
-                    app:icon="@drawable/ic_baseline_remove_24"
-                    app:iconGravity="textStart"
-                    app:iconPadding="0dp"
-                    app:iconSize="24dp"
-                    app:shapeAppearanceOverlay="@style/ShapeAppearanceOverlay.Button.Circle" />
+                    style="@style/CustomRoundedButton"
+                    android:layout_marginEnd="20dp"
+                    android:contentDescription="@string/txt_top"
+                    app:icon="@drawable/ic_baseline_remove_24" />
 
                 <TextView
                     android:id="@+id/txt_top"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:paddingStart="5dp"
-                    android:paddingEnd="5dp"
+                    android:includeFontPadding="false"
+                    android:paddingStart="20dp"
+                    android:paddingEnd="20dp"
                     android:text="@string/grade_default"
-                    android:textSize="85sp" />
+                    android:textSize="80sp" />
 
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/btn_topPlus"
-                    style="@style/Widget.MaterialComponents.Button.OutlinedButton.Icon"
-                    android:layout_width="40dp"
-                    android:layout_height="40dp"
-                    android:insetLeft="0dp"
-                    android:insetTop="0dp"
-                    android:insetRight="0dp"
-                    android:insetBottom="0dp"
-                    android:padding="0dp"
-                    app:icon="@drawable/ic_baseline_add_24"
-                    app:iconGravity="textStart"
-                    app:iconPadding="0dp"
-                    app:iconSize="24dp"
-                    app:shapeAppearanceOverlay="@style/ShapeAppearanceOverlay.Button.Circle" />
+                    style="@style/CustomRoundedButton"
+                    android:layout_marginStart="20dp"
+                    android:contentDescription="@string/txt_top"
+                    app:icon="@drawable/ic_baseline_add_24" />
             </LinearLayout>
-
         </com.google.android.material.card.MaterialCardView>
 
         <TextView
             android:id="@+id/text_criteria2"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
             android:text="AT"
             android:textSize="24sp"
-            app:layout_constraintEnd_toEndOf="@+id/materialCardView2"
-            app:layout_constraintStart_toStartOf="@+id/materialCardView2"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/materialCardView" />
 
         <com.google.android.material.card.MaterialCardView
             android:id="@+id/materialCardView2"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginStart="10dp"
+            android:layout_marginEnd="10dp"
             app:cardElevation="2dp"
             app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/text_criteria2">
 
             <LinearLayout
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:gravity="center"
                 android:orientation="horizontal"
@@ -130,72 +118,56 @@
 
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/btn_atMinus"
-                    style="@style/Widget.MaterialComponents.Button.OutlinedButton.Icon"
-                    android:layout_width="40dp"
-                    android:layout_height="40dp"
-                    android:insetLeft="0dp"
-                    android:insetTop="0dp"
-                    android:insetRight="0dp"
-                    android:insetBottom="0dp"
-                    android:padding="0dp"
+                    style="@style/CustomRoundedButton"
+                    android:layout_marginEnd="20dp"
+                    android:contentDescription="@string/at"
                     app:icon="@drawable/ic_baseline_remove_24"
-                    app:iconGravity="textStart"
-                    app:iconPadding="0dp"
-                    app:iconSize="24dp"
                     app:shapeAppearanceOverlay="@style/ShapeAppearanceOverlay.Button.Circle" />
 
                 <TextView
                     android:id="@+id/txt_at"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:paddingStart="5dp"
-                    android:paddingEnd="5dp"
+                    android:includeFontPadding="false"
+                    android:paddingStart="20dp"
+                    android:paddingEnd="20dp"
                     android:text="@string/grade_default"
-                    android:textSize="85sp" />
+                    android:textSize="80sp" />
 
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/btn_atPlus"
-                    style="@style/Widget.MaterialComponents.Button.OutlinedButton.Icon"
-                    android:layout_width="40dp"
-                    android:layout_height="40dp"
-                    android:insetLeft="0dp"
-                    android:insetTop="0dp"
-                    android:insetRight="0dp"
-                    android:insetBottom="0dp"
-                    android:padding="0dp"
-                    app:icon="@drawable/ic_baseline_add_24"
-                    app:iconGravity="textStart"
-                    app:iconPadding="0dp"
-                    app:iconSize="24dp"
-                    app:shapeAppearanceOverlay="@style/ShapeAppearanceOverlay.Button.Circle" />
+                    style="@style/CustomRoundedButton"
+                    android:layout_marginStart="20dp"
+                    android:contentDescription="@string/at"
+                    app:icon="@drawable/ic_baseline_add_24" />
             </LinearLayout>
-
         </com.google.android.material.card.MaterialCardView>
 
         <TextView
             android:id="@+id/text_criteria3"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
+            android:layout_marginTop="8dp"
             android:text="BONUS"
             android:textSize="24sp"
-            app:layout_constraintEnd_toEndOf="@+id/materialCardView3"
-            app:layout_constraintHorizontal_bias="0.509"
-            app:layout_constraintStart_toStartOf="@+id/materialCardView3"
-            app:layout_constraintTop_toBottomOf="@+id/materialCardView" />
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/materialCardView2" />
 
         <com.google.android.material.card.MaterialCardView
             android:id="@+id/materialCardView3"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:cardElevation="2dp"
+            android:layout_marginStart="10dp"
+            android:layout_marginEnd="10dp"
             android:layout_marginBottom="24dp"
-            app:layout_constraintBottom_toBottomOf="parent"
+            app:cardElevation="2dp"
+            app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/text_criteria3">
 
             <LinearLayout
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:gravity="center"
                 android:orientation="horizontal"
@@ -203,69 +175,53 @@
 
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/btn_bonusMinus"
-                    style="@style/Widget.MaterialComponents.Button.OutlinedButton.Icon"
-                    android:layout_width="45dp"
-                    android:layout_height="45dp"
-                    android:insetLeft="0dp"
-                    android:insetTop="0dp"
-                    android:insetRight="0dp"
-                    android:insetBottom="0dp"
-                    android:padding="0dp"
-                    app:icon="@drawable/ic_baseline_remove_24"
-                    app:iconGravity="textStart"
-                    app:iconPadding="0dp"
-                    app:iconSize="24dp"
-                    app:shapeAppearanceOverlay="@style/ShapeAppearanceOverlay.Button.Circle" />
+                    style="@style/CustomRoundedButton"
+                    android:layout_marginEnd="20dp"
+                    android:contentDescription="@string/bonus"
+                    app:icon="@drawable/ic_baseline_remove_24" />
 
                 <TextView
                     android:id="@+id/txt_bonus"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:paddingStart="2dp"
-                    android:paddingEnd="2dp"
+                    android:includeFontPadding="false"
+                    android:paddingStart="20dp"
+                    android:paddingEnd="20dp"
                     android:text="@string/grade_default"
-                    android:textSize="85sp" />
+                    android:textSize="80sp" />
 
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/btn_bonusPlus"
-                    style="@style/Widget.MaterialComponents.Button.OutlinedButton.Icon"
-                    android:layout_width="45dp"
-                    android:layout_height="45dp"
-                    android:insetLeft="0dp"
-                    android:insetTop="0dp"
-                    android:insetRight="0dp"
-                    android:insetBottom="0dp"
-                    android:padding="0dp"
-                    app:icon="@drawable/ic_baseline_add_24"
-                    app:iconGravity="textStart"
-                    app:iconPadding="0dp"
-                    app:iconSize="24dp"
-                    app:shapeAppearanceOverlay="@style/ShapeAppearanceOverlay.Button.Circle" />
+                    style="@style/CustomRoundedButton"
+                    android:layout_marginStart="20dp"
+                    android:contentDescription="@string/bonus"
+                    app:icon="@drawable/ic_baseline_add_24" />
             </LinearLayout>
-
         </com.google.android.material.card.MaterialCardView>
 
         <TextView
             android:id="@+id/text_criteria4"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
+            android:layout_marginTop="8dp"
             android:text="AB"
             android:textSize="24sp"
-            app:layout_constraintEnd_toEndOf="@+id/materialCardView4"
-            app:layout_constraintStart_toStartOf="@+id/materialCardView4"
-            app:layout_constraintTop_toBottomOf="@+id/materialCardView2" />
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/materialCardView3" />
 
         <com.google.android.material.card.MaterialCardView
             android:id="@+id/materialCardView4"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginStart="10dp"
+            android:layout_marginEnd="10dp"
             app:cardElevation="2dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/text_criteria4">
 
             <LinearLayout
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:gravity="center"
                 android:orientation="horizontal"
@@ -273,48 +229,29 @@
 
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/btn_abMinus"
-                    style="@style/Widget.MaterialComponents.Button.OutlinedButton.Icon"
-                    android:layout_width="45dp"
-                    android:layout_height="45dp"
-                    android:insetLeft="0dp"
-                    android:insetTop="0dp"
-                    android:insetRight="0dp"
-                    android:insetBottom="0dp"
-                    android:padding="0dp"
-                    app:icon="@drawable/ic_baseline_add_24"
-                    app:iconGravity="textStart"
-                    app:iconPadding="0dp"
-                    app:iconSize="24dp"
-                    app:shapeAppearanceOverlay="@style/ShapeAppearanceOverlay.Button.Circle" />
+                    style="@style/CustomRoundedButton"
+                    android:layout_marginEnd="20dp"
+                    android:contentDescription="@string/ab"
+                    app:icon="@drawable/ic_baseline_remove_24" />
 
                 <TextView
                     android:id="@+id/txt_ab"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:paddingStart="2dp"
-                    android:paddingEnd="2dp"
+                    android:includeFontPadding="true"
+                    android:paddingStart="20dp"
+                    android:paddingEnd="20dp"
                     android:text="@string/grade_default"
-                    android:textSize="85sp" />
+                    android:textSize="80sp" />
 
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/btn_abPlus"
-                    style="@style/Widget.MaterialComponents.Button.OutlinedButton.Icon"
-                    android:layout_width="45dp"
-                    android:layout_height="45dp"
-                    android:insetLeft="0dp"
-                    android:insetTop="0dp"
-                    android:insetRight="0dp"
-                    android:insetBottom="0dp"
-                    android:padding="0dp"
-                    app:icon="@drawable/ic_baseline_add_24"
-                    app:iconGravity="textStart"
-                    app:iconPadding="0dp"
-                    app:iconSize="24dp"
-                    app:shapeAppearanceOverlay="@style/ShapeAppearanceOverlay.Button.Circle" />
+                    style="@style/CustomRoundedButton"
+                    android:layout_marginStart="20dp"
+                    android:contentDescription="@string/ab"
+                    app:icon="@drawable/ic_baseline_add_24" />
             </LinearLayout>
-
         </com.google.android.material.card.MaterialCardView>
-
     </androidx.constraintlayout.widget.ConstraintLayout>
 
     <com.google.android.material.button.MaterialButton
@@ -323,7 +260,5 @@
         android:layout_height="wrap_content"
         android:text="Konfirmasi Nilai"
         app:layout_constraintBottom_toBottomOf="parent"
-        tools:layout_editor_absoluteX="11dp" />
-
-
+        tools:layout_editor_absoluteX="12dp" />
 </androidx.constraintlayout.widget.ConstraintLayout>

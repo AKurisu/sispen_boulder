@@ -17,22 +17,22 @@ class ListTableTopsisAdapter(private val list: ArrayList<SortedResult>? = null):
         var headRow: TableRow = itemView.findViewById(R.id.headrow)
 
         var headRow2: TextView = itemView.findViewById(R.id.headrow2)
-        var headRow3: TextView = itemView.findViewById(R.id.headrow3)
-        var headRow4: TextView = itemView.findViewById(R.id.headrow4)
-        var headRow5: TextView = itemView.findViewById(R.id.headrow5)
+        private var headRow3: TextView = itemView.findViewById(R.id.headrow3)
+        private var headRow4: TextView = itemView.findViewById(R.id.headrow4)
+        private var headRow5: TextView = itemView.findViewById(R.id.headrow5)
         var listHeadRow = arrayListOf<TextView>(headRow2, headRow3, headRow4, headRow5)
 
-        var row1: TextView = itemView.findViewById(R.id.row1)
-        var row2: TextView = itemView.findViewById(R.id.row2)
-        var row3: TextView = itemView.findViewById(R.id.row3)
-        var row4: TextView = itemView.findViewById(R.id.row4)
-        var row5: TextView = itemView.findViewById(R.id.row5)
+        private var row1: TextView = itemView.findViewById(R.id.row1)
+        private var row2: TextView = itemView.findViewById(R.id.row2)
+        private var row3: TextView = itemView.findViewById(R.id.row3)
+        private var row4: TextView = itemView.findViewById(R.id.row4)
+        private var row5: TextView = itemView.findViewById(R.id.row5)
         var listRow = arrayListOf<TextView>(row1, row2, row3, row4, row5)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ListViewHolder {
         val view = LayoutInflater.from(parent.context).inflate(R.layout.list_table_topsis, parent, false)
-        return ListTableTopsisAdapter.ListViewHolder(view)
+        return ListViewHolder(view)
     }
 
     override fun onBindViewHolder(holder: ListViewHolder, position: Int) {

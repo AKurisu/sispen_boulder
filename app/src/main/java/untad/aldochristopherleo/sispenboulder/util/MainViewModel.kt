@@ -1,16 +1,13 @@
 package untad.aldochristopherleo.sispenboulder.util
 
-import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.database.*
 import com.google.firebase.database.ktx.database
 import com.google.firebase.database.ktx.getValue
 import com.google.firebase.ktx.Firebase
-import untad.aldochristopherleo.sispenboulder.data.Event
 import untad.aldochristopherleo.sispenboulder.data.User
 
 
@@ -27,7 +24,7 @@ class MainViewModel: ViewModel() {
         getAhpPriority()
     }
 
-    fun getUserId() = FirebaseAuth.getInstance().currentUser
+    private fun getUserId() = FirebaseAuth.getInstance().currentUser
 
     private fun getCurrentUser() {
         val currentUser = getUserId()
@@ -60,7 +57,7 @@ class MainViewModel: ViewModel() {
     fun getResult(eventName: String): DatabaseReference =
         Firebase.database.reference.child("result/$eventName")
 
-    fun getAhpPriority(){
+    private fun getAhpPriority(){
         val result = ArrayList<Double>()
         Firebase.database.reference.child("algorithm")
             .child("ahp").child("criteria").get().addOnSuccessListener {

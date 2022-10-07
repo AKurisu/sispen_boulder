@@ -6,17 +6,10 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.TableLayout
 import android.widget.TextView
-import androidx.recyclerview.widget.DiffUtil
+import android.widget.Toast
 import androidx.recyclerview.widget.RecyclerView
-import com.firebase.ui.database.FirebaseRecyclerAdapter
-import com.firebase.ui.database.FirebaseRecyclerOptions
 import untad.aldochristopherleo.sispenboulder.R
-import untad.aldochristopherleo.sispenboulder.data.Alternative
-import untad.aldochristopherleo.sispenboulder.data.Event
-import untad.aldochristopherleo.sispenboulder.data.Result
 import untad.aldochristopherleo.sispenboulder.data.SortedResult
-import untad.aldochristopherleo.sispenboulder.databinding.ItemParticipantListBinding
-import untad.aldochristopherleo.sispenboulder.util.ResultDiffCallback
 
 class ListParticipantAdapter(private var list: ArrayList<SortedResult>): RecyclerView.Adapter<ListParticipantAdapter.ListViewHolder>() {
     class ListViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
@@ -47,6 +40,7 @@ class ListParticipantAdapter(private var list: ArrayList<SortedResult>): Recycle
         if (top == "0.0" && at == "0.0" && bonus == "0.0" && ab == "0.0"){
             holder.tableLayout.visibility = View.GONE
         } else {
+
             holder.top.text = top
             holder.at.text = at
             holder.bonus.text = bonus
@@ -66,14 +60,9 @@ class ListParticipantAdapter(private var list: ArrayList<SortedResult>): Recycle
 //        diffResult.dispatchUpdatesTo(this)
 //    }
 
-    fun clearData() {
-        list.clear()
-        notifyDataSetChanged()
-    }
-
     fun addAll(newList: ArrayList<SortedResult>){
         list = newList
-        Log.d("ADAPTER", newList.size.toString())
+        Log.d("ADAPTER", newList[1].result?.top.toString())
         notifyDataSetChanged()
     }
 }

@@ -2,8 +2,6 @@ package untad.aldochristopherleo.sispenboulder.data
 
 import android.os.Parcelable
 import kotlinx.parcelize.Parcelize
-import java.util.*
-import kotlin.collections.HashMap
 
 @Parcelize
 data class Event(val name: String = "",
