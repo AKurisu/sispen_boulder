@@ -191,21 +191,7 @@ class EventActivity : AppCompatActivity() {
         bind.btnEventEdit.setOnClickListener{
             when (userType) {
                 "Panitia" -> {
-                    if (bind.btnEventEdit.text.toString() == "Mulai Perlombaan"){
-                        MaterialAlertDialogBuilder(this)
-                            .setTitle("Apakah Lomba Siap Dimulai")
-                            .setMessage("Jumlah Peserta" + participantList.size.toString())
-                            .setPositiveButton("Ya"){_,_ ->
-                                database.child("events/${event.name}/status")
-                                    .setValue("LOMBA")
-                                    .addOnSuccessListener {
-                                        checkEventStatus()
-                                    }
-                            }
-                            .show()
-                    } else {
-                        setButtonAction(choosenParticipant, choosenKey)
-                    }
+                    setButtonAction(choosenParticipant, choosenKey)
                 }
                 "Juri Lapangan" -> {
                     val intent = Intent(this, GradingActivity::class.java)
@@ -301,8 +287,10 @@ class EventActivity : AppCompatActivity() {
             } else if (userType == "Panitia") {
                 if (!event.judges.isNullOrEmpty()){
                     if (event.judges!!.size == 4 && participantList.size >= 8){
-                        bind.btnEventEdit.text = "Mulai Perlombaan"
-                        Toast.makeText(this, "Mulai Perlombaan", Toast.LENGTH_SHORT).show()
+                        val menuMulai = menu.findItem(R.id.menu_start_event)
+                        menuMulai.isVisible = true
+
+                        Toast.makeText(this, "Perlombaan Sudah Siap Dimulai", Toast.LENGTH_SHORT).show()
 //                        checkEventStatus()
                     } else bind.btnEventEdit.text = "Tambah Peserta"
                 } else bind.btnEventEdit.text = "Tambah Peserta"
@@ -445,6 +433,20 @@ class EventActivity : AppCompatActivity() {
                 }
                 true
             }
+            R.id.menu_start_event -> {
+                MaterialAlertDialogBuilder(this)
+                    .setTitle("Apakah Lomba Siap Dimulai")
+                    .setMessage("Jumlah Peserta" + participantList.size.toString())
+                    .setPositiveButton("Ya"){_,_ ->
+                        database.child("events/${event.name}/status")
+                            .setValue("LOMBA")
+                            .addOnSuccessListener {
+                                checkEventStatus()
+                            }
+                    }
+                    .show()
+                true
+            }
             else -> super.onOptionsItemSelected(item)
         }
     }
@@ -526,6 +528,7 @@ class EventActivity : AppCompatActivity() {
 
         val menuUbah = menu.findItem(R.id.menu_edit_event)
         val menuHapus = menu.findItem(R.id.menu_hapus_event)
+        val menuMulai = menu.findItem(R.id.menu_start_event)
 
         if (userType != "Admin") {
             menuAhp?.isVisible = false
@@ -535,6 +538,7 @@ class EventActivity : AppCompatActivity() {
             menuUbah?.isVisible = false
             menuHapus?.isVisible = false
         }
+        menuMulai?.isVisible = false
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {

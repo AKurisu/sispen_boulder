@@ -1,10 +1,12 @@
 package untad.aldochristopherleo.sispenboulder.adapter
 
 import android.content.Intent
+import android.graphics.Color
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
+import androidx.cardview.widget.CardView
 import androidx.recyclerview.widget.RecyclerView
 import untad.aldochristopherleo.sispenboulder.EventActivity
 import untad.aldochristopherleo.sispenboulder.R
@@ -18,6 +20,7 @@ class ListEventDetailAdapter(private val event: ArrayList<Event>):
         var date : TextView = itemView.findViewById(R.id.item_contest_date_detail)
         var time : TextView = itemView.findViewById(R.id.item_contest_time_detail)
         var location : TextView = itemView.findViewById(R.id.item_contest_location_detail)
+        var cardView : CardView = itemView.findViewById(R.id.cardview_detail_event)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ListViewHolder {
@@ -32,6 +35,13 @@ class ListEventDetailAdapter(private val event: ArrayList<Event>):
         holder.date.text = date.getHomeDate()
         holder.time.text = date.getHomeTime()
         holder.location.text = event[position].location
+
+        if (event[position].status == "PERSIAPAN"){
+            holder.cardView.setCardBackgroundColor(Color.YELLOW)
+        } else if (event[position].status == "LOMBA"){
+            holder.cardView.setCardBackgroundColor(Color.GREEN)
+        } else holder.cardView.setCardBackgroundColor(Color.RED)
+
         holder.itemView.setOnClickListener {
             val intent = Intent(holder.itemView.context, EventActivity::class.java)
             intent.putExtra(EventActivity.EXTRA_EVENT, event[position])

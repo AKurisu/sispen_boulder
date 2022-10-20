@@ -4,6 +4,8 @@
         android:title="@string/txt_ahp" />
     <item android:id="@+id/menu_topsis"
         android:title="@string/txt_topsis" />
+    <item android:id="@+id/menu_start_event"
+        android:title="Mulai Perlombaan"/>
     <item android:id="@+id/menu_edit_event"
         android:title="Ubah Detail"/>
     <item android:id="@+id/menu_hapus_event"

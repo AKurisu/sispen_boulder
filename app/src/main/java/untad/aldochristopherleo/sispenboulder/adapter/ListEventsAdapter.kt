@@ -1,6 +1,8 @@
 package untad.aldochristopherleo.sispenboulder.adapter
 
 import android.content.Intent
+import android.content.res.ColorStateList
+import android.graphics.Color
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
@@ -26,6 +28,12 @@ class ListEventsAdapter(options: FirebaseRecyclerOptions<Event>) :
         fun bind(event: Event) {
             with(binding){
                 val converter = DateConverter(event.date)
+                if (event.status == "PERSIAPAN"){
+                    root.setCardBackgroundColor(Color.YELLOW)
+                } else if (event.status == "LOMBA"){
+                    root.setCardBackgroundColor(Color.GREEN)
+                } else root.setCardBackgroundColor(Color.RED)
+
                 itemContestName.text = event.name
                 itemContestDate.text = converter.getHomeDate()
                 itemContestTime.text = converter.getHomeTime()
