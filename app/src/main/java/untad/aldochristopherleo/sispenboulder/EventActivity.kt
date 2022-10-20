@@ -3,18 +3,25 @@ package untad.aldochristopherleo.sispenboulder
 import android.content.Intent
 import android.os.Build
 import android.os.Bundle
+import android.text.format.DateFormat
 import android.util.Log
 import android.view.Menu
 import android.view.MenuInflater
 import android.view.MenuItem
 import android.view.View
+import android.widget.EditText
 import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+import com.google.android.material.datepicker.CalendarConstraints
+import com.google.android.material.datepicker.DateValidatorPointForward
+import com.google.android.material.datepicker.MaterialDatePicker
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import com.google.android.material.timepicker.MaterialTimePicker
+import com.google.android.material.timepicker.TimeFormat
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.DatabaseReference
@@ -47,6 +54,7 @@ class EventActivity : AppCompatActivity() {
     private val database = Firebase.database.reference
     private val bind get() = _bind!!
     private val viewModel: MainViewModel by viewModels()
+    private lateinit var menu: Menu
     private lateinit var result : LinkedHashMap<String, Result>
     private lateinit var statusEvent : String
     private lateinit var booleanArray: BooleanArray
@@ -165,10 +173,20 @@ class EventActivity : AppCompatActivity() {
             bind.btnEventEdit.visibility = View.GONE
         }
 
-        bind.eventName.text = event.name + " (" + event.location + ")"
+        (event.name + " (" + event.location + ")").also { bind.eventName.text = it }
 
         setViewText()
 
+        val inputEditText = EditText(this)
+        inputEditText.setText(event.name)
+
+        bind.eventDateEdit.setOnClickListener {
+            openDatePicker()
+        }
+
+        bind.eventTimeEdit.setOnClickListener {
+            openTimePicker()
+        }
 
         bind.btnEventEdit.setOnClickListener{
             when (userType) {
@@ -285,7 +303,7 @@ class EventActivity : AppCompatActivity() {
                     if (event.judges!!.size == 4 && participantList.size >= 8){
                         bind.btnEventEdit.text = "Mulai Perlombaan"
                         Toast.makeText(this, "Mulai Perlombaan", Toast.LENGTH_SHORT).show()
-                        checkEventStatus()
+//                        checkEventStatus()
                     } else bind.btnEventEdit.text = "Tambah Peserta"
                 } else bind.btnEventEdit.text = "Tambah Peserta"
             }
@@ -371,8 +389,16 @@ class EventActivity : AppCompatActivity() {
 
                 swipeRefreshLayout.isRefreshing = false
             }
-
         }
+        Toast.makeText(this, "View Tampil", Toast.LENGTH_SHORT).show()
+        showView()
+    }
+
+    private fun showView() {
+        showMenuOptions()
+        bind.layoutHide.visibility = View.VISIBLE
+        bind.layoutHide.animate().alpha(1.0f)
+        bind.progressBar.visibility = View.GONE
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
@@ -408,6 +434,15 @@ class EventActivity : AppCompatActivity() {
                 true
             }
             R.id.menu_edit_event -> {
+                if (event.status != "SELESAI"){
+                    if(bind.eventDateEdit.visibility == View.GONE){
+                        bind.eventDateEdit.visibility = View.VISIBLE
+                        bind.eventTimeEdit.visibility = View.VISIBLE
+                    } else {
+                        bind.eventDateEdit.visibility = View.GONE
+                        bind.eventTimeEdit.visibility = View.GONE
+                    }
+                }
                 true
             }
             else -> super.onOptionsItemSelected(item)
@@ -421,17 +456,76 @@ class EventActivity : AppCompatActivity() {
         for (index in checkedItems.indices){
             booleanArray[index] = checkedItems[index]
         }
+//
+//        bind.layoutHide.visibility = View.VISIBLE
+//        bind.layoutHide.animate().alpha(1.0f)
+//        bind.progressBar.visibility = View.GONE
+    }
 
-        bind.layoutHide.visibility = View.VISIBLE
-        bind.progressBar.visibility = View.GONE
+    private fun openDatePicker() {
+        val date = event.date
+
+        val constraintBuilder = CalendarConstraints.Builder()
+            .setValidator(DateValidatorPointForward.now())
+            .build()
+
+        val picker = MaterialDatePicker.Builder
+            .datePicker()
+            .setSelection(date)
+            .setCalendarConstraints(constraintBuilder)
+            .setTitleText("Tanggal Event")
+            .build()
+
+        picker.show(supportFragmentManager, "TAG")
+
+        picker.addOnPositiveButtonClickListener {
+        }
+    }
+
+    private fun openTimePicker() {
+        val date = event.date
+        val hour = Date(date).hours
+        val minute = Date(date).minutes
+        val isSystem24Hour = DateFormat.is24HourFormat(this)
+        val clockFormat = if (isSystem24Hour) TimeFormat.CLOCK_24H else TimeFormat.CLOCK_12H
+
+        val picker = MaterialTimePicker.Builder()
+            .setTimeFormat(clockFormat)
+            .setHour(hour)
+            .setMinute(minute)
+            .setTitleText(R.string.waktu_event)
+            .build()
+
+        picker.show(supportFragmentManager, "TAG")
+
+        picker.addOnPositiveButtonClickListener {
+        }
     }
 
     override fun onPrepareOptionsMenu(menu: Menu?): Boolean {
-        val menuAhp = menu?.findItem(R.id.menu_ahp)
-        val menuTopsis = menu?.findItem(R.id.menu_topsis)
+//        val menuAhp = menu?.findItem(R.id.menu_ahp)
+//        val menuTopsis = menu?.findItem(R.id.menu_topsis)
+//
+//        val menuUbah = menu?.findItem(R.id.menu_edit_event)
+//        val menuHapus = menu?.findItem(R.id.menu_hapus_event)
+//
+//        if (userType != "Admin") {
+//            menuAhp?.isVisible = false
+//            menuTopsis?.isVisible = false
+//        }
+//        if (userType != "Panitia"){
+//            menuUbah?.isVisible = false
+//            menuHapus?.isVisible = false
+//        }
+        return super.onPrepareOptionsMenu(menu)
+    }
 
-        val menuUbah = menu?.findItem(R.id.menu_edit_event)
-        val menuHapus = menu?.findItem(R.id.menu_hapus_event)
+    private fun showMenuOptions() {
+        val menuAhp = menu.findItem(R.id.menu_ahp)
+        val menuTopsis = menu.findItem(R.id.menu_topsis)
+
+        val menuUbah = menu.findItem(R.id.menu_edit_event)
+        val menuHapus = menu.findItem(R.id.menu_hapus_event)
 
         if (userType != "Admin") {
             menuAhp?.isVisible = false
@@ -441,11 +535,11 @@ class EventActivity : AppCompatActivity() {
             menuUbah?.isVisible = false
             menuHapus?.isVisible = false
         }
-        return super.onPrepareOptionsMenu(menu)
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         var bool = false
+        this.menu = menu
         if(event.totalParticipant > 0){
             val inflater: MenuInflater = menuInflater
             inflater.inflate(R.menu.event_menu, menu)

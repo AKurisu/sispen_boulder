@@ -94,9 +94,14 @@ class AddEventActivity : AppCompatActivity() {
             } else {
                 MaterialAlertDialogBuilder(this)
                     .setTitle("Apakah Anda Yakin Telah Benar?")
+                    .setMessage(
+                                "Nama: ${bind.edtName.editText!!.text}\n" +
+                                "Tanggal: ${bind.edtDate.editText!!.text}\n" +
+                                "Tanggal: ${bind.edtTime.editText!!.text}\n" +
+                                "Lokasi: ${bind.edtLocation.editText!!.text}\n"+
+                                "Presiden Juri: ${bind.edtPresident.editText!!.text}\n")
                     .setPositiveButton("Ya"){ _, _ ->
                         setEventDb()
-
                     }
                     .setNegativeButton("Tidak"){ _, _ ->
 //                        Toast.makeText(this, "Berhasil", Toast.LENGTH_SHORT).show()

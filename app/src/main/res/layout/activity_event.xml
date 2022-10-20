@@ -7,7 +7,6 @@
     tools:context=".EventActivity"
     android:id="@+id/eventRefresh">
 
-
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent">
@@ -25,94 +24,123 @@
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/layout_hide"
+            android:animateLayoutChanges="true"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:padding="12dp"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent">
+            android:layout_height="match_parent">
 
-
-            <TextView
-                android:id="@+id/eventTime"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="12dp"
-                android:textSize="16sp"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/eventDate"
-                tools:text="Palu" />
-
-            <TextView
-                android:id="@+id/eventDate"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textSize="16sp"
-                app:layout_constraintStart_toStartOf="@+id/eventName"
-                app:layout_constraintTop_toBottomOf="@+id/eventName"
-                tools:text="1 Januari 1970" />
-
-            <TextView
-                android:id="@+id/eventName"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="12dp"
-                android:layout_marginTop="4dp"
-                android:textSize="24sp"
-                android:textStyle="bold"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                tools:text="Maruboro Boulder" />
-
-            <TextView
-                android:id="@+id/eventTotalParticipant"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="12dp"
-                android:layout_marginTop="16dp"
-                android:textSize="12sp"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/eventTime"
-                tools:text="Jumlah Peserta : 0" />
-
-        </androidx.constraintlayout.widget.ConstraintLayout>
-
-        <com.google.android.material.card.MaterialCardView
-            android:id="@+id/materialCardView5"
-            style="@style/CustomCardViewStyle"
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/layout_hide">
-
-            <LinearLayout
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/layout_detail"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:padding="12dp">
+                android:padding="12dp"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent">
 
-                <androidx.recyclerview.widget.RecyclerView
-                    android:id="@+id/participantRv"
+                <ImageView
+                    android:id="@+id/eventTimeEdit"
+                    android:layout_width="16dp"
+                    android:layout_height="16dp"
+                    android:layout_marginStart="16dp"
+                    android:layout_marginTop="4dp"
+                    android:visibility="gone"
+                    android:src="@drawable/ic_baseline_edit_24"
+                    app:layout_constraintStart_toEndOf="@+id/eventTime"
+                    app:layout_constraintTop_toBottomOf="@+id/eventDate" />
+
+
+                <TextView
+                    android:id="@+id/eventTime"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="12dp"
+                    android:textSize="16sp"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/eventDate"
+                    tools:text="19:30" />
+
+                <ImageView
+                    android:id="@+id/eventDateEdit"
+                    android:layout_width="16dp"
+                    android:layout_height="16dp"
+                    android:layout_marginStart="16dp"
+                    android:layout_marginTop="4dp"
+                    android:visibility="gone"
+                    android:src="@drawable/ic_baseline_edit_24"
+                    app:layout_constraintStart_toEndOf="@+id/eventDate"
+                    app:layout_constraintTop_toBottomOf="@+id/eventName" />
+
+                <TextView
+                    android:id="@+id/eventDate"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="16sp"
+                    app:layout_constraintStart_toStartOf="@+id/eventName"
+                    app:layout_constraintTop_toBottomOf="@+id/eventName"
+                    tools:text="1 Januari 1970" />
+
+                <TextView
+                    android:id="@+id/eventName"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="12dp"
+                    android:layout_marginTop="4dp"
+                    android:textSize="24sp"
+                    android:textStyle="bold"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    tools:text="Maruboro Boulder" />
+
+                <TextView
+                    android:id="@+id/eventTotalParticipant"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="12dp"
+                    android:layout_marginTop="16dp"
+                    android:textSize="12sp"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/eventTime"
+                    tools:text="Jumlah Peserta : 0" />
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/materialCardView5"
+                style="@style/CustomCardViewStyle"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/layout_detail">
+
+                <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/eventTotalParticipant" />
+                    android:padding="12dp">
 
-            </LinearLayout>
-        </com.google.android.material.card.MaterialCardView>
+                    <androidx.recyclerview.widget.RecyclerView
+                        android:id="@+id/participantRv"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toBottomOf="@+id/eventTotalParticipant" />
 
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/btn_eventEdit"
-            style="@style/ThemeOverlay.Material3.Button.TextButton"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_margin="12dp"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            tools:text="CEK"
-            tools:visibility="visible" />
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btn_eventEdit"
+                style="@style/ThemeOverlay.Material3.Button.TextButton"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="12dp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                tools:text="CEK"
+                tools:visibility="visible" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
