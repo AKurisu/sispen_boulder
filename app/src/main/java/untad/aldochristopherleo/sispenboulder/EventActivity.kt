@@ -1,8 +1,15 @@
 package untad.aldochristopherleo.sispenboulder
 
+import android.Manifest
 import android.content.Intent
+import android.content.pm.PackageManager
+import android.graphics.Color
+import android.net.Uri
 import android.os.Build
+import android.os.Build.VERSION.SDK_INT
 import android.os.Bundle
+import android.os.Environment
+import android.provider.Settings
 import android.text.format.DateFormat
 import android.util.Log
 import android.view.Menu
@@ -13,6 +20,9 @@ import android.widget.EditText
 import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
+import androidx.core.view.isEmpty
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
@@ -20,6 +30,7 @@ import com.google.android.material.datepicker.CalendarConstraints
 import com.google.android.material.datepicker.DateValidatorPointForward
 import com.google.android.material.datepicker.MaterialDatePicker
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import com.google.android.material.textfield.TextInputLayout
 import com.google.android.material.timepicker.MaterialTimePicker
 import com.google.android.material.timepicker.TimeFormat
 import com.google.firebase.database.DataSnapshot
@@ -27,17 +38,17 @@ import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.ValueEventListener
 import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
+import org.apache.commons.compress.archivers.dump.DumpArchiveEntry.PERMISSION
 import untad.aldochristopherleo.sispenboulder.adapter.ListParticipantAdapter
 import untad.aldochristopherleo.sispenboulder.data.*
 import untad.aldochristopherleo.sispenboulder.databinding.ActivityEventBinding
 import untad.aldochristopherleo.sispenboulder.util.Ahp
 import untad.aldochristopherleo.sispenboulder.util.MainViewModel
+import untad.aldochristopherleo.sispenboulder.util.PrintData
 import untad.aldochristopherleo.sispenboulder.util.Topsis
 import java.text.SimpleDateFormat
 import java.util.*
-import kotlin.collections.ArrayList
-import kotlin.collections.HashMap
-import kotlin.collections.LinkedHashMap
+
 
 @Suppress("DEPRECATION")
 class EventActivity : AppCompatActivity() {
@@ -45,8 +56,8 @@ class EventActivity : AppCompatActivity() {
     companion object {
         const val EXTRA_EVENT = "extra_event"
         const val EXTRA_EVENT_KEY = "extra_event_key"
+        const val PERMISSION_REQUEST_CODE = 0
     }
-
     private var userType : String? = null
     private var userName : String? = null
     private var _bind : ActivityEventBinding? = null
@@ -116,6 +127,7 @@ class EventActivity : AppCompatActivity() {
         }
 
         statusEvent = if (event.status != null) event.status!! else "KOSONG"
+
 
         database.child("events/${eventKey}/status").addValueEventListener(object : ValueEventListener{
             override fun onDataChange(snapshot: DataSnapshot) {
@@ -356,6 +368,7 @@ class EventActivity : AppCompatActivity() {
                     finish()
                 }
         } else if (statusEvent == "PERSIAPAN") {
+            bind.eventName.setTextColor(Color.YELLOW)
             if (userType == "Juri Lapangan") {
                 bind.btnEventEdit.visibility = View.GONE
             } else if (userType == "Panitia") {
@@ -370,6 +383,7 @@ class EventActivity : AppCompatActivity() {
                 } else bind.btnEventEdit.text = "Tambah Peserta"
             }
         } else if (statusEvent == "LOMBA"){
+            bind.eventName.setTextColor(Color.GREEN)
             run stop@{
                 event.judges?.forEach { (key, value) ->
                     if (value.name == userName && userType == "Juri Lapangan"){
@@ -545,7 +559,34 @@ class EventActivity : AppCompatActivity() {
                     .show()
                 true
             }
+            R.id.menu_print_hasil -> {
+                val editText = EditText(this)
+                editText.setText(event.name)
+                MaterialAlertDialogBuilder(this)
+                    .setTitle("Masukkan Nama File")
+                    .setView(editText)
+                    .setPositiveButton("OK") { _, _ ->
+                        Log.d("EPERMISS", checkPermission().toString())
+                        if (checkPermission()){
+                            if (editText.text.isNullOrEmpty()){
+                                print("workbook")
+                            } else print(editText.text.toString())
+                        } else requestPermission()
+                    }
+                    .show()
+                true
+            }
             else -> super.onOptionsItemSelected(item)
+        }
+    }
+
+    private fun print(fileName: String) {
+        val printData = PrintData(sortedResultSend)
+        try {
+            printData.print(fileName)
+            Toast.makeText(this, "File Berhasil Disimpan", Toast.LENGTH_SHORT).show()
+        } catch (e: Exception){
+            Toast.makeText(this, "File Gagal Disimpan", Toast.LENGTH_SHORT).show()
         }
     }
 
@@ -628,8 +669,8 @@ class EventActivity : AppCompatActivity() {
         val menuHapus = menu.findItem(R.id.menu_hapus_event)
         val menuMulai = menu.findItem(R.id.menu_start_event)
         val menuHapusPeserta = menu.findItem(R.id.menu_hapus_peserta)
-
         val menuJuriLapangan = menu.findItem(R.id.menu_nama_juri_lapangan)
+        val menuPrint = menu.findItem(R.id.menu_print_hasil)
 
         if (userType != "Admin") {
             menuAhp?.isVisible = false
@@ -645,6 +686,10 @@ class EventActivity : AppCompatActivity() {
             menuJuriLapangan.isVisible = false
             menuHapusPeserta?.isVisible = false
         }
+
+        if (userType == "Presiden Juri" || userType == "Panitia"){
+            menuPrint.isVisible = true
+        }
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
@@ -656,5 +701,75 @@ class EventActivity : AppCompatActivity() {
             bool = true
         }
         return bool
+    }
+
+
+    private fun checkPermission(): Boolean {
+        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            Environment.isExternalStorageManager()
+        } else {
+            val result =
+                ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE)
+            val result1 =
+                ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)
+            result == PackageManager.PERMISSION_GRANTED && result1 == PackageManager.PERMISSION_GRANTED
+        }
+    }
+
+    private fun requestPermission() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            try {
+                val intent = Intent(Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION)
+                intent.addCategory("android.intent.category.DEFAULT")
+                intent.data = Uri.parse(String.format("package:%s", applicationContext.packageName))
+                startActivityForResult(intent, 2296)
+            } catch (e: Exception) {
+                val intent = Intent()
+                intent.action = Settings.ACTION_MANAGE_ALL_FILES_ACCESS_PERMISSION
+                startActivityForResult(intent, 2296)
+            }
+        } else {
+            //below android 11
+            ActivityCompat.requestPermissions(
+                this,
+                arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE),
+                PERMISSION_REQUEST_CODE
+            )
+        }
+    }
+
+    @Deprecated("Deprecated in Java")
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if (requestCode == 2296) {
+            if (SDK_INT >= Build.VERSION_CODES.R) {
+                if (Environment.isExternalStorageManager()) {
+                    // perform action when allow permission success
+                } else {
+                    Toast.makeText(this, "Allow permission for storage access!", Toast.LENGTH_SHORT)
+                        .show()
+                }
+            }
+        }
+    }
+
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<String>,
+        grantResults: IntArray
+    ) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        when (requestCode) {
+            PERMISSION_REQUEST_CODE -> if (grantResults.size > 0) {
+                val READ_EXTERNAL_STORAGE = grantResults[0] == PackageManager.PERMISSION_GRANTED
+                val WRITE_EXTERNAL_STORAGE = grantResults[1] == PackageManager.PERMISSION_GRANTED
+                if (READ_EXTERNAL_STORAGE && WRITE_EXTERNAL_STORAGE) {
+                    // perform action when allow permission success
+                } else {
+                    Toast.makeText(this, "Allow permission for storage access!", Toast.LENGTH_SHORT)
+                        .show()
+                }
+            }
+        }
     }
 }

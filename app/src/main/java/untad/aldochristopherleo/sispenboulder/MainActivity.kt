@@ -1,11 +1,21 @@
 package untad.aldochristopherleo.sispenboulder
 
+import android.Manifest.permission.READ_EXTERNAL_STORAGE
+import android.Manifest.permission.WRITE_EXTERNAL_STORAGE
 import android.content.Intent
+import android.content.pm.PackageManager
+import android.net.Uri
+import android.os.Build
+import android.os.Build.VERSION.SDK_INT
 import android.os.Bundle
+import android.os.Environment
+import android.provider.Settings
 import android.view.View
 import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 import androidx.navigation.findNavController
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.setupActionBarWithNavController
@@ -13,6 +23,7 @@ import androidx.navigation.ui.setupWithNavController
 import untad.aldochristopherleo.sispenboulder.databinding.ActivityMainBinding
 import untad.aldochristopherleo.sispenboulder.util.ConnectionLiveData
 import untad.aldochristopherleo.sispenboulder.util.MainViewModel
+
 
 class MainActivity : AppCompatActivity(), View.OnClickListener {
 
@@ -69,6 +80,7 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
         }
     }
 
+    @Deprecated("Deprecated in Java")
     override fun onBackPressed() {
         if (backPressedTime + 2000 > System.currentTimeMillis()){
             backToast.cancel()
@@ -82,4 +94,5 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
         backPressedTime = System.currentTimeMillis()
 
     }
+
 }
