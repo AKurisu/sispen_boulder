@@ -31,6 +31,7 @@ class AddJudgesActivity : AppCompatActivity() {
     private lateinit var judges: ArrayList<String>
     private lateinit var alertBuilder : AlertDialog.Builder
     private var eventData: Event? = null
+    private var eventKey : String? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -42,6 +43,8 @@ class AddJudgesActivity : AppCompatActivity() {
         } else {
             intent.getParcelableExtra<Event>("EXTRA_EVENT") as Event
         }
+
+        eventKey = intent.getStringExtra("EXTRA_EVENT_KEY")
 
         setEventList()
 
@@ -92,7 +95,7 @@ class AddJudgesActivity : AppCompatActivity() {
             confirmJudges()
         }
     }
-
+// Hapus FUNGSI SETEVENTLIST!
     private fun setEventList() {
         Log.d("ADDJUDGE", eventData?.judges.isNullOrEmpty().toString())
         if (!eventData?.judges.isNullOrEmpty()){
@@ -146,7 +149,7 @@ class AddJudgesActivity : AppCompatActivity() {
         }
 
         if (eventData != null){
-            database.child("events/${eventData!!.name}/judges").setValue(juri)
+            database.child("events/${eventKey}/judges").setValue(juri)
             Toast.makeText(this, "Data Berhasil Ditambahkan", Toast.LENGTH_SHORT).show()
             finish()
         } else Toast.makeText(this, "Terjadi Masalah Koneksi", Toast.LENGTH_SHORT).show()

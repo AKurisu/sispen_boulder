@@ -131,10 +131,11 @@ class AddEventActivity : AppCompatActivity() {
         val l = LocalDateTime.parse(dateStr, DateTimeFormatter.ofPattern("EEEE, d MMMM yyyy HH:mm"))
         Toast.makeText(this,dateStr,Toast.LENGTH_SHORT).show()
         val date = l.toInstant(ZoneId.systemDefault().rules.getOffset(l)).toEpochMilli()
+        val key = database.child("events").push().key.toString()
 
         val event = Event(name, date, location, false, 0, president, status = "PERSIAPAN")
 
-        database.child("events").child(name).setValue(event).addOnSuccessListener {
+        database.child("events").child(key).setValue(event).addOnSuccessListener {
             Toast.makeText(this, "Lomba Berhasil Ditambahkan", Toast.LENGTH_SHORT).show()
             finish()
         }.addOnFailureListener {

@@ -28,6 +28,7 @@ class GradingActivity : AppCompatActivity() {
     companion object {
         const val EXTRA_EVENT = "extra_event"
         const val EXTRA_KEY = "extra_key"
+        const val EXTRA_EVENT_KEY = "extra_event_key"
     }
 
     private var _bind : ActivityGradingBinding? = null
@@ -42,6 +43,7 @@ class GradingActivity : AppCompatActivity() {
     private lateinit var total: Result
     private lateinit var event: Event
     private lateinit var userKey: String
+    private lateinit var eventKey: String
     private lateinit var selectedKeyParticipant: String
     private lateinit var keyParticipant: ArrayList<String>
     private lateinit var stringArray: Array<String>
@@ -53,6 +55,7 @@ class GradingActivity : AppCompatActivity() {
         _bind = ActivityGradingBinding.inflate(layoutInflater)
         setContentView(bind.root)
 
+        eventKey = intent.getStringExtra(EXTRA_EVENT_KEY).toString()
         userKey = intent.getStringExtra(EXTRA_KEY).toString()
         if (Build.VERSION.SDK_INT >= 33){
             event = intent.getParcelableExtra(EXTRA_EVENT, Event::class.java)!!
@@ -68,7 +71,7 @@ class GradingActivity : AppCompatActivity() {
         selectedKeyParticipant = ""
 
         if (event != null) {
-            viewModel.getParticipant(event.name).addValueEventListener(object : ValueEventListener {
+            viewModel.getParticipant(eventKey).addValueEventListener(object : ValueEventListener {
                 override fun onDataChange(snapshot: DataSnapshot) {
                     val nameList = ArrayList<String>()
                     val keyList = ArrayList<String>()
@@ -80,7 +83,7 @@ class GradingActivity : AppCompatActivity() {
                     }
                     val checkList = ArrayList<String>()
                     keyParticipant = ArrayList()
-                    database.child("result/${event.name}").get().addOnSuccessListener {
+                    database.child("result/$eventKey").get().addOnSuccessListener {
                         for (index in keyList.indices){
                             if (!it.hasChild(keyList[index])){
                                 checkList.add(nameList[index])
@@ -112,8 +115,7 @@ class GradingActivity : AppCompatActivity() {
             MaterialAlertDialogBuilder(this)
                 .setTitle("Apakah Data Yang Dimasukkan Sudah Benar?")
                 .setMessage("Peserta yang dinilai : $participant")
-                .setNegativeButton("Tidak"){ _, _ ->
-                }
+                .setNegativeButton("Tidak"){ _, _ -> }
                 .setPositiveButton("Yakin"){ _, _ ->
                     if (event != null) {
                         setResult(participant)
@@ -124,7 +126,7 @@ class GradingActivity : AppCompatActivity() {
     }
 
     private fun setResultValue() {
-        database.child("result/${event.name}/$selectedKeyParticipant/Total").get().addOnSuccessListener {
+        database.child("result/$eventKey/$selectedKeyParticipant/Total").get().addOnSuccessListener {
             if (it.value != null){
                 total = it.getValue(Result::class.java)!!
                 Toast.makeText(this, it.toString(), Toast.LENGTH_SHORT).show()
@@ -149,8 +151,8 @@ class GradingActivity : AppCompatActivity() {
         val result = Result(topValue.toDouble(), atValue.toDouble(), bonusValue.toDouble(), abValue.toDouble())
         val resultTotal =
             Result(result.top + total.top, result.at + total.at, result.bonus + total.bonus, result.ab + total.ab)
-        database.child("result/${event.name}/$selectedKeyParticipant/$userKey").setValue(result).addOnSuccessListener {
-            database.child("result/${event.name}/$selectedKeyParticipant/Total").setValue(resultTotal).addOnSuccessListener {
+        database.child("result/$eventKey/$selectedKeyParticipant/$userKey").setValue(result).addOnSuccessListener {
+            database.child("result/$eventKey/$selectedKeyParticipant/Total").setValue(resultTotal).addOnSuccessListener {
                 Toast.makeText(this, "Data Berhasil Diinput", Toast.LENGTH_SHORT).show()
                 finish()
             }

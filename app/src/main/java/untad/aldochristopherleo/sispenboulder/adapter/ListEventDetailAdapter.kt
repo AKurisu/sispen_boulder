@@ -13,7 +13,7 @@ import untad.aldochristopherleo.sispenboulder.R
 import untad.aldochristopherleo.sispenboulder.data.Event
 import untad.aldochristopherleo.sispenboulder.util.DateConverter
 
-class ListEventDetailAdapter(private val event: ArrayList<Event>):
+class ListEventDetailAdapter(private val event: ArrayList<Event>, private val eventKeys: ArrayList<String>):
     RecyclerView.Adapter<ListEventDetailAdapter.ListViewHolder>() {
     class ListViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView){
         var name : TextView = itemView.findViewById(R.id.item_contest_name_detail)
@@ -44,6 +44,7 @@ class ListEventDetailAdapter(private val event: ArrayList<Event>):
 
         holder.itemView.setOnClickListener {
             val intent = Intent(holder.itemView.context, EventActivity::class.java)
+            intent.putExtra(EventActivity.EXTRA_EVENT_KEY, eventKeys[position])
             intent.putExtra(EventActivity.EXTRA_EVENT, event[position])
             holder.itemView.context.startActivity(intent)
         }

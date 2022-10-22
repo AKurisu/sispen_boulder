@@ -10,5 +10,9 @@
         android:title="Ubah Detail"/>
     <item android:id="@+id/menu_hapus_event"
         android:title="Hapus Event"/>
+    <item android:id="@+id/menu_hapus_peserta"
+        android:title="Hapus Peserta"/>
+    <item android:id="@+id/menu_nama_juri_lapangan"
+        android:title="Nama Juri Lapangan"/>
 
 </menu>

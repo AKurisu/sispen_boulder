@@ -24,10 +24,8 @@ import com.google.android.material.timepicker.MaterialTimePicker
 import com.google.android.material.timepicker.TimeFormat
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
-import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.ValueEventListener
 import com.google.firebase.database.ktx.database
-import com.google.firebase.database.ktx.getValue
 import com.google.firebase.ktx.Firebase
 import untad.aldochristopherleo.sispenboulder.adapter.ListParticipantAdapter
 import untad.aldochristopherleo.sispenboulder.data.*
@@ -46,6 +44,7 @@ class EventActivity : AppCompatActivity() {
 
     companion object {
         const val EXTRA_EVENT = "extra_event"
+        const val EXTRA_EVENT_KEY = "extra_event_key"
     }
 
     private var userType : String? = null
@@ -54,8 +53,14 @@ class EventActivity : AppCompatActivity() {
     private val database = Firebase.database.reference
     private val bind get() = _bind!!
     private val viewModel: MainViewModel by viewModels()
+    private lateinit var eventKey: String
     private lateinit var menu: Menu
     private lateinit var result : LinkedHashMap<String, Result>
+    private lateinit var resultWall1 : ArrayList<Result>
+    private lateinit var resultWall2 : ArrayList<Result>
+    private lateinit var resultWall3 : ArrayList<Result>
+    private lateinit var resultWall4 : ArrayList<Result>
+    private lateinit var judgesList : ArrayList<String>
     private lateinit var statusEvent : String
     private lateinit var booleanArray: BooleanArray
     private lateinit var stringArray: Array<String>
@@ -71,6 +76,7 @@ class EventActivity : AppCompatActivity() {
     private lateinit var rv: RecyclerView
     private lateinit var refreshListener: SwipeRefreshLayout.OnRefreshListener
     private lateinit var judgeKey: String
+    private var refreshPulledTime : Long = 0
     private val participantList = ArrayList<Alternative>()
     private val allParticipantList = ArrayList<String>()
     private val checkedItems = ArrayList<Boolean>()
@@ -90,6 +96,7 @@ class EventActivity : AppCompatActivity() {
         bind.progressBar.visibility = View.VISIBLE
         swipeRefreshLayout = bind.eventRefresh
 
+        eventKey = intent.getStringExtra(GradingActivity.EXTRA_EVENT_KEY).toString()
         event = intent.getParcelableExtra<Event>(EXTRA_EVENT) as Event
         allParticipant = ArrayList()
         allParticipantKey = ArrayList()
@@ -98,10 +105,19 @@ class EventActivity : AppCompatActivity() {
         sortedResult = ArrayList()
         sortedResultSend = ArrayList()
         resultArray = ArrayList()
+        resultWall1 = ArrayList()
+        resultWall2 = ArrayList()
+        resultWall3 = ArrayList()
+        resultWall4 = ArrayList()
+        judgesList = ArrayList()
+
+        event.judges?.forEach { (_, item) ->
+            item.name?.let { judgesList.add(it) }
+        }
 
         statusEvent = if (event.status != null) event.status!! else "KOSONG"
 
-        database.child("events/${event.name}/status").addValueEventListener(object : ValueEventListener{
+        database.child("events/${eventKey}/status").addValueEventListener(object : ValueEventListener{
             override fun onDataChange(snapshot: DataSnapshot) {
                 statusEvent = snapshot.value.toString()
                 checkEventStatus()
@@ -117,9 +133,17 @@ class EventActivity : AppCompatActivity() {
         checkEventParticipant()
 
         refreshListener = SwipeRefreshLayout.OnRefreshListener {
-            swipeRefreshLayout.isRefreshing = true
-            checkEventParticipant()
-            swipeRefreshLayout.isRefreshing = false
+            if (refreshPulledTime + 60000 > System.currentTimeMillis()){
+                Toast.makeText(this, "Tunggu 1 menit sebelum refresh ulang", Toast.LENGTH_SHORT).show()
+                swipeRefreshLayout.isRefreshing = false
+            } else {
+                swipeRefreshLayout.isRefreshing = true
+                getEventData()
+                checkEventParticipant()
+                swipeRefreshLayout.isRefreshing = false
+            }
+
+            refreshPulledTime = System.currentTimeMillis()
         }
 
         rv.layoutManager = LinearLayoutManager(this)
@@ -167,13 +191,9 @@ class EventActivity : AppCompatActivity() {
             checkEventStatus()
         }
 
-
-
         if (event.finished){
             bind.btnEventEdit.visibility = View.GONE
         }
-
-        (event.name + " (" + event.location + ")").also { bind.eventName.text = it }
 
         setViewText()
 
@@ -191,16 +211,18 @@ class EventActivity : AppCompatActivity() {
         bind.btnEventEdit.setOnClickListener{
             when (userType) {
                 "Panitia" -> {
-                    setButtonAction(choosenParticipant, choosenKey)
+                    setParticipantEvent(choosenParticipant, choosenKey)
                 }
                 "Juri Lapangan" -> {
                     val intent = Intent(this, GradingActivity::class.java)
+                    intent.putExtra(GradingActivity.EXTRA_EVENT_KEY, eventKey)
                     intent.putExtra(GradingActivity.EXTRA_EVENT, event)
                     intent.putExtra(GradingActivity.EXTRA_KEY, judgeKey)
                     startActivity(intent)
                 }
                 "Presiden Juri" -> {
                     val intent = Intent(this, AddJudgesActivity::class.java)
+                    intent.putExtra("EXTRA_EVENT_KEY", eventKey)
                     intent.putExtra("EXTRA_EVENT", event)
                     startActivity(intent)
                 }
@@ -211,12 +233,33 @@ class EventActivity : AppCompatActivity() {
 
     }
 
+    private fun getEventData(){
+        database.child("events/$eventKey").addValueEventListener(
+            object : ValueEventListener{
+                override fun onDataChange(snapshot: DataSnapshot) {
+                    val latestEventData : Event? = snapshot.getValue(Event::class.java)
+                    if (latestEventData != null){
+                        if (event != latestEventData){
+                            event = latestEventData
+                            setViewText()
+                        }
+                    }
+                }
+
+                override fun onCancelled(error: DatabaseError) {
+                    Log.e("EVENT_DATA", error.toString())
+                }
+
+            }
+        )
+    }
+
     private fun setViewText() {
         val locale = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N){
-            getResources().getConfiguration().getLocales().get(0);
+            resources.configuration.locales.get(0);
         } else{
             //noinspection deprecation
-            getResources().getConfiguration().locale;
+            resources.configuration.locale;
         }
         val date = Date(event.date)
         val dateFormat = SimpleDateFormat("E, dd-MM-yyyy", locale)
@@ -224,6 +267,7 @@ class EventActivity : AppCompatActivity() {
         val dateText = dateFormat.format(date)
         val timeText = timeFormat.format(date)
 
+        (event.name + " (" + event.location + ")").also { bind.eventName.text = it }
         bind.eventDate.text = dateText
         bind.eventTime.text = timeText
         bind.eventTotalParticipant.text = getString(R.string.txt_jumlah_peserta, event.totalParticipant.toString())
@@ -232,45 +276,75 @@ class EventActivity : AppCompatActivity() {
     private fun checkEventParticipant() {
         Log.d("CheckFirst", sortedResult.size.toString())
 
-        viewModel.getParticipant(event.name).addListenerForSingleValueEvent(
-            object : ValueEventListener {
-                override fun onDataChange(snapshot: DataSnapshot) {
-                    sortedResult.clear()
-                    sortedResultSend.clear()
-                    participantList.clear()
-                    result.clear()
-                    for (item in snapshot.children) {
-                        val participant = item.getValue(Participant::class.java)
-                        val participantKey = item.key
-                        participantList.add(Alternative(participant?.name))
+        viewModel.getParticipant(eventKey).get().addOnSuccessListener { snapshot ->
+            sortedResult.clear()
+            sortedResultSend.clear()
+            participantList.clear()
+            result.clear()
+            resultWall1.clear()
+            resultWall2.clear()
+            resultWall3.clear()
+            resultWall4.clear()
+            for (item in snapshot.children) {
+                val participant = item.getValue(Participant::class.java)
+                val participantKey = item.key
+                participantList.add(Alternative(participant?.name))
 
-                        viewModel.getResult(event.name).get().addOnSuccessListener {
-                            var data = Result()
-                            if(it.hasChild(participantKey!!)){
-                                if (participant != null) {
-                                    Log.d("CHECKPART",it.toString())
-                                    result[participant.name + " ("+ participant.group + ")"] =
-                                        it.child("$participantKey/Total").getValue(Result::class.java)!!
-                                    data = it.child("$participantKey/Total").getValue(Result::class.java)!!
-                                }
-                            } else if (participant != null) {
-                                result[participant.name + " ("+ participant.group + ")"] = Result()
-                            }
+                viewModel.getResult(eventKey).get().addOnSuccessListener {
+                    var data = Result()
+                    if(it.hasChild(participantKey!!)){
+                        if (participant != null) {
+                            Log.d("CHECKPART",it.toString())
 
-                            resultArray.addAll(data.toArrayList())
-                            Log.d("OnDataChange",(snapshot.childrenCount * 4).toString() +" "+ resultArray.size.toLong().toString())
+                            result[participant.name + " ("+ participant.group + ")"] =
+                                it.child("$participantKey/Total").getValue(Result::class.java)!!
+                            data = it.child("$participantKey/Total").getValue(Result::class.java)!!
 
-                            if ((snapshot.childrenCount * 4) == resultArray.size.toLong()){
-                                setPosition(snapshot.childrenCount)
-                            }
+                            if ( it.child("$participantKey/Dinding 1").exists() ){
+                                resultWall1.add(it.child("$participantKey/Dinding 1").getValue(Result::class.java)!!)
+                            } else resultWall1.add(Result())
+                            if ( it.child("$participantKey/Dinding 2").exists() ){
+                                resultWall2.add(it.child("$participantKey/Dinding 2").getValue(Result::class.java)!!)
+                            } else resultWall2.add(Result())
+                            if ( it.child("$participantKey/Dinding 3").exists() ){
+                                resultWall3.add(it.child("$participantKey/Dinding 3").getValue(Result::class.java)!!)
+                            } else resultWall3.add(Result())
+                            if ( it.child("$participantKey/Dinding 4").exists() ){
+                                resultWall4.add(it.child("$participantKey/Dinding 4").getValue(Result::class.java)!!)
+                            } else resultWall4.add(Result())
+
                         }
+                    } else if (participant != null) {
+                        result[participant.name + " ("+ participant.group + ")"] = Result()
+                        resultWall1.add(Result())
+                        resultWall2.add(Result())
+                        resultWall3.add(Result())
+                        resultWall4.add(Result())
+                    }
+
+                    Log.d("OnDataChange",resultWall1.size.toString())
+
+
+                    resultArray.addAll(data.toArrayList())
+                    Log.d("OnDataChange",(snapshot.childrenCount * 4).toString() +" "+ resultArray.size.toLong().toString())
+
+                    if ((snapshot.childrenCount * 4) == resultArray.size.toLong()){
+                        setPosition(snapshot.childrenCount)
                     }
                 }
+            }
+        }
 
-                override fun onCancelled(error: DatabaseError) {
-                    Log.w("TAG", "loadPost:onCancelled", error.toException())
-                }
-            })
+//        viewModel.getParticipant(event.name).addListenerForSingleValueEvent(
+//            object : ValueEventListener {
+//                override fun onDataChange(snapshot: DataSnapshot) {
+//
+//                }
+//
+//                override fun onCancelled(error: DatabaseError) {
+//                    Log.w("TAG", "loadPost:onCancelled", error.toException())
+//                }
+//            })
     }
 
     private fun checkEventStatus(){
@@ -308,7 +382,7 @@ class EventActivity : AppCompatActivity() {
         }
     }
 
-    private fun setButtonAction(
+    private fun setParticipantEvent(
         participant: ArrayList<Participant>,
         key: ArrayList<String>
     ) {
@@ -323,7 +397,7 @@ class EventActivity : AppCompatActivity() {
                     choosenKey = saveChoosenKey
                 }
                 .setPositiveButton("Ya") { _, _ ->
-                    viewModel.getParticipant(event.name).removeValue()
+                    viewModel.getParticipant(eventKey).removeValue()
                     if (choosenParticipant.isNotEmpty()){
                         val listChoosenParticipant = HashMap<String, Participant>()
                         for (index in choosenParticipant.indices){
@@ -333,10 +407,10 @@ class EventActivity : AppCompatActivity() {
 //                                .setValue(choosenParticipant[index])
                             //Simpan Data Participant
                         }
-                        database.child("events/${event.name}/participant")
+                        database.child("events/${eventKey}/participant")
                             .setValue(listChoosenParticipant)
                     }
-                    database.child("events/${event.name}/totalParticipant")
+                    database.child("events/${eventKey}/totalParticipant")
                         .setValue(choosenParticipant.size)
 
                     checkEventParticipant()
@@ -364,7 +438,8 @@ class EventActivity : AppCompatActivity() {
 
                 for ((index, item) in result.keys.withIndex()){
                     Log.d("CHECK", result.size.toString())
-                    sortedResult.add(SortedResult(item, resultTopsis[index], result[item]))
+                    sortedResult.add(SortedResult(item, resultTopsis[index], result[item],
+                        resultWall1[index], resultWall2[index], resultWall3[index], resultWall4[index]))
                 }
 
                 sortedResult.sortByDescending { it.preferenceValue }
@@ -411,7 +486,7 @@ class EventActivity : AppCompatActivity() {
                 MaterialAlertDialogBuilder(this)
                     .setMessage("Apakah Anda Yakin Ingin Menghapus Ini?")
                     .setPositiveButton("Ya"){_,_ ->
-                        database.child("events/${event.name}").removeValue().addOnSuccessListener {
+                        database.child("events/$eventKey").removeValue().addOnSuccessListener {
                             Toast.makeText(this, "Event berhasil dihapus", Toast.LENGTH_SHORT).show()
                             finish()
                         }
@@ -424,9 +499,11 @@ class EventActivity : AppCompatActivity() {
             R.id.menu_edit_event -> {
                 if (event.status != "SELESAI"){
                     if(bind.eventDateEdit.visibility == View.GONE){
+                        bind.eventNameEdit.visibility = View.VISIBLE
                         bind.eventDateEdit.visibility = View.VISIBLE
                         bind.eventTimeEdit.visibility = View.VISIBLE
                     } else {
+                        bind.eventNameEdit.visibility = View.GONE
                         bind.eventDateEdit.visibility = View.GONE
                         bind.eventTimeEdit.visibility = View.GONE
                     }
@@ -438,11 +515,32 @@ class EventActivity : AppCompatActivity() {
                     .setTitle("Apakah Lomba Siap Dimulai")
                     .setMessage("Jumlah Peserta" + participantList.size.toString())
                     .setPositiveButton("Ya"){_,_ ->
-                        database.child("events/${event.name}/status")
+                        database.child("events/$eventKey/status")
                             .setValue("LOMBA")
                             .addOnSuccessListener {
                                 checkEventStatus()
                             }
+                    }
+                    .show()
+                true
+            }
+            R.id.menu_hapus_peserta -> {
+                setParticipantEvent(choosenParticipant, choosenKey)
+                true
+            }
+            R.id.menu_nama_juri_lapangan -> {
+                var message = ""
+                if (judgesList.size != 0){
+                    judgesList.forEachIndexed { index, s ->
+                        message = message + "Dinding ${index + 1} = " + s + "\n"
+                    }
+                } else message = "Juri lapangan belum dipilih"
+
+
+                MaterialAlertDialogBuilder(this)
+                    .setTitle("Juri Lapangan yang bertugas")
+                    .setMessage(message)
+                    .setPositiveButton("OK") { _, _ ->
                     }
                     .show()
                 true
@@ -529,6 +627,9 @@ class EventActivity : AppCompatActivity() {
         val menuUbah = menu.findItem(R.id.menu_edit_event)
         val menuHapus = menu.findItem(R.id.menu_hapus_event)
         val menuMulai = menu.findItem(R.id.menu_start_event)
+        val menuHapusPeserta = menu.findItem(R.id.menu_hapus_peserta)
+
+        val menuJuriLapangan = menu.findItem(R.id.menu_nama_juri_lapangan)
 
         if (userType != "Admin") {
             menuAhp?.isVisible = false
@@ -539,6 +640,11 @@ class EventActivity : AppCompatActivity() {
             menuHapus?.isVisible = false
         }
         menuMulai?.isVisible = false
+
+        if (userType != "Presiden Juri"){
+            menuJuriLapangan.isVisible = false
+            menuHapusPeserta?.isVisible = false
+        }
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {

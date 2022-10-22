@@ -56,10 +56,11 @@ class ListEventsAdapter(options: FirebaseRecyclerOptions<Event>) :
 //    }
 //    override fun getItemCount(): Int = listEvents.size
     override fun onBindViewHolder(holder: ListViewHolder, position: Int, model: Event) {
-
+        val key = getRef(position).key.toString()
         holder.bind(model)
         holder.itemView.setOnClickListener {
             val intent = Intent(holder.itemView.context, EventActivity::class.java)
+            intent.putExtra(EventActivity.EXTRA_EVENT_KEY, key)
             intent.putExtra(EventActivity.EXTRA_EVENT, model)
             holder.itemView.context.startActivity(intent)
         }

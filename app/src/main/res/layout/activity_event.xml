@@ -42,10 +42,11 @@
                     android:layout_height="16dp"
                     android:layout_marginStart="16dp"
                     android:layout_marginTop="4dp"
-                    android:visibility="gone"
                     android:src="@drawable/ic_baseline_edit_24"
+                    android:visibility="gone"
                     app:layout_constraintStart_toEndOf="@+id/eventTime"
-                    app:layout_constraintTop_toBottomOf="@+id/eventDate" />
+                    app:layout_constraintTop_toBottomOf="@+id/eventDate"
+                    tools:visibility="visible" />
 
 
                 <TextView
@@ -64,10 +65,11 @@
                     android:layout_height="16dp"
                     android:layout_marginStart="16dp"
                     android:layout_marginTop="4dp"
-                    android:visibility="gone"
                     android:src="@drawable/ic_baseline_edit_24"
+                    android:visibility="gone"
                     app:layout_constraintStart_toEndOf="@+id/eventDate"
-                    app:layout_constraintTop_toBottomOf="@+id/eventName" />
+                    app:layout_constraintTop_toBottomOf="@+id/eventName"
+                    tools:visibility="visible" />
 
                 <TextView
                     android:id="@+id/eventDate"
@@ -77,6 +79,18 @@
                     app:layout_constraintStart_toStartOf="@+id/eventName"
                     app:layout_constraintTop_toBottomOf="@+id/eventName"
                     tools:text="1 Januari 1970" />
+
+                <ImageView
+                    android:id="@+id/eventNameEdit"
+                    android:layout_width="16dp"
+                    android:layout_height="16dp"
+                    android:layout_marginStart="16dp"
+                    android:layout_marginTop="12dp"
+                    android:src="@drawable/ic_baseline_edit_24"
+                    android:visibility="gone"
+                    app:layout_constraintStart_toEndOf="@+id/eventName"
+                    app:layout_constraintTop_toTopOf="parent"
+                    tools:visibility="visible" />
 
                 <TextView
                     android:id="@+id/eventName"
@@ -129,18 +143,19 @@
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/btn_eventEdit"
-                style="@style/ThemeOverlay.Material3.Button.TextButton"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_margin="12dp"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                tools:text="CEK"
-                tools:visibility="visible" />
+
         </androidx.constraintlayout.widget.ConstraintLayout>
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btn_eventEdit"
+            style="@style/ThemeOverlay.Material3.Button.TextButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="12dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            tools:text="CEK"
+            tools:visibility="visible" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

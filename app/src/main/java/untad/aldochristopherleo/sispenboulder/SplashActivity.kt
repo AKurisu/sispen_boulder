@@ -41,13 +41,15 @@ class SplashActivity : AppCompatActivity() {
         }, 2000)
     }
 
+    @Deprecated("Deprecated in Java")
     override fun onBackPressed() {
         if (backPressedTime + 1000 > System.currentTimeMillis()){
             backToast.cancel()
+            finish()
             super.onBackPressed()
             return
         } else {
-            backToast = Toast.makeText(this, "Press back again on exit", Toast.LENGTH_SHORT)
+            backToast = Toast.makeText(this, "Press back again to exit", Toast.LENGTH_SHORT)
             backToast.show()
         }
 
