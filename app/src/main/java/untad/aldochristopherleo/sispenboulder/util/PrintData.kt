@@ -4,11 +4,13 @@ import android.util.Log
 import io.github.evanrupert.excelkt.Sheet
 import io.github.evanrupert.excelkt.Workbook
 import io.github.evanrupert.excelkt.workbook
+import org.apache.poi.hssf.usermodel.HSSFCreationHelper
 import org.apache.poi.ss.usermodel.BorderStyle
 import org.apache.poi.ss.usermodel.FillPatternType
 import org.apache.poi.ss.usermodel.HorizontalAlignment
 import org.apache.poi.ss.usermodel.IndexedColors
 import org.apache.poi.ss.util.CellRangeAddress
+import org.apache.poi.ss.util.RegionUtil
 import untad.aldochristopherleo.sispenboulder.data.SortedResult
 
 class PrintData(val result: ArrayList<SortedResult>) {
@@ -23,37 +25,43 @@ class PrintData(val result: ArrayList<SortedResult>) {
 
         dataToPrint =
         workbook {
-            sheet {
+            sheet("File 1") {
                 docHeader()
                 val nameWrap = createCellStyle{
                     wrapText = true
                 }
-                row {  }
                 var i = 1
+                val rowLeftStyle = createCellStyle {
+                    borderLeft = BorderStyle.THICK
+                }
+                val rowRightStyle = createCellStyle {
+                    borderRight = BorderStyle.THICK
+                }
                 for(item in result){
                     row {
+                        cell("")
                         cell(i++, nameWrap)
                         cell(item.name.toString(), nameWrap)
-                        cell(item.wall1.top.toInt())
+                        cell(item.wall1.top.toInt(), rowLeftStyle)
                         cell(item.wall1.bonus.toInt())
                         cell(item.wall1.at.toInt())
                         cell(item.wall1.ab.toInt())
-                        cell(item.wall2.top.toInt())
+                        cell(item.wall2.top.toInt(), rowLeftStyle)
                         cell(item.wall2.bonus.toInt())
                         cell(item.wall2.at.toInt())
                         cell(item.wall2.ab.toInt())
-                        cell(item.wall3.top.toInt())
+                        cell(item.wall3.top.toInt(), rowLeftStyle)
                         cell(item.wall3.bonus.toInt())
                         cell(item.wall3.at.toInt())
                         cell(item.wall3.ab.toInt())
-                        cell(item.wall4.top.toInt())
+                        cell(item.wall4.top.toInt(), rowLeftStyle)
                         cell(item.wall4.bonus.toInt())
                         cell(item.wall4.at.toInt())
                         cell(item.wall4.ab.toInt())
-                        item.result?.top?.toInt()?.let { cell(it) }
+                        item.result?.top?.toInt()?.let { cell(it, rowLeftStyle) }
                         item.result?.bonus?.toInt()?.let { cell(it) }
                         item.result?.at?.toInt()?.let { cell(it) }
-                        item.result?.ab?.toInt()?.let { cell(it) }
+                        item.result?.ab?.toInt()?.let { cell(it, rowRightStyle) }
                     }
                 }
             }
@@ -86,16 +94,17 @@ class PrintData(val result: ArrayList<SortedResult>) {
             alignment = HorizontalAlignment.CENTER
         }
 
-        xssfSheet.addMergedRegion(CellRangeAddress(0,1,0,0))
-        xssfSheet.addMergedRegion(CellRangeAddress(0,1,1,1))
-        xssfSheet.addMergedRegion(CellRangeAddress(0,0,2,5))
-        xssfSheet.addMergedRegion(CellRangeAddress(0,0,6,9))
-        xssfSheet.addMergedRegion(CellRangeAddress(0,0,10,13))
-        xssfSheet.addMergedRegion(CellRangeAddress(0,0,14,17))
-        xssfSheet.addMergedRegion(CellRangeAddress(0,0,18,21))
+        xssfSheet.addMergedRegion(range(0,1,1,1))
+        xssfSheet.addMergedRegion(range(0,1,2,2))
+        xssfSheet.addMergedRegion(range(0,0,3,6))
+        xssfSheet.addMergedRegion(range(0,0,7,10))
+        xssfSheet.addMergedRegion(range(0,0,11,14))
+        xssfSheet.addMergedRegion(range(0,0,15,18))
+        xssfSheet.addMergedRegion(range(0,0,19,22))
 
         row(headStyle) {
-            cell("No", createCellStyle{wrapText = true})
+            cell("")
+            cell("No")
             cell("Name")
             cell("Dinding 1")
             cell("")
@@ -119,6 +128,7 @@ class PrintData(val result: ArrayList<SortedResult>) {
         row(headingStyle) {
             cell("")
             cell("")
+            cell("")
             headings.forEach { cell(it) }
         }
     }
@@ -133,5 +143,7 @@ class PrintData(val result: ArrayList<SortedResult>) {
         var tes = path.path + "/" + dataName
         dataToPrint.write(tes)
     }
+
+    fun range(a: Int, b: Int, c: Int, d: Int): CellRangeAddress = CellRangeAddress(a,b,c,d)
 
 }

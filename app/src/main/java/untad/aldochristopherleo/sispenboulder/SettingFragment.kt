@@ -22,10 +22,10 @@ class SettingFragment : PreferenceFragmentCompat(){
             val ahp1 = preferenceScreen.findPreference<Preference>("penilaian_kriteria")
             val ahp2 = preferenceScreen.findPreference<Preference>("hasil_penilaian_kriteria")
 
-            if (ahp1 != null && ahp2 != null) {
-                preferenceScreen.removePreference(ahp1)
-                preferenceScreen.removePreference(ahp2)
-            }
+//            if (ahp1 != null && ahp2 != null) {
+//                preferenceScreen.removePreference(ahp1)
+//                preferenceScreen.removePreference(ahp2)
+//            }
         }
     }
 

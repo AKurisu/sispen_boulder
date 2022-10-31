@@ -141,6 +141,7 @@ class EventActivity : AppCompatActivity() {
         })
 
         rv = bind.participantRv
+        rv.layoutManager = LinearLayoutManager(this)
         adapter = ListParticipantAdapter(sortedResult)
         checkEventParticipant()
 
@@ -158,8 +159,7 @@ class EventActivity : AppCompatActivity() {
             refreshPulledTime = System.currentTimeMillis()
         }
 
-        rv.layoutManager = LinearLayoutManager(this)
-        rv.adapter = adapter
+
 
         viewModel.getAllParticipants().addValueEventListener(object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
@@ -190,6 +190,8 @@ class EventActivity : AppCompatActivity() {
             }
 
         })
+
+        rv.adapter = adapter
 
         viewModel.user.observe(this) {
             if (it.type == "Manajer") bind.btnEventEdit.visibility = View.GONE
@@ -274,8 +276,8 @@ class EventActivity : AppCompatActivity() {
             resources.configuration.locale;
         }
         val date = Date(event.date)
-        val dateFormat = SimpleDateFormat("E, dd-MM-yyyy", locale)
-        val timeFormat = SimpleDateFormat("HH:mm", locale)
+        val dateFormat = SimpleDateFormat("EEEE, dd MMMM yyyy", locale)
+        val timeFormat = SimpleDateFormat("HH:mm z", locale)
         val dateText = dateFormat.format(date)
         val timeText = timeFormat.format(date)
 
@@ -289,6 +291,7 @@ class EventActivity : AppCompatActivity() {
         Log.d("CheckFirst", sortedResult.size.toString())
 
         viewModel.getParticipant(eventKey).get().addOnSuccessListener { snapshot ->
+            Log.d("CheckVM", snapshot.toString())
             sortedResult.clear()
             sortedResultSend.clear()
             participantList.clear()
@@ -297,54 +300,57 @@ class EventActivity : AppCompatActivity() {
             resultWall2.clear()
             resultWall3.clear()
             resultWall4.clear()
-            for (item in snapshot.children) {
-                val participant = item.getValue(Participant::class.java)
-                val participantKey = item.key
-                participantList.add(Alternative(participant?.name))
+            if (snapshot.value != null){
+                for (item in snapshot.children) {
+                    val participant = item.getValue(Participant::class.java)
+                    val participantKey = item.key
+                    participantList.add(Alternative(participant?.name))
 
-                viewModel.getResult(eventKey).get().addOnSuccessListener {
-                    var data = Result()
-                    if(it.hasChild(participantKey!!)){
-                        if (participant != null) {
-                            Log.d("CHECKPART",it.toString())
+                    viewModel.getResult(eventKey).get().addOnSuccessListener {
+                        var data = Result()
+                        if(it.hasChild(participantKey!!)){
+                            if (participant != null) {
+                                Log.d("CHECKPART",it.toString())
 
-                            result[participant.name + " ("+ participant.group + ")"] =
-                                it.child("$participantKey/Total").getValue(Result::class.java)!!
-                            data = it.child("$participantKey/Total").getValue(Result::class.java)!!
+                                result[participant.name + " ("+ participant.group + ")"] =
+                                    it.child("$participantKey/Total").getValue(Result::class.java)!!
+                                data = it.child("$participantKey/Total").getValue(Result::class.java)!!
 
-                            if ( it.child("$participantKey/Dinding 1").exists() ){
-                                resultWall1.add(it.child("$participantKey/Dinding 1").getValue(Result::class.java)!!)
-                            } else resultWall1.add(Result())
-                            if ( it.child("$participantKey/Dinding 2").exists() ){
-                                resultWall2.add(it.child("$participantKey/Dinding 2").getValue(Result::class.java)!!)
-                            } else resultWall2.add(Result())
-                            if ( it.child("$participantKey/Dinding 3").exists() ){
-                                resultWall3.add(it.child("$participantKey/Dinding 3").getValue(Result::class.java)!!)
-                            } else resultWall3.add(Result())
-                            if ( it.child("$participantKey/Dinding 4").exists() ){
-                                resultWall4.add(it.child("$participantKey/Dinding 4").getValue(Result::class.java)!!)
-                            } else resultWall4.add(Result())
+                                if ( it.child("$participantKey/Dinding 1").exists() ){
+                                    resultWall1.add(it.child("$participantKey/Dinding 1").getValue(Result::class.java)!!)
+                                } else resultWall1.add(Result())
+                                if ( it.child("$participantKey/Dinding 2").exists() ){
+                                    resultWall2.add(it.child("$participantKey/Dinding 2").getValue(Result::class.java)!!)
+                                } else resultWall2.add(Result())
+                                if ( it.child("$participantKey/Dinding 3").exists() ){
+                                    resultWall3.add(it.child("$participantKey/Dinding 3").getValue(Result::class.java)!!)
+                                } else resultWall3.add(Result())
+                                if ( it.child("$participantKey/Dinding 4").exists() ){
+                                    resultWall4.add(it.child("$participantKey/Dinding 4").getValue(Result::class.java)!!)
+                                } else resultWall4.add(Result())
 
+                            }
+                        } else if (participant != null) {
+                            result[participant.name + " ("+ participant.group + ")"] = Result()
+                            resultWall1.add(Result())
+                            resultWall2.add(Result())
+                            resultWall3.add(Result())
+                            resultWall4.add(Result())
                         }
-                    } else if (participant != null) {
-                        result[participant.name + " ("+ participant.group + ")"] = Result()
-                        resultWall1.add(Result())
-                        resultWall2.add(Result())
-                        resultWall3.add(Result())
-                        resultWall4.add(Result())
-                    }
 
-                    Log.d("OnDataChange",resultWall1.size.toString())
+                        Log.d("OnDataChange",resultWall1.size.toString())
 
 
-                    resultArray.addAll(data.toArrayList())
-                    Log.d("OnDataChange",(snapshot.childrenCount * 4).toString() +" "+ resultArray.size.toLong().toString())
+                        resultArray.addAll(data.toArrayList())
+                        Log.d("OnDataChange",(snapshot.childrenCount * 4).toString() +" "+ resultArray.size.toLong().toString())
 
-                    if ((snapshot.childrenCount * 4) == resultArray.size.toLong()){
-                        setPosition(snapshot.childrenCount)
+                        if ((snapshot.childrenCount * 4) == resultArray.size.toLong()){
+                            setPosition(snapshot.childrenCount)
+                        }
                     }
                 }
-            }
+            } else showView()
+
         }
 
 //        viewModel.getParticipant(event.name).addListenerForSingleValueEvent(
@@ -360,6 +366,7 @@ class EventActivity : AppCompatActivity() {
     }
 
     private fun checkEventStatus(){
+        Log.d("CheckEvent", "tes")
         if (statusEvent == "KOSONG") {
             MaterialAlertDialogBuilder(this)
                 .setTitle("Event Bermasalah")
@@ -368,6 +375,7 @@ class EventActivity : AppCompatActivity() {
                     finish()
                 }
         } else if (statusEvent == "PERSIAPAN") {
+            bind.txtEventStatus.text = "Event Belum Dimulai"
             bind.eventName.setTextColor(Color.YELLOW)
             if (userType == "Juri Lapangan") {
                 bind.btnEventEdit.visibility = View.GONE
@@ -378,11 +386,12 @@ class EventActivity : AppCompatActivity() {
                         menuMulai.isVisible = true
 
                         Toast.makeText(this, "Perlombaan Sudah Siap Dimulai", Toast.LENGTH_SHORT).show()
-//                        checkEventStatus()
+                        checkEventStatus()
                     } else bind.btnEventEdit.text = "Tambah Peserta"
                 } else bind.btnEventEdit.text = "Tambah Peserta"
             }
         } else if (statusEvent == "LOMBA"){
+            bind.txtEventStatus.text = "Event Sedang Berlangsung"
             bind.eventName.setTextColor(Color.GREEN)
             run stop@{
                 event.judges?.forEach { (key, value) ->
@@ -393,7 +402,7 @@ class EventActivity : AppCompatActivity() {
                     } else bind.btnEventEdit.visibility = View.GONE
                 }
             }
-        }
+        } else bind.txtEventStatus.text = "Event Telah Selesai"
     }
 
     private fun setParticipantEvent(
@@ -662,40 +671,45 @@ class EventActivity : AppCompatActivity() {
     }
 
     private fun showMenuOptions() {
-        val menuAhp = menu.findItem(R.id.menu_ahp)
-        val menuTopsis = menu.findItem(R.id.menu_topsis)
+        if (this::menu.isInitialized){
 
-        val menuUbah = menu.findItem(R.id.menu_edit_event)
-        val menuHapus = menu.findItem(R.id.menu_hapus_event)
-        val menuMulai = menu.findItem(R.id.menu_start_event)
-        val menuHapusPeserta = menu.findItem(R.id.menu_hapus_peserta)
-        val menuJuriLapangan = menu.findItem(R.id.menu_nama_juri_lapangan)
-        val menuPrint = menu.findItem(R.id.menu_print_hasil)
+            val menuAhp = menu.findItem(R.id.menu_ahp)
+            val menuTopsis = menu.findItem(R.id.menu_topsis)
 
-        if (userType != "Admin") {
-            menuAhp?.isVisible = false
-            menuTopsis?.isVisible = false
-        }
-        if (userType != "Panitia"){
-            menuUbah?.isVisible = false
-            menuHapus?.isVisible = false
-        }
-        menuMulai?.isVisible = false
+            val menuUbah = menu.findItem(R.id.menu_edit_event)
+            val menuHapus = menu.findItem(R.id.menu_hapus_event)
+            val menuMulai = menu.findItem(R.id.menu_start_event)
+            val menuHapusPeserta = menu.findItem(R.id.menu_hapus_peserta)
+            val menuJuriLapangan = menu.findItem(R.id.menu_nama_juri_lapangan)
+            val menuPrint = menu.findItem(R.id.menu_print_hasil)
 
-        if (userType != "Presiden Juri"){
-            menuJuriLapangan.isVisible = false
-            menuHapusPeserta?.isVisible = false
-        }
+            if (userType != "Admin") {
+                menuAhp?.isVisible = false
+                menuTopsis?.isVisible = false
+            }
+            if (userType != "Panitia"){
+                menuUbah?.isVisible = false
+                menuHapus?.isVisible = false
+            }
+            menuMulai?.isVisible = false
 
-        if (userType == "Presiden Juri" || userType == "Panitia"){
-            menuPrint.isVisible = true
+            if (userType != "Presiden Juri"){
+                menuJuriLapangan?.isVisible = false
+                menuHapusPeserta?.isVisible = false
+            }
+
+            if (userType == "Presiden Juri" || userType == "Panitia"){
+                if (event.participant?.size == 0){
+                    menuPrint.isVisible = true
+                }
+            }
         }
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         var bool = false
         this.menu = menu
-        if(event.totalParticipant > 0){
+        if(event.status != null){
             val inflater: MenuInflater = menuInflater
             inflater.inflate(R.menu.event_menu, menu)
             bool = true

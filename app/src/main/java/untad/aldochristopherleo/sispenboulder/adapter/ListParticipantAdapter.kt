@@ -7,14 +7,18 @@ import android.view.ViewGroup
 import android.widget.LinearLayout
 import android.widget.TableLayout
 import android.widget.TextView
+import android.widget.Toast
+import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import org.w3c.dom.Text
 import untad.aldochristopherleo.sispenboulder.R
 import untad.aldochristopherleo.sispenboulder.data.SortedResult
 import untad.aldochristopherleo.sispenboulder.data.Result
+import untad.aldochristopherleo.sispenboulder.util.ResultDiffCallback
 
 class ListParticipantAdapter(
     private var list: ArrayList<SortedResult>): RecyclerView.Adapter<ListParticipantAdapter.ListViewHolder>() {
+    private var refreshCount = 0
     class ListViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         var numberPosition : TextView = itemView.findViewById(R.id.txt_position)
         var layoutName : LinearLayout = itemView.findViewById(R.id.layout_name)
@@ -31,12 +35,14 @@ class ListParticipantAdapter(
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ListViewHolder {
+        Log.d("onCreateViewHolder: ", list.size.toString())
         val view = LayoutInflater.from(parent.context).inflate(R.layout.item_participant_list, parent, false)
         return ListViewHolder(view)
     }
 
     override fun onBindViewHolder(holder: ListViewHolder, position: Int) {
 
+        Log.d("onBindViewHolder: ", list.size.toString())
         val result = list[position]
         val wall1 = result.wall1
         val wall2 = result.wall2
@@ -66,6 +72,7 @@ class ListParticipantAdapter(
 
         val textTotal = "$top $bonus"
         val textTotalAttempt = "$at $ab"
+        Log.d("onBindViewHolder: ", textTotal)
 
         holder.numberPosition.text = (position + 1).toString()
         holder.name.text = name
@@ -103,8 +110,21 @@ class ListParticipantAdapter(
     fun addAll(
         newList: ArrayList<SortedResult>
     ){
-        list = newList
-        Log.d("ADAPTER", newList[1].result?.top.toString())
-        notifyDataSetChanged()
+        Log.d("onBindViewHolder: ", "refreshCount: $refreshCount")
+        if (refreshCount == 0){
+            list = newList
+            notifyDataSetChanged()
+            refreshCount++
+        } else {
+            refreshCount++
+            notifyDataSetChanged()
+            if (list != newList){
+                Log.d("onBindViewHolder: ", "list != newlist")
+
+                list = newList
+
+            }
+        }
+
     }
 }

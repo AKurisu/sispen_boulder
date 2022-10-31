@@ -20,8 +20,9 @@
     </Preference>
 
     <Preference
+        android:icon="@drawable/ic_baseline_log_out_24"
         app:key="logout"
-        app:title="Log Out Aplikasi">
+        app:title="Log Out">
         <intent android:action="untad.aldochristopher.sispenboulder.startactivity"/>
     </Preference>
 

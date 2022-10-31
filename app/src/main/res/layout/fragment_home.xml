@@ -27,8 +27,8 @@
                 android:id="@+id/main_welcome"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="16dp"
-                android:layout_marginEnd="16dp"
+                android:layout_marginStart="32dp"
+                android:layout_marginTop="4dp"
                 android:text="@string/main_welcome"
                 android:textSize="30sp"
                 android:textStyle="bold"
@@ -39,8 +39,7 @@
                 android:id="@+id/main_username"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="16dp"
-                android:layout_marginEnd="16dp"
+                android:layout_marginStart="32dp"
                 android:text="User"
                 android:textSize="18sp"
                 app:layout_constraintStart_toStartOf="parent"
@@ -50,9 +49,8 @@
                 android:id="@+id/main_event_title"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginStart="32dp"
                 android:layout_marginTop="8dp"
-                android:layout_marginStart="16dp"
-                android:layout_marginEnd="16dp"
                 android:text="Perlombaan:"
                 android:textSize="14sp"
                 android:textStyle="bold"
@@ -63,12 +61,12 @@
                 android:id="@+id/main_rv"
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
-                android:layout_marginStart="16dp"
-                android:layout_marginEnd="16dp"
+                android:layout_marginStart="32dp"
+                android:layout_marginEnd="32dp"
+                android:scrollbars="horizontal"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/main_event_title"
-                android:scrollbars="horizontal"
-                tools:listitem="@layout/item_event_list"/>
+                tools:listitem="@layout/item_event_list" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
     </ScrollView>

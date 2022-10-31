@@ -11,11 +11,13 @@ import android.os.Bundle
 import android.os.Environment
 import android.provider.Settings
 import android.view.View
+import android.widget.AdapterView.OnItemSelectedListener
 import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import androidx.navigation.NavOptions
 import androidx.navigation.findNavController
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.setupActionBarWithNavController
@@ -41,6 +43,8 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
 
         setContentView(activityMainBinding.root)
 
+
+
         viewModel.user.observe(this){ user ->
             fabIntent = if (user.type == "Panitia"){
                 Intent(this@MainActivity, AddEventActivity::class.java)
@@ -62,14 +66,43 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
 ////                Toast.makeText(this, "hello",Toast.LENGTH_SHORT).show()
 //            }
 //        }
-
+        supportActionBar?.hide()
         activityMainBinding.bottomNavView.background = null
         activityMainBinding.bottomNavView.menu.getItem(2).isEnabled = false
         val navController = findNavController(R.id.nav_fragment)
-        activityMainBinding.bottomNavView.setupWithNavController(navController)
-        val appBarConfiguration = AppBarConfiguration(setOf(R.id.homeFragment, R.id.listFragment ,R.id.profileFragment, R.id.settingFragment))
-        setupActionBarWithNavController(navController, appBarConfiguration)
+        val options =  NavOptions.Builder()
+            .setLaunchSingleTop(true)
+            .setEnterAnim(R.anim.enter_from_right)
+            .setExitAnim(R.anim.exit_to_left)
+            .setPopEnterAnim(R.anim.enter_from_left)
+            .setPopExitAnim(R.anim.exit_to_right)
+            .setPopUpTo(navController.graph.startDestinationId, false)
+            .build()
+        activityMainBinding.bottomNavView.setOnItemSelectedListener{ item ->
+            when(item.itemId){
+                R.id.homeFragment ->{
+                    navController.navigate(R.id.homeFragment, null, options)
+                }
+                R.id.listFragment ->{
+                    navController.navigate(R.id.listFragment, null, options)
+                }
+                R.id.profileFragment ->{
+                    navController.navigate(R.id.profileFragment, null, options)
+                }
+                R.id.settingFragment ->{
+                    navController.navigate(R.id.settingFragment, null, options)
+                }
+            }
+            true
+        }
+        activityMainBinding.bottomNavView.setOnItemReselectedListener {
+            return@setOnItemReselectedListener
+        }
+//        activityMainBinding.bottomNavView.setupWithNavController(navController)
+//        val appBarConfiguration = AppBarConfiguration(setOf(R.id.homeFragment, R.id.listFragment ,R.id.profileFragment, R.id.settingFragment))
+//        setupActionBarWithNavController(navController, appBarConfiguration)
         activityMainBinding.fab.setOnClickListener(this)
+
     }
 
     override fun onClick(v: View?){
