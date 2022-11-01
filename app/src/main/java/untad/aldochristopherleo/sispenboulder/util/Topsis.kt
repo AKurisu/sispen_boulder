@@ -65,9 +65,9 @@ class Topsis (ahpPriority: ArrayList<Double>, climberScore: ArrayList<Double>) {
                 }
             }
         }
-        Collections.addAll(positivesAlt, 0.0, 0.0, 0.0, 0.0)
+        Collections.addAll(positivesAlt, 0.0, 999.0, 0.0, 999.0)
 
-        Collections.addAll(negativeAlt, 999.0, 999.0, 999.0, 999.0)
+        Collections.addAll(negativeAlt, 999.0, 0.0, 999.0, 0.0)
 
         rootNorms.indices.forEach { index ->
             when {
@@ -78,8 +78,8 @@ class Topsis (ahpPriority: ArrayList<Double>, climberScore: ArrayList<Double>) {
                 }
                 index % 4 == 1 -> {
                     priorityNorms.add(rootNorms[index].times(ahpPriority[1]))
-                    if (priorityNorms[index] > positivesAlt[1]) positivesAlt[1] = priorityNorms[index]
-                    if (priorityNorms[index] < negativeAlt[1]) negativeAlt[1] = priorityNorms[index]
+                    if (priorityNorms[index] < positivesAlt[1]) positivesAlt[1] = priorityNorms[index]
+                    if (priorityNorms[index] > negativeAlt[1]) negativeAlt[1] = priorityNorms[index]
                 }
                 index % 4 == 2 -> {
                     priorityNorms.add(rootNorms[index].times(ahpPriority[2]))
@@ -88,8 +88,8 @@ class Topsis (ahpPriority: ArrayList<Double>, climberScore: ArrayList<Double>) {
                 }
                 index % 4 == 3 -> {
                     priorityNorms.add(rootNorms[index].times(ahpPriority[3]))
-                    if (priorityNorms[index] > positivesAlt[3]) positivesAlt[3] = priorityNorms[index]
-                    if (priorityNorms[index] < negativeAlt[3]) negativeAlt[3] = priorityNorms[index]
+                    if (priorityNorms[index] < positivesAlt[3]) positivesAlt[3] = priorityNorms[index]
+                    if (priorityNorms[index] > negativeAlt[3]) negativeAlt[3] = priorityNorms[index]
                 }
             }
         }

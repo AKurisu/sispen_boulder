@@ -1,6 +1,7 @@
 package untad.aldochristopherleo.sispenboulder
 
 import android.Manifest
+import android.app.Activity
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Color
@@ -18,11 +19,12 @@ import android.view.MenuItem
 import android.view.View
 import android.widget.EditText
 import android.widget.Toast
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.activity.result.contract.ActivityResultContracts.*
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
-import androidx.core.view.isEmpty
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
@@ -30,7 +32,6 @@ import com.google.android.material.datepicker.CalendarConstraints
 import com.google.android.material.datepicker.DateValidatorPointForward
 import com.google.android.material.datepicker.MaterialDatePicker
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
-import com.google.android.material.textfield.TextInputLayout
 import com.google.android.material.timepicker.MaterialTimePicker
 import com.google.android.material.timepicker.TimeFormat
 import com.google.firebase.database.DataSnapshot
@@ -38,7 +39,6 @@ import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.ValueEventListener
 import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
-import org.apache.commons.compress.archivers.dump.DumpArchiveEntry.PERMISSION
 import untad.aldochristopherleo.sispenboulder.adapter.ListParticipantAdapter
 import untad.aldochristopherleo.sispenboulder.data.*
 import untad.aldochristopherleo.sispenboulder.databinding.ActivityEventBinding
@@ -232,7 +232,7 @@ class EventActivity : AppCompatActivity() {
                     intent.putExtra(GradingActivity.EXTRA_EVENT_KEY, eventKey)
                     intent.putExtra(GradingActivity.EXTRA_EVENT, event)
                     intent.putExtra(GradingActivity.EXTRA_KEY, judgeKey)
-                    startActivity(intent)
+                    activityResult.launch(intent)
                 }
                 "Presiden Juri" -> {
                     val intent = Intent(this, AddJudgesActivity::class.java)
@@ -267,6 +267,8 @@ class EventActivity : AppCompatActivity() {
             }
         )
     }
+
+
 
     private fun setViewText() {
         val locale = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N){
@@ -682,11 +684,11 @@ class EventActivity : AppCompatActivity() {
             val menuHapusPeserta = menu.findItem(R.id.menu_hapus_peserta)
             val menuJuriLapangan = menu.findItem(R.id.menu_nama_juri_lapangan)
             val menuPrint = menu.findItem(R.id.menu_print_hasil)
-
-            if (userType != "Admin") {
-                menuAhp?.isVisible = false
-                menuTopsis?.isVisible = false
-            }
+//
+//            if (userType != "Admin") {
+//                menuAhp?.isVisible = false
+//                menuTopsis?.isVisible = false
+//            }
             if (userType != "Panitia"){
                 menuUbah?.isVisible = false
                 menuHapus?.isVisible = false
@@ -784,6 +786,12 @@ class EventActivity : AppCompatActivity() {
                         .show()
                 }
             }
+        }
+    }
+
+    var activityResult = registerForActivityResult(StartActivityForResult()) { result ->
+        if (result.resultCode == Activity.RESULT_OK){
+            checkEventParticipant()
         }
     }
 }

@@ -113,15 +113,14 @@ class ListParticipantAdapter(
         Log.d("onBindViewHolder: ", "refreshCount: $refreshCount")
         if (refreshCount == 0){
             list = newList
-            notifyDataSetChanged()
             refreshCount++
+            notifyDataSetChanged()
         } else {
             refreshCount++
-            notifyDataSetChanged()
             if (list != newList){
                 Log.d("onBindViewHolder: ", "list != newlist")
-
-                list = newList
+                notifyDataSetChanged()
+//                list = newList
 
             }
         }
