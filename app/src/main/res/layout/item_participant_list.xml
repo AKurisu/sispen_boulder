@@ -149,4 +149,128 @@
         </TableRow>
     </TableLayout>
 
+    <TableLayout
+        android:id="@+id/table_result_five_wall"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:shrinkColumns="*"
+        android:stretchColumns="*"
+        android:visibility="visible"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/table_result">
+
+        <TableRow
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="4dp">
+
+            <TextView
+                android:id="@+id/txt_position_five"
+                android:layout_width="0dp"
+                android:layout_weight="1.4"
+                android:textAlignment="center"
+                android:textStyle="bold"
+                tools:text="1" />
+
+            <TextView
+                android:id="@+id/txt_nama_five"
+                android:layout_width="0dp"
+                android:layout_weight="14"
+                android:textStyle="bold"
+                tools:text="Nama" />
+
+            <TextView
+                android:id="@+id/txt_attempt_total_five"
+                android:layout_width="0dp"
+                android:layout_weight="6.3"
+                android:textAlignment="center"
+                android:textStyle="bold"
+                tools:text="15 18" />
+        </TableRow>
+
+        <TableRow android:background="#808080">
+
+            <TextView
+                android:text="@string/ab"
+                android:textSize="1sp"
+                android:visibility="invisible" />
+        </TableRow>
+
+        <TableRow
+            android:divider="#808080"
+            android:showDividers="middle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:padding="4dp">
+            <TextView
+                android:visibility="invisible"
+                android:textStyle="bold"
+                android:textAlignment="center"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                tools:text="1" />
+
+            <TextView
+                android:layout_weight="2"
+                android:layout_width="0dp"
+                android:paddingStart="3dp"
+                android:textAlignment="center"
+                android:id="@+id/txt_wall1_five"
+                android:textSize="11sp"
+                tools:text="t1z1" />
+
+            <TextView
+                android:layout_weight="2"
+                android:layout_width="0dp"
+                android:paddingStart="3dp"
+                android:textAlignment="center"
+                android:id="@+id/txt_wall2_five"
+                android:textSize="11sp"
+                tools:text="z2" />
+
+            <TextView
+                android:layout_weight="2"
+                android:layout_width="0dp"
+                android:paddingStart="3dp"
+                android:textAlignment="center"
+                android:id="@+id/txt_wall3_five"
+                android:textSize="11sp"
+                tools:text="z6" />
+
+            <TextView
+                android:layout_weight="2"
+                android:layout_width="0dp"
+                android:paddingStart="3dp"
+                android:textAlignment="center"
+                android:id="@+id/txt_wall4_five"
+                android:textSize="11sp"
+                tools:text="t1z2" />
+
+            <TextView
+                android:layout_weight="2"
+                android:layout_width="0dp"
+                android:paddingStart="3dp"
+                android:textAlignment="center"
+                android:id="@+id/txt_wall5_five"
+                android:textSize="11sp"
+                tools:text="t1z2" />
+
+            <TextView
+                android:layout_weight="4"
+                android:layout_width="0dp"
+                android:textAlignment="center"
+                android:id="@+id/txt_total_five"
+                tools:text="11 10" />
+        </TableRow>
+
+        <TableRow android:background="#808080">
+
+            <TextView
+                android:text="@string/ab"
+                android:textSize="1sp"
+                android:visibility="invisible" />
+        </TableRow>
+    </TableLayout>
+
 </androidx.constraintlayout.widget.ConstraintLayout>

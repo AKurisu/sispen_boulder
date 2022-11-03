@@ -7,14 +7,9 @@ import android.view.ViewGroup
 import android.widget.LinearLayout
 import android.widget.TableLayout
 import android.widget.TextView
-import android.widget.Toast
-import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
-import org.w3c.dom.Text
 import untad.aldochristopherleo.sispenboulder.R
 import untad.aldochristopherleo.sispenboulder.data.SortedResult
-import untad.aldochristopherleo.sispenboulder.data.Result
-import untad.aldochristopherleo.sispenboulder.util.ResultDiffCallback
 
 class ListParticipantAdapter(
     private var list: ArrayList<SortedResult>): RecyclerView.Adapter<ListParticipantAdapter.ListViewHolder>() {
@@ -25,13 +20,25 @@ class ListParticipantAdapter(
         var nameNull : TextView = itemView.findViewById(R.id.txt_nama_null)
         var posNull : TextView = itemView.findViewById(R.id.txt_position_null)
         var name : TextView = itemView.findViewById(R.id.txt_nama)
-        var total : TextView = itemView.findViewById(R.id.txt_total)
-        var attemptTotal : TextView = itemView.findViewById(R.id.txt_attempt_total)
+        var totalAttempt : TextView = itemView.findViewById(R.id.txt_total)
+        var total : TextView = itemView.findViewById(R.id.txt_attempt_total)
         var top : TextView = itemView.findViewById(R.id.txt_topResult)
         var at : TextView = itemView.findViewById(R.id.txt_atResult)
         var bonus : TextView = itemView.findViewById(R.id.txt_bonusResult)
         var ab : TextView = itemView.findViewById(R.id.txt_abResult)
         var tableLayout : TableLayout = itemView.findViewById(R.id.table_result)
+        var tableLayoutFive :TableLayout = itemView.findViewById(R.id.table_result_five_wall)
+
+        var numberPositionFive : TextView = itemView.findViewById(R.id.txt_position_five)
+        var nameFive : TextView = itemView.findViewById(R.id.txt_nama_five)
+
+        var totalFive : TextView = itemView.findViewById(R.id.txt_attempt_total_five)
+        var totalAttemptFive : TextView = itemView.findViewById(R.id.txt_total_five)
+        var wall1Five : TextView = itemView.findViewById(R.id.txt_wall1_five)
+        var wall2Five : TextView = itemView.findViewById(R.id.txt_wall2_five)
+        var wall3Five : TextView = itemView.findViewById(R.id.txt_wall3_five)
+        var wall4Five : TextView = itemView.findViewById(R.id.txt_wall4_five)
+        var wall5Five : TextView = itemView.findViewById(R.id.txt_wall5_five)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ListViewHolder {
@@ -48,21 +55,24 @@ class ListParticipantAdapter(
         val wall2 = result.wall2
         val wall3 = result.wall3
         val wall4 = result.wall4
+        val wall5 = result.wall5
 
         val name = result.name.toString()
+        var textWall5 = ""
 
         val textWall1 =  if (wall1.at != 0.0 || wall1.ab != 0.0 || wall1.top != 0.0 || wall1.bonus != 0.0){
-            "t" + wall1.top.toInt().toString() + " " + "z" + wall1.bonus.toInt().toString()
-        } else ""
+            "t" + wall1.at.toInt().toString() + " " + "z" + wall1.ab.toInt().toString()
+        } else "-"
         val textWall2 =  if (wall2.at != 0.0 || wall2.ab != 0.0 || wall2.top != 0.0 || wall2.bonus != 0.0){
-            "t" + wall2.top.toInt().toString() + " " + "z" + wall2.bonus.toInt().toString()
-        } else ""
+            "t" + wall2.at.toInt().toString() + " " + "z" + wall2.ab.toInt().toString()
+        } else "-"
         val textWall3 =  if (wall3.at != 0.0 || wall3.ab != 0.0 || wall3.top != 0.0 || wall3.bonus != 0.0){
-            "t" + wall3.top.toInt().toString() + " " + "z" + wall3.bonus.toInt().toString()
-        } else ""
+            "t" + wall3.at.toInt().toString() + " " + "z" + wall3.ab.toInt().toString()
+        } else "-"
         val textWall4 =  if (wall4.at != 0.0 || wall4.ab != 0.0 || wall4.top != 0.0 || wall4.bonus != 0.0){
-            "t" + wall4.top.toInt().toString() + " " + "z" + wall4.bonus.toInt().toString()
-        } else ""
+            "t" + wall4.at.toInt().toString() + " " + "z" + wall4.ab.toInt().toString()
+        } else "-"
+        if (wall5 != null)  textWall5 = inputText(wall5.at, wall5.ab)
 
 
         val top = result.result!!.top.toInt().toString()
@@ -70,28 +80,48 @@ class ListParticipantAdapter(
         val bonus = result.result.bonus.toInt().toString()
         val ab = result.result.ab.toInt().toString()
 
-        val textTotal = "$top $bonus"
-        val textTotalAttempt = "$at $ab"
+        val textTotal = "$top + $bonus"
+        val textTotalAttempt = "t$at z$ab"
         Log.d("onBindViewHolder: ", textTotal)
 
-        holder.numberPosition.text = (position + 1).toString()
-        holder.name.text = name
-        holder.posNull.text = (position + 1).toString()
-        holder.nameNull.text = name
 
         if (top == "0" && at == "0" && bonus == "0" && ab == "0"){
+            holder.posNull.text = (position + 1).toString()
+            holder.nameNull.text = name
+
             holder.layoutName.visibility = View.VISIBLE
             holder.tableLayout.visibility = View.GONE
-        } else {
+            holder.tableLayoutFive.visibility = View.GONE
+        } else if (wall5 == null) {
             holder.layoutName.visibility = View.GONE
+            holder.tableLayoutFive.visibility = View.GONE
+
+            holder.numberPosition.text = (position + 1).toString()
+            holder.name.text = name
 
             holder.top.text = textWall1
             holder.at.text = textWall2
             holder.bonus.text = textWall3
             holder.ab.text = textWall4
 
+            holder.totalAttempt.text = textTotalAttempt
             holder.total.text = textTotal
-            holder.attemptTotal.text = textTotalAttempt
+        } else {
+            holder.layoutName.visibility = View.GONE
+            holder.tableLayout.visibility = View.GONE
+
+            holder.numberPositionFive.text = (position + 1).toString()
+            holder.nameFive.text = name
+
+            holder.wall1Five.text = textWall1
+            holder.wall2Five.text = textWall2
+            holder.wall3Five.text = textWall3
+            holder.wall4Five.text = textWall4
+            holder.wall5Five.text = textWall5
+
+
+            holder.totalAttemptFive.text = textTotalAttempt
+            holder.totalFive.text = textTotal
         }
     }
 
@@ -125,5 +155,15 @@ class ListParticipantAdapter(
             }
         }
 
+    }
+
+    private fun inputText (at: Double, ab: Double) : String {
+        return if (at == 0.0 && ab == 0.0){
+            "-"
+        } else if (at == 0.0){
+            "z$ab"
+        } else if (ab == 0.0){
+            "t$at"
+        } else "t$at z$ab"
     }
 }
