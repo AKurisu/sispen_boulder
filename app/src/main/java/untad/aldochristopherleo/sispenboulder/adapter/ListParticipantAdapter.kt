@@ -74,6 +74,7 @@ class ListParticipantAdapter(
         } else "-"
         if (wall5 != null)  textWall5 = inputText(wall5.at, wall5.ab)
 
+        val positionResult = result.position.toString()
 
         val top = result.result!!.top.toInt().toString()
         val at = result.result.at.toInt().toString()
@@ -86,7 +87,7 @@ class ListParticipantAdapter(
 
 
         if (top == "0" && at == "0" && bonus == "0" && ab == "0"){
-            holder.posNull.text = (position + 1).toString()
+            holder.posNull.text = positionResult
             holder.nameNull.text = name
 
             holder.layoutName.visibility = View.VISIBLE
@@ -96,7 +97,7 @@ class ListParticipantAdapter(
             holder.layoutName.visibility = View.GONE
             holder.tableLayoutFive.visibility = View.GONE
 
-            holder.numberPosition.text = (position + 1).toString()
+            holder.numberPosition.text = positionResult
             holder.name.text = name
 
             holder.top.text = textWall1
@@ -110,7 +111,7 @@ class ListParticipantAdapter(
             holder.layoutName.visibility = View.GONE
             holder.tableLayout.visibility = View.GONE
 
-            holder.numberPositionFive.text = (position + 1).toString()
+            holder.numberPositionFive.text = positionResult
             holder.nameFive.text = name
 
             holder.wall1Five.text = textWall1

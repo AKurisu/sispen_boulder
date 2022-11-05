@@ -19,7 +19,6 @@ import android.view.MenuItem
 import android.view.View
 import android.widget.EditText
 import android.widget.Toast
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.result.contract.ActivityResultContracts.*
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
@@ -68,10 +67,12 @@ class EventActivity : AppCompatActivity() {
     private lateinit var eventKey: String
     private lateinit var menu: Menu
     private lateinit var result : LinkedHashMap<String, Result>
+    private lateinit var resultParticipantKey : ArrayList<String>
     private lateinit var resultWall1 : ArrayList<Result>
     private lateinit var resultWall2 : ArrayList<Result>
     private lateinit var resultWall3 : ArrayList<Result>
     private lateinit var resultWall4 : ArrayList<Result>
+    private lateinit var resultWall5 : ArrayList<Result>
     private lateinit var judgesList : ArrayList<String>
     private lateinit var statusEvent : String
     private lateinit var booleanArray: BooleanArray
@@ -120,6 +121,8 @@ class EventActivity : AppCompatActivity() {
         resultWall2 = ArrayList()
         resultWall3 = ArrayList()
         resultWall4 = ArrayList()
+        resultWall5 = ArrayList()
+        resultParticipantKey = ArrayList()
         judgesList = ArrayList()
 
         event.judges?.forEach { (_, item) ->
@@ -290,14 +293,8 @@ class EventActivity : AppCompatActivity() {
 
         viewModel.getParticipant(eventKey).get().addOnSuccessListener { snapshot ->
             Log.d("CheckVM", snapshot.toString())
-            sortedResult.clear()
-            sortedResultSend.clear()
-            participantList.clear()
-            result.clear()
-            resultWall1.clear()
-            resultWall2.clear()
-            resultWall3.clear()
-            resultWall4.clear()
+            clearList()
+
             if (snapshot.value != null){
                 for (item in snapshot.children) {
                     val participant = item.getValue(Participant::class.java)
@@ -313,6 +310,7 @@ class EventActivity : AppCompatActivity() {
                                 result[participant.name + " ("+ participant.group + ")"] =
                                     it.child("$participantKey/Total").getValue(Result::class.java)!!
                                 data = it.child("$participantKey/Total").getValue(Result::class.java)!!
+                                resultParticipantKey.add(participantKey)
 
                                 if ( it.child("$participantKey/Dinding 1").exists() ){
                                     resultWall1.add(it.child("$participantKey/Dinding 1").getValue(Result::class.java)!!)
@@ -326,14 +324,19 @@ class EventActivity : AppCompatActivity() {
                                 if ( it.child("$participantKey/Dinding 4").exists() ){
                                     resultWall4.add(it.child("$participantKey/Dinding 4").getValue(Result::class.java)!!)
                                 } else resultWall4.add(Result())
+                                if ( it.child("$participantKey/Dinding 5").exists() ){
+                                    resultWall5.add(it.child("$participantKey/Dinding 5").getValue(Result::class.java)!!)
+                                } else resultWall5.add(Result())
 
                             }
                         } else if (participant != null) {
                             result[participant.name + " ("+ participant.group + ")"] = Result()
+                            resultParticipantKey.add(participantKey)
                             resultWall1.add(Result())
                             resultWall2.add(Result())
                             resultWall3.add(Result())
                             resultWall4.add(Result())
+                            resultWall5.add(Result())
                         }
 
                         Log.d("OnDataChange",resultWall1.size.toString())
@@ -361,6 +364,19 @@ class EventActivity : AppCompatActivity() {
 //                    Log.w("TAG", "loadPost:onCancelled", error.toException())
 //                }
 //            })
+    }
+
+    private fun clearList() {
+        sortedResult.clear()
+        sortedResultSend.clear()
+        participantList.clear()
+        result.clear()
+        resultWall1.clear()
+        resultWall2.clear()
+        resultWall3.clear()
+        resultWall4.clear()
+        resultWall5.clear()
+        resultParticipantKey.clear()
     }
 
     private fun checkEventStatus(){
@@ -472,19 +488,44 @@ class EventActivity : AppCompatActivity() {
                 val ahp = Ahp(priority)
                 topsis = Topsis(ahp.getConsistencySum(), resultArray)
                 val resultTopsis = topsis.getPreference()
+                val resultNotCount = ArrayList<SortedResult>()
 
                 for ((index, item) in result.keys.withIndex()){
-                    Log.d("CHECK", result.size.toString())
-                    sortedResult.add(SortedResult(item, resultTopsis[index], result[item],
-                        resultWall1[index], resultWall2[index], resultWall3[index], resultWall4[index]))
+
+                    if (result[item] == Result()){
+                        resultNotCount.add(SortedResult(item, resultTopsis[index], result[item],
+                            resultWall1[index], resultWall2[index], resultWall3[index], resultWall4[index], null, null, resultParticipantKey[index]))
+                    } else if (event.round == "KUALIFIKASI") {
+                        sortedResult.add(SortedResult(item, resultTopsis[index], result[item],
+                            resultWall1[index], resultWall2[index], resultWall3[index], resultWall4[index], null, null, resultParticipantKey[index]))
+                    } else {
+                        sortedResult.add(SortedResult(item, resultTopsis[index], result[item],
+                            resultWall1[index], resultWall2[index], resultWall3[index], resultWall4[index], resultWall5[index], null, resultParticipantKey[index]))
+                    }
                 }
 
                 sortedResult.sortByDescending { it.preferenceValue }
+                sortedResult.addAll(resultNotCount)
                 sortedResultSend= sortedResult
                 resultArray.clear()
 
+                var position = 1
+                var setPosition = position
+                sortedResult.forEachIndexed { index, item ->
+                    if (index == 0){
+                        setParticipantPosition(setPosition, index, item.key)
+                        position++
+                    } else if (sortedResult[index].preferenceValue == sortedResult[index - 1].preferenceValue){
+                        setParticipantPosition(setPosition, index, item.key)
+                        position++
+                    } else {
+                        setPosition = position
+                        setParticipantPosition(setPosition, index, item.key)
+                        position++
+                    }
+                }
+
 //                adapter.clearData()
-                Log.d("ADAPTEREvent", sortedResult.size.toString())
                 adapter.addAll(sortedResult)
 
                 swipeRefreshLayout.isRefreshing = false
@@ -492,6 +533,13 @@ class EventActivity : AppCompatActivity() {
         }
         Toast.makeText(this, "View Tampil", Toast.LENGTH_SHORT).show()
         showView()
+    }
+
+    private fun setParticipantPosition(position: Int, index: Int, key: String) {
+        sortedResult[index].position = position
+        database.child("result/$eventKey/$key/position").setValue(position).addOnSuccessListener {
+            Log.d("setParticipantPosition", "SUCCESS")
+        }
     }
 
     private fun showView() {

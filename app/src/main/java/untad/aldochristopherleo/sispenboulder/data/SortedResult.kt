@@ -9,4 +9,6 @@ class SortedResult(val name: String? = null, val preferenceValue: Double? = null
                    val wall2: Result = Result(),
                    val wall3: Result = Result(),
                    val wall4: Result = Result(),
-                   val wall5: Result? = null)  : Parcelable
+                   val wall5: Result? = null,
+                   var position: Int? = null,
+                   val key: String = "")  : Parcelable

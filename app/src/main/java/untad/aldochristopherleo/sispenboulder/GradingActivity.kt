@@ -81,7 +81,7 @@ class GradingActivity : AppCompatActivity() {
              userWallKey = pickDialog()
         } else userWallKey = wallList[0]
 
-        if (userWallKey.isNullOrEmpty()){
+        if (userWallKey.isEmpty()){
             MaterialAlertDialogBuilder(this)
                 .setTitle("Event Bermasalah.")
                 .setMessage("Mohon Laporkan Kepada Administrator")
