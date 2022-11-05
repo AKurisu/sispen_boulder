@@ -19,6 +19,7 @@
 
         <TextView
             android:id="@+id/item_contest_name_detail"
+            style="@style/EventTextDetail"
             android:textSize="20sp"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -27,18 +28,21 @@
 
         <TextView
             android:id="@+id/item_contest_date_detail"
+            style="@style/EventTextDetail"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             tools:text="01 Januari 1970"/>
 
         <TextView
             android:id="@+id/item_contest_time_detail"
+            style="@style/EventTextDetail"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             tools:text="00:00 - 23:59"/>
 
         <TextView
             android:id="@+id/item_contest_location_detail"
+            style="@style/EventTextDetail"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             tools:text="Taman Kota"/>

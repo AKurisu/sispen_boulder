@@ -10,6 +10,26 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/btn_addParticipant"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:fabSize="mini"
+            android:layout_margin="20dp"
+            android:contentDescription="@string/txt_btn_add_participant"
+            android:src="@drawable/ic_baseline_add_24"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Tambah Peserta"
+            android:textSize="9sp"
+            app:layout_constraintEnd_toEndOf="@+id/btn_addParticipant"
+            app:layout_constraintStart_toStartOf="@+id/btn_addParticipant"
+            app:layout_constraintTop_toBottomOf="@+id/btn_addParticipant" />
+
         <TextView
             android:id="@+id/profile_name"
             android:layout_width="wrap_content"
@@ -39,20 +59,28 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
             android:layout_marginTop="28dp"
-            android:text="Daftar Atlit Anda:"
+            android:text="Daftar Peserta"
             android:visibility="gone"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/profile_type" />
 
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/profile_recycler"
+        <LinearLayout
+            android:id="@+id/recycler_wrapper"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:padding="16dp"
+            app:layout_constrainedHeight="true"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/profile_txt1" />
+            app:layout_constraintTop_toBottomOf="@+id/profile_txt1"
+            app:layout_constraintBottom_toBottomOf="parent">
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/profile_recycler"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:padding="4dp"/>
+        </LinearLayout>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

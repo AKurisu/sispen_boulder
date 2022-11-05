@@ -84,22 +84,31 @@ class AddEventActivity : AppCompatActivity() {
         }
 
         bind.btnConfirmEventAdd.setOnClickListener {
-            val name = bind.edtName.editText?.text.isNullOrEmpty()
-            val date = bind.edtDate.editText?.text.isNullOrEmpty()
-            val time = bind.edtTime.editText?.text.isNullOrEmpty()
-            val location = bind.edtLocation.editText?.text.isNullOrEmpty()
-            val president = bind.edtPresident.editText?.text.isNullOrEmpty()
-            if (name || date || time || location || president){
-                Toast.makeText(this, "Mohon Lengkapi Data Anda", Toast.LENGTH_SHORT).show()
-            } else {
+            val name = bind.edtName.editText?.text
+            val date = bind.edtDate.editText?.text
+            val time = bind.edtTime.editText?.text
+            val location = bind.edtLocation.editText?.text
+            val president = bind.edtPresident.editText?.text
+            val coordinator = bind.edtCoordinator.editText?.text
+            val reviewer = bind.edtReviewer.editText?.text
+            if (name.isNullOrEmpty()) bind.edtName.editText?.error = getString(R.string.txt_error, "Nama")
+            else if (date.isNullOrEmpty()) bind.edtName.editText?.error = getString(R.string.txt_error, "Tanggal")
+            else if (time.isNullOrEmpty()) bind.edtName.editText?.error = getString(R.string.txt_error, "Waktu")
+            else if (location.isNullOrEmpty()) bind.edtName.editText?.error = getString(R.string.txt_error, "Lokasi")
+            else if (president.isNullOrEmpty()) bind.edtName.editText?.error = getString(R.string.txt_error, "Presiden")
+            else if (coordinator.isNullOrEmpty()) bind.edtName.editText?.error = getString(R.string.txt_error, "Panitia Pelaksana")
+            else if (reviewer.isNullOrEmpty()) bind.edtName.editText?.error = getString(R.string.txt_error, "Utusan")
+            else {
                 MaterialAlertDialogBuilder(this)
                     .setTitle("Apakah Anda Yakin Telah Benar?")
                     .setMessage(
-                                "Nama: ${bind.edtName.editText!!.text}\n" +
-                                "Tanggal: ${bind.edtDate.editText!!.text}\n" +
-                                "Tanggal: ${bind.edtTime.editText!!.text}\n" +
-                                "Lokasi: ${bind.edtLocation.editText!!.text}\n"+
-                                "Presiden Juri: ${bind.edtPresident.editText!!.text}\n")
+                                "Nama: ${name}\n" +
+                                "Tanggal: ${date}\n" +
+                                "Waktu: ${time}\n" +
+                                "Lokasi: ${location}\n"+
+                                "Presiden Juri: ${president}\n"+
+                                "Panpel: ${coordinator}\n"+
+                                "Utusan: ${reviewer}\n")
                     .setPositiveButton("Ya"){ _, _ ->
                         setEventDb()
                     }
@@ -125,6 +134,8 @@ class AddEventActivity : AppCompatActivity() {
         val time = bind.edtTime.editText?.text.toString().trim()
         var dateStr = bind.edtDate.editText?.text.toString().trim()
         val president = bind.edtPresident.editText?.text.toString().trim()
+        val coordinator = bind.edtCoordinator.editText?.text.toString().trim()
+        val reviewer = bind.edtReviewer.editText?.text.toString().trim()
 
         dateStr = "$dateStr $time"
 
@@ -133,7 +144,7 @@ class AddEventActivity : AppCompatActivity() {
         val date = l.toInstant(ZoneId.systemDefault().rules.getOffset(l)).toEpochMilli()
         val key = database.child("events").push().key.toString()
 
-        val event = Event(name, date, location, false, 0, president, status = "PERSIAPAN")
+        val event = Event(name, date, location, false, 0, president, status = "PERSIAPAN", null, null, coordinator, reviewer)
 
         database.child("events").child(key).setValue(event).addOnSuccessListener {
             Toast.makeText(this, "Lomba Berhasil Ditambahkan", Toast.LENGTH_SHORT).show()

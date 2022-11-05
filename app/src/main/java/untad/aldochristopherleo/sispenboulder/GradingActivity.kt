@@ -15,7 +15,6 @@ import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.ValueEventListener
 import com.google.firebase.database.ktx.database
-import com.google.firebase.database.ktx.getValue
 import com.google.firebase.ktx.Firebase
 import untad.aldochristopherleo.sispenboulder.data.Event
 import untad.aldochristopherleo.sispenboulder.data.Result
@@ -27,8 +26,8 @@ class GradingActivity : AppCompatActivity() {
 
     companion object {
         const val EXTRA_EVENT = "extra_event"
-        const val EXTRA_KEY = "extra_key"
         const val EXTRA_EVENT_KEY = "extra_event_key"
+        const val EXTRA_NAME = "extra_name"
     }
 
     private var _bind : ActivityGradingBinding? = null
@@ -37,12 +36,15 @@ class GradingActivity : AppCompatActivity() {
     private var atValue = 0
     private var bonusValue = 0
     private var abValue = 0
+    private var dialogOpen = 0
 
     private val viewModel: MainViewModel by viewModels()
 
     private lateinit var total: Result
     private lateinit var event: Event
-    private lateinit var userKey: String
+    private lateinit var userWallKey: String
+    private lateinit var userName: String
+    private lateinit var wallList : Array<String>
     private lateinit var eventKey: String
     private lateinit var selectedKeyParticipant: String
     private lateinit var keyParticipant: ArrayList<String>
@@ -54,9 +56,12 @@ class GradingActivity : AppCompatActivity() {
 
         _bind = ActivityGradingBinding.inflate(layoutInflater)
         setContentView(bind.root)
+        bind.layoutHide.visibility = View.GONE
+        bind.btnConfirmGrading.visibility = View.GONE
 
         eventKey = intent.getStringExtra(EXTRA_EVENT_KEY).toString()
-        userKey = intent.getStringExtra(EXTRA_KEY).toString()
+        userName = intent.getStringExtra(EXTRA_NAME).toString()
+        userWallKey = ""
         if (Build.VERSION.SDK_INT >= 33){
             event = intent.getParcelableExtra(EXTRA_EVENT, Event::class.java)!!
         } else {
@@ -65,8 +70,26 @@ class GradingActivity : AppCompatActivity() {
 //        val event = intent.getParcelableExtra<Event>("EXTRA_EVENT") as Event
         database = Firebase.database.reference
 
-        bind.layoutHide.visibility = View.GONE
-        bind.btnConfirmGrading.visibility = View.GONE
+        val listOfWalls = ArrayList<String>()
+        event.judges?.forEach { (key, value) ->
+            if (value.name == userName){
+                  listOfWalls.add(key)
+            }
+        }
+        wallList = listOfWalls.toTypedArray()
+        if (wallList.size > 1) {
+             userWallKey = pickDialog()
+        } else userWallKey = wallList[0]
+
+        if (userWallKey.isNullOrEmpty()){
+            MaterialAlertDialogBuilder(this)
+                .setTitle("Event Bermasalah.")
+                .setMessage("Mohon Laporkan Kepada Administrator")
+                .setPositiveButton("Ok"){_,_ ->
+                    finish()
+                }
+                .show()
+        } else setTitle(userWallKey)
 
         selectedKeyParticipant = ""
 
@@ -125,6 +148,24 @@ class GradingActivity : AppCompatActivity() {
         }
     }
 
+    private fun pickDialog(): String {
+        var result = ""
+
+        val builder = MaterialAlertDialogBuilder(this)
+            .setTitle("Silahkan Pilih Dinding")
+            .setSingleChoiceItems(wallList,-1) { _, which ->
+                result = wallList[which]
+            }
+        if (dialogOpen != 0){
+            builder.setNeutralButton("Cancel"){dialog,_ -> dialog.cancel()}
+        }
+        dialogOpen++
+        val dialog = builder.create()
+        dialog.setCanceledOnTouchOutside(false)
+        dialog.show()
+        return result
+    }
+
     private fun setResultValue() {
         database.child("result/$eventKey/$selectedKeyParticipant/Total").get().addOnSuccessListener {
             if (it.value != null){
@@ -151,7 +192,7 @@ class GradingActivity : AppCompatActivity() {
         val result = Result(topValue.toDouble(), atValue.toDouble(), bonusValue.toDouble(), abValue.toDouble())
         val resultTotal =
             Result(result.top + total.top, result.at + total.at, result.bonus + total.bonus, result.ab + total.ab)
-        database.child("result/$eventKey/$selectedKeyParticipant/$userKey").setValue(result).addOnSuccessListener {
+        database.child("result/$eventKey/$selectedKeyParticipant/$userWallKey").setValue(result).addOnSuccessListener {
             database.child("result/$eventKey/$selectedKeyParticipant/Total").setValue(resultTotal).addOnSuccessListener {
                 Toast.makeText(this, "Data Berhasil Diinput", Toast.LENGTH_SHORT).show()
                 finish()

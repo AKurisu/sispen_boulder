@@ -51,9 +51,9 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
             } else if (user.type == "Manajer") {
                 Intent(this@MainActivity, SignUpActivity::class.java)
             } else {
-                Intent()
+                Intent(this@MainActivity, AddEventActivity::class.java)
             }
-            if (user.type == "Juri Lapangan" || user.type == "Presiden Juri"){
+            if (user.type == "Juri Lapangan"){
                 activityMainBinding.fab.visibility = View.GONE
             }
         }

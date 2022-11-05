@@ -27,4 +27,6 @@
     <string name="txt_ahp">AHP</string>
     <string name="txt_topsis">TOPSIS</string>
     <string name="txt_jumlah_peserta">Jumlah Peserta : %s</string>
+    <string name="txt_btn_add_participant">Tambah Peserta</string>
+    <string name="txt_error">Mohon Masukkan %s</string>
 </resources>

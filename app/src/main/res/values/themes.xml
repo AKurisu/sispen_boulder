@@ -7,6 +7,13 @@
         <item name="colorOnPrimary">#000</item>
     </style>
 
+    <style name="TextDetail" parent="TextAppearance.AppCompat.Body1">
+        <item name="android:textColor">@color/common_google_signin_btn_text_dark</item>
+    </style>
+    <style name="EventTextDetail" parent="TextAppearance.AppCompat.Body1">
+        <item name="android:textColor">@color/common_google_signin_btn_text_light</item>
+    </style>
+
     <style name="CustomCardViewStyle" parent="@style/Widget.MaterialComponents.CardView">
         <item name="shapeAppearanceOverlay">@style/ShapeAppearanceOverlay_card_custom_corners</item>
         <item name="cardElevation">8dp</item>

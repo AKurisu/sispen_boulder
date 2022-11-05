@@ -48,6 +48,7 @@ import untad.aldochristopherleo.sispenboulder.util.PrintData
 import untad.aldochristopherleo.sispenboulder.util.Topsis
 import java.text.SimpleDateFormat
 import java.util.*
+import kotlin.collections.ArrayList
 
 
 @Suppress("DEPRECATION")
@@ -86,7 +87,6 @@ class EventActivity : AppCompatActivity() {
     private lateinit var swipeRefreshLayout: SwipeRefreshLayout
     private lateinit var rv: RecyclerView
     private lateinit var refreshListener: SwipeRefreshLayout.OnRefreshListener
-    private lateinit var judgeKey: String
     private var refreshPulledTime : Long = 0
     private val participantList = ArrayList<Alternative>()
     private val allParticipantList = ArrayList<String>()
@@ -231,7 +231,7 @@ class EventActivity : AppCompatActivity() {
                     val intent = Intent(this, GradingActivity::class.java)
                     intent.putExtra(GradingActivity.EXTRA_EVENT_KEY, eventKey)
                     intent.putExtra(GradingActivity.EXTRA_EVENT, event)
-                    intent.putExtra(GradingActivity.EXTRA_KEY, judgeKey)
+                    intent.putExtra(GradingActivity.EXTRA_NAME, userName)
                     activityResult.launch(intent)
                 }
                 "Presiden Juri" -> {
@@ -271,12 +271,8 @@ class EventActivity : AppCompatActivity() {
 
 
     private fun setViewText() {
-        val locale = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N){
+        val locale =
             resources.configuration.locales.get(0);
-        } else{
-            //noinspection deprecation
-            resources.configuration.locale;
-        }
         val date = Date(event.date)
         val dateFormat = SimpleDateFormat("EEEE, dd MMMM yyyy", locale)
         val timeFormat = SimpleDateFormat("HH:mm z", locale)
@@ -381,12 +377,11 @@ class EventActivity : AppCompatActivity() {
             bind.eventName.setTextColor(Color.YELLOW)
             if (userType == "Juri Lapangan") {
                 bind.btnEventEdit.visibility = View.GONE
-            } else if (userType == "Panitia") {
+            } else if (userType == "Panitia" || userType == "Juri Lapangan") {
                 if (!event.judges.isNullOrEmpty()){
                     if (event.judges!!.size == 4 && participantList.size >= 8){
                         val menuMulai = menu.findItem(R.id.menu_start_event)
                         menuMulai.isVisible = true
-
                         Toast.makeText(this, "Perlombaan Sudah Siap Dimulai", Toast.LENGTH_SHORT).show()
                         checkEventStatus()
                     } else bind.btnEventEdit.text = "Tambah Peserta"
@@ -396,15 +391,32 @@ class EventActivity : AppCompatActivity() {
             bind.txtEventStatus.text = "Event Sedang Berlangsung"
             bind.eventName.setTextColor(Color.GREEN)
             run stop@{
-                event.judges?.forEach { (key, value) ->
+                event.judges?.forEach { (_, value) ->
                     if (value.name == userName && userType == "Juri Lapangan"){
-                        judgeKey = key
                         bind.btnEventEdit.visibility = View.VISIBLE
                         return@stop
                     } else bind.btnEventEdit.visibility = View.GONE
                 }
             }
         } else bind.txtEventStatus.text = "Event Telah Selesai"
+    }
+
+    private fun pickDialog() : String {
+        var result = ""
+
+        var wallList = arrayOf("Semi Final", "Final")
+
+        val builder = MaterialAlertDialogBuilder(this)
+            .setTitle("Silahkan Pilih Dinding")
+            .setSingleChoiceItems(wallList,-1) { _, which ->
+                result = wallList[which]
+            }
+
+        builder.setNeutralButton("Cancel"){dialog,_ -> dialog.cancel()}
+        val dialog = builder.create()
+        dialog.setCanceledOnTouchOutside(false)
+        dialog.show()
+        return result
     }
 
     private fun setParticipantEvent(
@@ -540,11 +552,17 @@ class EventActivity : AppCompatActivity() {
                     .setTitle("Apakah Lomba Siap Dimulai")
                     .setMessage("Jumlah Peserta" + participantList.size.toString())
                     .setPositiveButton("Ya"){_,_ ->
-                        database.child("events/$eventKey/status")
-                            .setValue("LOMBA")
-                            .addOnSuccessListener {
+                        val round = if (participantList.size <= 6){
+                            pickDialog()
+                        } else if (participantList.size <= 20) {
+                            "Semi Final"
+                        } else "Kualifikasi"
+
+                        database.child("events/$eventKey/round").setValue(round).addOnSuccessListener {
+                            database.child("events/$eventKey/status").setValue("LOMBA").addOnSuccessListener {
                                 checkEventStatus()
                             }
+                        }
                     }
                     .show()
                 true

@@ -12,7 +12,8 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         app:defaultNavHost="true"
-        app:navGraph="@navigation/nav_graph" />
+        app:navGraph="@navigation/nav_graph"
+        android:layout_marginBottom="?actionBarSize"/>
 
     <com.google.android.material.bottomappbar.BottomAppBar
         android:id="@+id/bottomAppBar"
@@ -40,5 +41,17 @@
         android:contentDescription="@string/app_name"
         app:layout_anchor="@id/bottomAppBar"
         android:src="@drawable/ic_baseline_add_24"/>
+
+    <TextView
+        android:id="@+id/txt_fab"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAlignment="center"
+        android:text="Tambah Event"
+        android:textSize="9sp"
+        app:layout_anchorGravity="center_horizontal|bottom"
+        app:layout_dodgeInsetEdges="bottom"
+        android:layout_marginBottom="10dp"
+        app:layout_anchor="@id/bottomAppBar"/>
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

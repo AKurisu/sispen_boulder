@@ -16,6 +16,7 @@
 
         <TextView
             android:id="@+id/txt_position_null"
+            style="@style/TextDetail"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
@@ -27,6 +28,7 @@
 
         <TextView
             android:id="@+id/txt_nama_null"
+            style="@style/TextDetail"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textStyle="bold"
@@ -52,6 +54,7 @@
 
             <TextView
                 android:id="@+id/txt_position"
+                style="@style/TextDetail"
                 android:layout_width="0dp"
                 android:layout_weight="1.4"
                 android:textAlignment="center"
@@ -60,6 +63,7 @@
 
             <TextView
                 android:id="@+id/txt_nama"
+                style="@style/TextDetail"
                 android:layout_width="0dp"
                 android:layout_weight="14"
                 android:textStyle="bold"
@@ -67,6 +71,7 @@
 
             <TextView
                 android:id="@+id/txt_attempt_total"
+                style="@style/TextDetail"
                 android:layout_width="0dp"
                 android:layout_weight="6.3"
                 android:textAlignment="center"
@@ -98,6 +103,7 @@
 
             <TextView
                 android:layout_weight="3"
+                style="@style/TextDetail"
                 android:layout_width="0dp"
                 android:paddingStart="3dp"
                 android:textAlignment="center"
@@ -107,6 +113,7 @@
 
             <TextView
                 android:layout_weight="3"
+                style="@style/TextDetail"
                 android:layout_width="0dp"
                 android:paddingStart="3dp"
                 android:textAlignment="center"
@@ -116,6 +123,7 @@
 
             <TextView
                 android:layout_weight="3"
+                style="@style/TextDetail"
                 android:layout_width="0dp"
                 android:paddingStart="3dp"
                 android:textAlignment="center"
@@ -125,6 +133,7 @@
 
             <TextView
                 android:layout_weight="3"
+                style="@style/TextDetail"
                 android:layout_width="0dp"
                 android:paddingStart="3dp"
                 android:textAlignment="center"
@@ -134,6 +143,7 @@
 
             <TextView
                 android:layout_weight="5"
+                style="@style/TextDetail"
                 android:layout_width="0dp"
                 android:textAlignment="center"
                 android:id="@+id/txt_total"
@@ -167,6 +177,7 @@
 
             <TextView
                 android:id="@+id/txt_position_five"
+                style="@style/TextDetail"
                 android:layout_width="0dp"
                 android:layout_weight="1.4"
                 android:textAlignment="center"
@@ -175,6 +186,7 @@
 
             <TextView
                 android:id="@+id/txt_nama_five"
+                style="@style/TextDetail"
                 android:layout_width="0dp"
                 android:layout_weight="14"
                 android:textStyle="bold"
@@ -182,6 +194,7 @@
 
             <TextView
                 android:id="@+id/txt_attempt_total_five"
+                style="@style/TextDetail"
                 android:layout_width="0dp"
                 android:layout_weight="6.3"
                 android:textAlignment="center"
@@ -213,6 +226,7 @@
 
             <TextView
                 android:layout_weight="2"
+                style="@style/TextDetail"
                 android:layout_width="0dp"
                 android:paddingStart="3dp"
                 android:textAlignment="center"
@@ -222,6 +236,7 @@
 
             <TextView
                 android:layout_weight="2"
+                style="@style/TextDetail"
                 android:layout_width="0dp"
                 android:paddingStart="3dp"
                 android:textAlignment="center"
@@ -231,6 +246,7 @@
 
             <TextView
                 android:layout_weight="2"
+                style="@style/TextDetail"
                 android:layout_width="0dp"
                 android:paddingStart="3dp"
                 android:textAlignment="center"
@@ -240,6 +256,7 @@
 
             <TextView
                 android:layout_weight="2"
+                style="@style/TextDetail"
                 android:layout_width="0dp"
                 android:paddingStart="3dp"
                 android:textAlignment="center"
@@ -249,6 +266,7 @@
 
             <TextView
                 android:layout_weight="2"
+                style="@style/TextDetail"
                 android:layout_width="0dp"
                 android:paddingStart="3dp"
                 android:textAlignment="center"
@@ -258,6 +276,7 @@
 
             <TextView
                 android:layout_weight="4"
+                style="@style/TextDetail"
                 android:layout_width="0dp"
                 android:textAlignment="center"
                 android:id="@+id/txt_total_five"

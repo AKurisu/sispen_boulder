@@ -130,13 +130,13 @@ class AddJudgesActivity : AppCompatActivity() {
                 Toast.makeText(this, "Pastikan semua dinding telah ada juri", Toast.LENGTH_SHORT).show()
                 return
             }
-            for (ii in (i+1)..wallsAdded){
-                if (i == wallsAdded) break
-                if(wallsList[i].editText?.text.toString() == wallsList[ii].editText?.text.toString()){
-                    Toast.makeText(this, "Juri Lapangan Tidak Boleh Lebih Dari 1 Dinding", Toast.LENGTH_SHORT).show()
-                    return
-                }
-            }
+//            for (ii in (i+1)..wallsAdded){
+//                if (i == wallsAdded) break
+//                if(wallsList[i].editText?.text.toString() == wallsList[ii].editText?.text.toString()){
+//                    Toast.makeText(this, "Juri Lapangan Tidak Boleh Lebih Dari 1 Dinding", Toast.LENGTH_SHORT).show()
+//                    return
+//                }
+//            }
         }
         saveData(wallsAdded)
     }

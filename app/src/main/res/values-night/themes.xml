@@ -1,3 +1,10 @@
 <resources>
     <!-- Base application theme. -->
+    <style name="TextDetail" parent="TextAppearance.AppCompat.Body1">
+        <item name="android:textColor">@color/common_google_signin_btn_text_light</item>
+    </style>
+
+    <style name="EventTextDetail" parent="TextAppearance.AppCompat.Body1">
+        <item name="android:textColor">@color/common_google_signin_btn_text_light</item>
+    </style>
 </resources>

@@ -33,7 +33,7 @@ class AccountTypeActivity : AppCompatActivity() {
         val user = mAuth.currentUser
         database = Firebase.database.reference
 
-        val items = listOf("Panitia", "Presiden Juri", "Juri Lapangan", "Manajer")
+        val items = listOf("Presiden Juri", "Juri Lapangan")
         val adapter = ArrayAdapter(this, R.layout.list_type, items)
         (bind.dropdownType as? AutoCompleteTextView)?.setAdapter(adapter)
 

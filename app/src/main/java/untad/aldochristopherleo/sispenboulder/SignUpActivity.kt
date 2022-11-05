@@ -16,9 +16,17 @@ import untad.aldochristopherleo.sispenboulder.util.MainViewModel
 
 class SignUpActivity : AppCompatActivity() {
 
+    companion object{
+        const val EXTRA_PARTICIPANT_KEY = "extra_participant_key"
+        const val EXTRA_PARTICIPANT_NAME = "extra_participant_name"
+        const val EXTRA_PARTICIPANT_GROUP = "extra_participant_group"
+    }
+
     private lateinit var bind: ActivitySignUpBinding
     private lateinit var database: DatabaseReference
-    private lateinit var group: String
+    private lateinit var key : String
+    private lateinit var updateName : String
+    private lateinit var updateGroup : String
     private val viewModel: MainViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -29,16 +37,28 @@ class SignUpActivity : AppCompatActivity() {
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
         title = "Tambah Peserta"
 
-        viewModel.user.observe(this){
-            if (it.group != null){
-                group = it.group
-                bind.edtGroupname.editText?.setText(group)
-            }
+        if (intent.hasExtra("extra_participant_key") ){
+            key = intent.getStringExtra(EXTRA_PARTICIPANT_KEY).toString()
+            updateName = intent.getStringExtra(EXTRA_PARTICIPANT_NAME).toString()
+            updateGroup = intent.getStringExtra(EXTRA_PARTICIPANT_GROUP).toString()
+            bind.edtName.editText?.setText(updateName)
+            bind.edtGroupname.editText?.setText(updateGroup)
+        } else {
+            key = ""
+            updateName = ""
+            updateGroup = ""
         }
 
-        bind.edtName.editText?.doOnTextChanged { text, start, before, count ->
+//        viewModel.user.observe(this){
+//            if (it.group != null){
+//                group = it.group
+//                bind.edtGroupname.editText?.setText(group)
+//            }
+//        }
+
+        bind.edtName.editText?.doOnTextChanged { _, _, _, _ ->
             if (bind.edtName.editText?.text.isNullOrBlank()){
-                bind.edtName.error = "Text"
+                bind.edtName.error = "Nama Harus Diisi"
             } else {
                 bind.edtName.error = null
             }
@@ -46,37 +66,65 @@ class SignUpActivity : AppCompatActivity() {
 
         bind.btnConfirmationSignUp.setOnClickListener {
             val name = bind.edtName.editText?.text
-            if (!name.isNullOrBlank()){
-                MaterialAlertDialogBuilder(this)
-                    .setTitle("Apakah Anda Yakin Telah Benar?")
-                    .setMessage(name.toString())
-                    .setPositiveButton("Ya"){ _, _ ->
-                        setUserDb()
-                        Toast.makeText(this, "Berhasil", Toast.LENGTH_SHORT).show()
-                        finish()
-                    }
-                    .setNegativeButton("Tidak"){ _, _ ->
-                        Toast.makeText(this, "Berhasil", Toast.LENGTH_SHORT).show()
-                    }
-                    .show()
+            val groupName = bind.edtGroupname.editText?.text
+            if (!name.isNullOrBlank() || !groupName.isNullOrBlank()){
+                if (name.toString() == updateName && groupName.toString() == updateGroup){
+                    Toast.makeText(this, "Data Tidak Memiliki Perubahan", Toast.LENGTH_SHORT).show()
+                } else {
+                    MaterialAlertDialogBuilder(this)
+                        .setTitle("Apakah Anda Yakin Data Peserta Telah Benar?")
+                        .setMessage(name.toString())
+                        .setPositiveButton("Ya"){ _, _ ->
+                            setUserDb()
+                        }
+                        .setNegativeButton("Tidak"){ _, _ ->
+                            Toast.makeText(this, "Berhasil", Toast.LENGTH_SHORT).show()
+                        }
+                        .show()
+                }
             } else {
+                bind.edtName.error = "Nama Harus Diisi"
                 Toast.makeText(this, "Lengkapi Data", Toast.LENGTH_SHORT).show()
             }
         }
     }
 
     private fun setUserDb() {
-
         database = Firebase.database.reference
 
         val groupName = bind.edtGroupname.editText?.text.toString()
         val name = bind.edtName.editText?.text.toString()
         val participant = Participant(name, groupName)
+
+        if (key == ""){
+            database.child("participant").orderByChild("name")
+                .equalTo(name).get().addOnSuccessListener {
+                    if (it.exists()){
+                        var count = 0
+                        for (item in it.children){
+                            val checkGroup = item.child("group").value.toString()
+                            if (checkGroup == groupName){
+                                Toast.makeText(this, "Terdapat Data Yang Sama Di Database", Toast.LENGTH_SHORT).show()
+                            } else if (count == it.children.count()) {
+                                addParticipant(participant)
+                            }
+                            count++
+                        }
+                    } else {
+                        addParticipant(participant)
+                    }
+                }
+        } else {
+            database.child("participant").child(key).setValue(participant)
+        }
+    }
+
+    private fun addParticipant(participant : Participant){
         val key = database.child("participant").push().key
         if (key == null){
             Log.w("TAG", "Couldn't get push key for posts")
-            return
-        }
-        database.child("participant").child(key).setValue(participant)
+        } else database.child("participant").child(key).setValue(participant)
+        Toast.makeText(this, "Berhasil", Toast.LENGTH_SHORT).show()
+        finish()
     }
 }
