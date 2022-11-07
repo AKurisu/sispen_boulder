@@ -27,7 +27,6 @@ class SignUpActivity : AppCompatActivity() {
     private lateinit var key : String
     private lateinit var updateName : String
     private lateinit var updateGroup : String
-    private val viewModel: MainViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

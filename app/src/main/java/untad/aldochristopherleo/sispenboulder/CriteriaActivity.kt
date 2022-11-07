@@ -134,14 +134,14 @@ class CriteriaActivity : AppCompatActivity() {
                 for (item in list.iterator()){
                     val index = list.indexOf(item)
                     if (index % 2 == 0){
-                        item.removeTextChangedListener(ChangedListener(list[index + 1], item))
+                        item.removeTextChangedListener(ChangedListener(list[index + 1]))
                         if (item == editText) watchIndex = index + 1
                     } else {
-                        item.removeTextChangedListener(ChangedListener(list[index - 1], item))
+                        item.removeTextChangedListener(ChangedListener(list[index - 1]))
                         if (item == editText) watchIndex = index - 1
                     }
                 }
-                editText.addTextChangedListener(ChangedListener(list[watchIndex], editText))
+                editText.addTextChangedListener(ChangedListener(list[watchIndex]))
                 getCriteriaResult()
             }
         }

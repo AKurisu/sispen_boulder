@@ -89,7 +89,7 @@ class GradingActivity : AppCompatActivity() {
                     finish()
                 }
                 .show()
-        } else setTitle(userWallKey)
+        } else title = userWallKey
 
         selectedKeyParticipant = ""
 

@@ -69,7 +69,7 @@ class PrintData(val result: ArrayList<SortedResult>) {
     }
 
     private fun Sheet.docHeader(){
-        val headings = listOf("TOP", "ZONE", "ATTEMPT TO TOP", "ATTEMPT TO ZONE", "TOP", "ZONE", "ATTEMPT TO TOP", "ATTEMPT TO ZONE","TOP", "ZONE", "ATTEMPT TO TOP", "ATTEMPT TO ZONE","TOP", "ZONE", "ATTEMPT TO TOP", "ATTEMPT TO ZONE","TOP", "ZONE", "ATTEMPT TO TOP", "ATTEMPT TO ZONE",)
+        val headings = listOf("TOP", "ZONE", "ATTEMPT TO TOP", "ATTEMPT TO ZONE", "TOP", "ZONE", "ATTEMPT TO TOP", "ATTEMPT TO ZONE","TOP", "ZONE", "ATTEMPT TO TOP", "ATTEMPT TO ZONE","TOP", "ZONE", "ATTEMPT TO TOP", "ATTEMPT TO ZONE","TOP", "ZONE", "ATTEMPT TO TOP", "ATTEMPT TO ZONE")
 
         val headingStyle = createCellStyle {
             setFont(createFont {
@@ -87,10 +87,10 @@ class PrintData(val result: ArrayList<SortedResult>) {
             borderBottom = BorderStyle.THICK
             borderLeft = BorderStyle.THICK
 
-            setTopBorderColor(IndexedColors.BLACK.index)
-            setRightBorderColor(IndexedColors.BLACK.index)
-            setBottomBorderColor(IndexedColors.BLACK.index)
-            setLeftBorderColor(IndexedColors.BLACK.index)
+            topBorderColor = IndexedColors.BLACK.index
+            rightBorderColor = IndexedColors.BLACK.index
+            bottomBorderColor = IndexedColors.BLACK.index
+            leftBorderColor = IndexedColors.BLACK.index
             alignment = HorizontalAlignment.CENTER
         }
 
@@ -139,11 +139,11 @@ class PrintData(val result: ArrayList<SortedResult>) {
             name + ".xlsx"
         } else name
 
-        var path = android.os.Environment.getExternalStorageDirectory()
-        var tes = path.path + "/" + dataName
+        val path = android.os.Environment.getExternalStorageDirectory()
+        val tes = path.path + "/" + dataName
         dataToPrint.write(tes)
     }
 
-    fun range(a: Int, b: Int, c: Int, d: Int): CellRangeAddress = CellRangeAddress(a,b,c,d)
+    private fun range(a: Int, b: Int, c: Int, d: Int): CellRangeAddress = CellRangeAddress(a,b,c,d)
 
 }

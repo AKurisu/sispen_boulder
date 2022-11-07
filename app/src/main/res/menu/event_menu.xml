@@ -10,8 +10,10 @@
         android:title="Ubah Detail"/>
     <item android:id="@+id/menu_hapus_event"
         android:title="Hapus Event"/>
+    <item android:id="@+id/menu_tambah_peserta"
+        android:title="Tambah Peserta"/>
     <item android:id="@+id/menu_hapus_peserta"
-        android:title="Hapus Peserta"/>
+        android:title="Ubah Peserta"/>
     <item android:id="@+id/menu_nama_juri_lapangan"
         android:title="Nama Juri Lapangan"/>
     <item android:id="@+id/menu_print_hasil"

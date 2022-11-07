@@ -8,9 +8,7 @@ import java.lang.NumberFormatException
 import java.math.BigDecimal
 import java.math.RoundingMode
 
-class ChangedListener internal constructor(private val editText: EditText, private val self: EditText): TextWatcher{
-
-    private var text = ""
+class ChangedListener internal constructor(private val editText: EditText): TextWatcher{
 
     override fun beforeTextChanged(p0: CharSequence?, start: Int, count: Int, after: Int) {
     }

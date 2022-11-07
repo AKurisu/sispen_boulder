@@ -58,6 +58,10 @@ class EventActivity : AppCompatActivity() {
         const val EXTRA_EVENT_KEY = "extra_event_key"
         const val PERMISSION_REQUEST_CODE = 0
     }
+
+    private var firstOpen = 0
+    private lateinit var notCountKeys: ArrayList<String>
+    private lateinit var oldList: ArrayList<SortedResult>
     private var userType : String? = null
     private var userName : String? = null
     private var _bind : ActivityEventBinding? = null
@@ -124,6 +128,8 @@ class EventActivity : AppCompatActivity() {
         resultWall5 = ArrayList()
         resultParticipantKey = ArrayList()
         judgesList = ArrayList()
+        oldList = ArrayList()
+        notCountKeys = ArrayList()
 
         event.judges?.forEach { (_, item) ->
             item.name?.let { judgesList.add(it) }
@@ -275,7 +281,7 @@ class EventActivity : AppCompatActivity() {
 
     private fun setViewText() {
         val locale =
-            resources.configuration.locales.get(0);
+            resources.configuration.locales.get(0)
         val date = Date(event.date)
         val dateFormat = SimpleDateFormat("EEEE, dd MMMM yyyy", locale)
         val timeFormat = SimpleDateFormat("HH:mm z", locale)
@@ -293,6 +299,7 @@ class EventActivity : AppCompatActivity() {
 
         viewModel.getParticipant(eventKey).get().addOnSuccessListener { snapshot ->
             Log.d("CheckVM", snapshot.toString())
+            oldList = sortedResult
             clearList()
 
             if (snapshot.value != null){
@@ -377,6 +384,7 @@ class EventActivity : AppCompatActivity() {
         resultWall4.clear()
         resultWall5.clear()
         resultParticipantKey.clear()
+        notCountKeys.clear()
     }
 
     private fun checkEventStatus(){
@@ -420,7 +428,7 @@ class EventActivity : AppCompatActivity() {
     private fun pickDialog() : String {
         var result = ""
 
-        var wallList = arrayOf("Semi Final", "Final")
+        val wallList = arrayOf("Semi Final", "Final")
 
         val builder = MaterialAlertDialogBuilder(this)
             .setTitle("Silahkan Pilih Dinding")
@@ -491,8 +499,10 @@ class EventActivity : AppCompatActivity() {
                 val resultNotCount = ArrayList<SortedResult>()
 
                 for ((index, item) in result.keys.withIndex()){
-
-                    if (result[item] == Result()){
+                    val resultItem = result[item]
+                    if (resultItem?.at == 0.0 && resultItem.ab == 0.0 && resultItem.top == 0.0 && resultItem.bonus == 0.0){
+                        Log.d("SETPOST", "CHECKNULLDATA")
+                        notCountKeys.add(resultParticipantKey[index])
                         resultNotCount.add(SortedResult(item, resultTopsis[index], result[item],
                             resultWall1[index], resultWall2[index], resultWall3[index], resultWall4[index], null, null, resultParticipantKey[index]))
                     } else if (event.round == "KUALIFIKASI") {
@@ -502,32 +512,24 @@ class EventActivity : AppCompatActivity() {
                         sortedResult.add(SortedResult(item, resultTopsis[index], result[item],
                             resultWall1[index], resultWall2[index], resultWall3[index], resultWall4[index], resultWall5[index], null, resultParticipantKey[index]))
                     }
+                    sortedResultSend.add(SortedResult(item, resultTopsis[index], result[item],
+                        resultWall1[index], resultWall2[index], resultWall3[index], resultWall4[index], resultWall5[index], null, resultParticipantKey[index]))
                 }
 
                 sortedResult.sortByDescending { it.preferenceValue }
                 sortedResult.addAll(resultNotCount)
-                sortedResultSend= sortedResult
+//                sortedResultSend= sortedResult
                 resultArray.clear()
 
-                var position = 1
-                var setPosition = position
-                sortedResult.forEachIndexed { index, item ->
-                    if (index == 0){
-                        setParticipantPosition(setPosition, index, item.key)
-                        position++
-                    } else if (sortedResult[index].preferenceValue == sortedResult[index - 1].preferenceValue){
-                        setParticipantPosition(setPosition, index, item.key)
-                        position++
-                    } else {
-                        setPosition = position
-                        setParticipantPosition(setPosition, index, item.key)
-                        position++
-                    }
+                if (firstOpen == 0){
+                    Log.d("SETPOST", "CHECK")
+                    prepareDataToShow()
+                } else if (sortedResult.size != oldList.size && sortedResult[0].key != oldList[0].key &&
+                    sortedResult[sortedResult.size - 1].key != oldList[oldList.size - 1].key){
+                    prepareDataToShow()
                 }
 
-//                adapter.clearData()
-                adapter.addAll(sortedResult)
-
+                firstOpen++
                 swipeRefreshLayout.isRefreshing = false
             }
         }
@@ -535,8 +537,34 @@ class EventActivity : AppCompatActivity() {
         showView()
     }
 
+    private fun prepareDataToShow() {
+        var position = 1
+        var setPosition = position
+        sortedResult.forEachIndexed { index, item ->
+            if (index == 0){
+                setParticipantPosition(setPosition, index, item.key)
+                position++
+            } else if (sortedResult[index].preferenceValue == sortedResult[index - 1].preferenceValue){
+                setParticipantPosition(setPosition, index, item.key)
+                position++
+            } else {
+                setPosition = position
+                setParticipantPosition(setPosition, index, item.key)
+                position++
+            }
+        }
+        adapter.addAll(sortedResult)
+    }
+
     private fun setParticipantPosition(position: Int, index: Int, key: String) {
         sortedResult[index].position = position
+        for (item in notCountKeys){
+            Log.d("SETPARTPOST", item + " " + sortedResult[index].key)
+            if (item == sortedResult[index].key){
+                Log.d("SETPARTPOST", "CHECK")
+                return
+            }
+        }
         database.child("result/$eventKey/$key/position").setValue(position).addOnSuccessListener {
             Log.d("setParticipantPosition", "SUCCESS")
         }
@@ -560,9 +588,10 @@ class EventActivity : AppCompatActivity() {
             R.id.menu_topsis -> {
                 if (topsis.getNormalization().isNotEmpty()){
                     val intent = Intent(this, TopsisActivity::class.java)
+                    val topsisData = DataTopsis(topsis.getNormalization(),
+                        topsis.getPriorityNormalize(), topsis.getdPosNeg("+"), topsis.getdPosNeg("-"))
                     intent.putExtra(TopsisActivity.EXTRA_EVENT, sortedResultSend)
-                    intent.putExtra(TopsisActivity.EXTRA_TOPSIS, DataTopsis(topsis.getNormalization(),
-                        topsis.getPriorityNormalize(), topsis.getdPosNeg("+"), topsis.getdPosNeg("-")))
+                    intent.putExtra(TopsisActivity.EXTRA_TOPSIS, topsisData)
                     startActivity(intent)
                 }
                 true
@@ -653,12 +682,19 @@ class EventActivity : AppCompatActivity() {
                     .show()
                 true
             }
+            R.id.menu_tambah_peserta ->{
+                val intent = Intent(this, SignUpActivity::class.java)
+                startActivity(intent)
+                true
+            }
             else -> super.onOptionsItemSelected(item)
         }
     }
 
     private fun print(fileName: String) {
-        val printData = PrintData(sortedResultSend)
+        val printResult = sortedResultSend
+        printResult.sortByDescending { it.preferenceValue }
+        val printData = PrintData(printResult)
         try {
             printData.print(fileName)
             Toast.makeText(this, "File Berhasil Disimpan", Toast.LENGTH_SHORT).show()
@@ -748,6 +784,7 @@ class EventActivity : AppCompatActivity() {
             val menuHapus = menu.findItem(R.id.menu_hapus_event)
             val menuMulai = menu.findItem(R.id.menu_start_event)
             val menuHapusPeserta = menu.findItem(R.id.menu_hapus_peserta)
+            val menuTambahPeserta = menu.findItem(R.id.menu_tambah_peserta)
             val menuJuriLapangan = menu.findItem(R.id.menu_nama_juri_lapangan)
             val menuPrint = menu.findItem(R.id.menu_print_hasil)
 //
@@ -764,6 +801,7 @@ class EventActivity : AppCompatActivity() {
             if (userType != "Presiden Juri"){
                 menuJuriLapangan?.isVisible = false
                 menuHapusPeserta?.isVisible = false
+                menuTambahPeserta?.isVisible = false
             }
 
             if (userType == "Presiden Juri" || userType == "Panitia"){
@@ -787,7 +825,7 @@ class EventActivity : AppCompatActivity() {
 
 
     private fun checkPermission(): Boolean {
-        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+        return if (SDK_INT >= Build.VERSION_CODES.R) {
             Environment.isExternalStorageManager()
         } else {
             val result =
@@ -799,7 +837,7 @@ class EventActivity : AppCompatActivity() {
     }
 
     private fun requestPermission() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+        if (SDK_INT >= Build.VERSION_CODES.R) {
             try {
                 val intent = Intent(Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION)
                 intent.addCategory("android.intent.category.DEFAULT")
@@ -842,7 +880,7 @@ class EventActivity : AppCompatActivity() {
     ) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
         when (requestCode) {
-            PERMISSION_REQUEST_CODE -> if (grantResults.size > 0) {
+            PERMISSION_REQUEST_CODE -> if (grantResults.isNotEmpty()) {
                 val READ_EXTERNAL_STORAGE = grantResults[0] == PackageManager.PERMISSION_GRANTED
                 val WRITE_EXTERNAL_STORAGE = grantResults[1] == PackageManager.PERMISSION_GRANTED
                 if (READ_EXTERNAL_STORAGE && WRITE_EXTERNAL_STORAGE) {
@@ -855,7 +893,7 @@ class EventActivity : AppCompatActivity() {
         }
     }
 
-    var activityResult = registerForActivityResult(StartActivityForResult()) { result ->
+    private var activityResult = registerForActivityResult(StartActivityForResult()) { result ->
         if (result.resultCode == Activity.RESULT_OK){
             checkEventParticipant()
         }

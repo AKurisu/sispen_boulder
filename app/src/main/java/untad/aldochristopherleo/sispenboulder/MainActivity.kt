@@ -19,6 +19,7 @@ import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.navigation.NavOptions
 import androidx.navigation.findNavController
+import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
@@ -69,7 +70,8 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
         supportActionBar?.hide()
         activityMainBinding.bottomNavView.background = null
         activityMainBinding.bottomNavView.menu.getItem(2).isEnabled = false
-        val navController = findNavController(R.id.nav_fragment)
+        val navHostFragment = supportFragmentManager.findFragmentById(R.id.nav_fragment) as NavHostFragment
+        val navController = navHostFragment.navController
         val options =  NavOptions.Builder()
             .setLaunchSingleTop(true)
             .setEnterAnim(R.anim.enter_from_right)

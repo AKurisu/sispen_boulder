@@ -199,7 +199,7 @@ class AddEventActivity : AppCompatActivity() {
             hour = picker.hour
             minute = picker.minute
             if (hour < 10) displayHour = "0$hour" else displayHour = hour.toString()
-            if (minute < 10) displayMinute = "0$minute" else displayMinute = minute.toString()
+            displayMinute = if (minute < 10) "0$minute" else minute.toString()
             bind.edtTime.editText?.setText(getString(R.string.display_time, displayHour, displayMinute))
         }
     }

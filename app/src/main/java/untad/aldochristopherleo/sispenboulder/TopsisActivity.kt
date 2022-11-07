@@ -1,6 +1,7 @@
 package untad.aldochristopherleo.sispenboulder
 
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -156,6 +157,8 @@ class TopsisActivity : AppCompatActivity() {
             event.indices.forEach { index ->
                 event5.add(SortedResult(event[index].name, event[index].preferenceValue, null))
             }
+
+            event5.sortByDescending { it.preferenceValue }
 
             val rvFifth = bind.expandCvrFifth
             adapter1 = ListTableTopsisAdapter(event5)
