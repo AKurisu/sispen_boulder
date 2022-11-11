@@ -115,6 +115,8 @@ class SignUpActivity : AppCompatActivity() {
                 }
         } else {
             database.child("participant").child(key).setValue(participant)
+            Toast.makeText(this, "Berhasil", Toast.LENGTH_SHORT).show()
+            finish()
         }
     }
 

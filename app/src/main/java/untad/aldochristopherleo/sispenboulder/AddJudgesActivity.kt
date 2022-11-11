@@ -144,7 +144,8 @@ class AddJudgesActivity : AppCompatActivity() {
     private fun saveData(wallsAdded: Int) {
         val juri = HashMap<String, Judge>()
         for (i in 0..wallsAdded){
-            juri["Dinding " + i+1] = Judge(wallsList[i].editText?.text.toString())
+            val index = i+1
+            juri["Dinding " + index] = Judge(wallsList[i].editText?.text.toString())
 //            juri.add(Judge(wallsList[i].editText?.text.toString()))
         }
 

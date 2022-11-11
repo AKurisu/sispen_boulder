@@ -51,6 +51,18 @@ class ListParticipantAdapter(
 
         Log.d("onBindViewHolder: ", list.size.toString())
         val result = list[position]
+        var wall1IsAvailable = false
+        var wall2IsAvailable = false
+        var wall3IsAvailable = false
+        var wall4IsAvailable = false
+        var wall5IsAvailable = false
+        for (item in result.listOfWall){
+            if (item == 1) wall1IsAvailable = true
+            else if (item == 2) wall2IsAvailable = true
+            else if (item == 3) wall3IsAvailable = true
+            else if (item == 4) wall4IsAvailable = true
+            else if (item == 5) wall5IsAvailable = true
+        }
         val wall1 = result.wall1
         val wall2 = result.wall2
         val wall3 = result.wall3
@@ -60,16 +72,16 @@ class ListParticipantAdapter(
         val name = result.name.toString()
         var textWall5 = ""
 
-        val textWall1 =  if (wall1.at != 0.0 || wall1.ab != 0.0 || wall1.top != 0.0 || wall1.bonus != 0.0){
+        val textWall1 =  if (wall1IsAvailable){
             "t" + wall1.at.toInt().toString() + " " + "z" + wall1.ab.toInt().toString()
         } else "-"
-        val textWall2 =  if (wall2.at != 0.0 || wall2.ab != 0.0 || wall2.top != 0.0 || wall2.bonus != 0.0){
+        val textWall2 =  if (wall2IsAvailable){
             "t" + wall2.at.toInt().toString() + " " + "z" + wall2.ab.toInt().toString()
         } else "-"
-        val textWall3 =  if (wall3.at != 0.0 || wall3.ab != 0.0 || wall3.top != 0.0 || wall3.bonus != 0.0){
+        val textWall3 =  if (wall3IsAvailable){
             "t" + wall3.at.toInt().toString() + " " + "z" + wall3.ab.toInt().toString()
         } else "-"
-        val textWall4 =  if (wall4.at != 0.0 || wall4.ab != 0.0 || wall4.top != 0.0 || wall4.bonus != 0.0){
+        val textWall4 =  if (wall4IsAvailable){
             "t" + wall4.at.toInt().toString() + " " + "z" + wall4.ab.toInt().toString()
         } else "-"
         if (wall5 != null)  textWall5 = inputText(wall5.at, wall5.ab)
@@ -162,9 +174,9 @@ class ListParticipantAdapter(
         return if (at == 0.0 && ab == 0.0){
             "-"
         } else if (at == 0.0){
-            "z$ab"
+            "z${ab.toInt()}"
         } else if (ab == 0.0){
-            "t$at"
-        } else "t$at z$ab"
+            "t${at.toInt()}"
+        } else "t${at.toInt()} z${ab.toInt()}"
     }
 }

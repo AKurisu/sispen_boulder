@@ -6,14 +6,17 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
+import android.widget.Toast
 import androidx.cardview.widget.CardView
 import androidx.recyclerview.widget.RecyclerView
 import untad.aldochristopherleo.sispenboulder.EventActivity
+import untad.aldochristopherleo.sispenboulder.GradingActivity
 import untad.aldochristopherleo.sispenboulder.R
 import untad.aldochristopherleo.sispenboulder.data.Event
 import untad.aldochristopherleo.sispenboulder.util.DateConverter
 
-class ListEventDetailAdapter(private val event: ArrayList<Event>, private val eventKeys: ArrayList<String>):
+class ListEventDetailAdapter(private val event: ArrayList<Event>, private val eventKeys: ArrayList<String>,
+private val userName: String, private val userType: String):
     RecyclerView.Adapter<ListEventDetailAdapter.ListViewHolder>() {
     class ListViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView){
         var name : TextView = itemView.findViewById(R.id.item_contest_name_detail)
@@ -43,10 +46,25 @@ class ListEventDetailAdapter(private val event: ArrayList<Event>, private val ev
         } else holder.cardView.setCardBackgroundColor(Color.RED)
 
         holder.itemView.setOnClickListener {
-            val intent = Intent(holder.itemView.context, EventActivity::class.java)
-            intent.putExtra(EventActivity.EXTRA_EVENT_KEY, eventKeys[position])
-            intent.putExtra(EventActivity.EXTRA_EVENT, event[position])
-            holder.itemView.context.startActivity(intent)
+
+            if (event[position].status == "PERSIAPAN"){
+                Toast.makeText(holder.cardView.context, "Lomba Belum Dimulai", Toast.LENGTH_SHORT).show()
+            } else if (event[position].status == "LOMBA"){
+                if (userType == "Juri Lapangan"){
+
+                    val intent = Intent(holder.itemView.context, GradingActivity::class.java)
+                    intent.putExtra(GradingActivity.EXTRA_EVENT_KEY, eventKeys[position])
+                    intent.putExtra(GradingActivity.EXTRA_EVENT, event[position])
+                    intent.putExtra(GradingActivity.EXTRA_NAME, userName)
+                    holder.cardView.context.startActivity(intent)
+                } else {
+
+                    val intent = Intent(holder.itemView.context, EventActivity::class.java)
+                    intent.putExtra(EventActivity.EXTRA_EVENT_KEY, eventKeys[position])
+                    intent.putExtra(EventActivity.EXTRA_EVENT, event[position])
+                    holder.itemView.context.startActivity(intent)
+                }
+            } else holder.cardView.setCardBackgroundColor(Color.RED)
         }
     }
 

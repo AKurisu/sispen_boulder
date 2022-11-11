@@ -24,6 +24,8 @@ class ListFragment : Fragment() {
     private lateinit var rvDone : RecyclerView
     private lateinit var rvUpcoming : RecyclerView
     private val viewModel: MainViewModel by viewModels()
+    private var userName = ""
+    private var userType = ""
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -34,11 +36,16 @@ class ListFragment : Fragment() {
 
         if (activity != null){
 
-            rvDone = binding.listRvDone
-            rvUpcoming = binding.listRvUpcoming
+            viewModel.user.observe(viewLifecycleOwner){ user ->
+                userName = user.name.toString()
+                userType = user.type.toString()
 
-            setRecyclerView()
-            setOnClickListener()
+                rvDone = binding.listRvDone
+                rvUpcoming = binding.listRvUpcoming
+
+                setRecyclerView()
+                setOnClickListener()
+            }
 
         }
 
@@ -84,8 +91,8 @@ class ListFragment : Fragment() {
         val listUpcoming = ArrayList<Event>()
         val eventKeysDone = ArrayList<String>()
         val eventKeysUpcoming = ArrayList<String>()
-        val adapterDone = ListEventDetailAdapter(listDone, eventKeysDone)
-        val adapterUpcoming = ListEventDetailAdapter(listUpcoming, eventKeysUpcoming)
+        val adapterDone = ListEventDetailAdapter(listDone, eventKeysDone, userName, userType)
+        val adapterUpcoming = ListEventDetailAdapter(listUpcoming, eventKeysUpcoming, userName, userType)
 
         viewModel.getEvents().orderByChild("date").addValueEventListener(object : ValueEventListener{
             override fun onDataChange(snapshot: DataSnapshot) {

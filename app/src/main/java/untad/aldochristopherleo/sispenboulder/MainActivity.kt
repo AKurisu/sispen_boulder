@@ -35,6 +35,8 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
     private lateinit var backToast: Toast
     private lateinit var connectionLiveData: ConnectionLiveData
     private val viewModel: MainViewModel by viewModels()
+    private var userName = ""
+    private var userType = ""
     private lateinit var fabIntent : Intent
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -47,6 +49,8 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
 
 
         viewModel.user.observe(this){ user ->
+            userName = user.name.toString()
+            userType = user.type.toString()
             fabIntent = if (user.type == "Panitia"){
                 Intent(this@MainActivity, AddEventActivity::class.java)
             } else if (user.type == "Manajer") {
@@ -56,6 +60,7 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
             }
             if (user.type == "Juri Lapangan"){
                 activityMainBinding.fab.visibility = View.GONE
+                activityMainBinding.txtFab.visibility = View.GONE
             }
         }
 

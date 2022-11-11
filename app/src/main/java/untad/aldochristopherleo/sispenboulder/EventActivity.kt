@@ -33,6 +33,7 @@ import com.google.android.material.datepicker.MaterialDatePicker
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.timepicker.MaterialTimePicker
 import com.google.android.material.timepicker.TimeFormat
+import com.google.firebase.database.ChildEventListener
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.ValueEventListener
@@ -48,6 +49,7 @@ import untad.aldochristopherleo.sispenboulder.util.Topsis
 import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.collections.ArrayList
+import kotlin.collections.LinkedHashMap
 
 
 @Suppress("DEPRECATION")
@@ -98,6 +100,9 @@ class EventActivity : AppCompatActivity() {
     private val checkedItems = ArrayList<Boolean>()
     private val choosenParticipant = ArrayList<Participant>()
     private val choosenKey = ArrayList<String>()
+    private val wallHasBeenCount = LinkedHashMap<String, ArrayList<Int>>()
+    private var participantSize = 0
+    private var participantHasBeenCount = 0
 
     override fun onCreate(savedInstanceState: Bundle?) {
 
@@ -159,6 +164,7 @@ class EventActivity : AppCompatActivity() {
                 Toast.makeText(this, "Tunggu 1 menit sebelum refresh ulang", Toast.LENGTH_SHORT).show()
                 swipeRefreshLayout.isRefreshing = false
             } else {
+                checkEventStatus()
                 swipeRefreshLayout.isRefreshing = true
                 getEventData()
                 checkEventParticipant()
@@ -167,8 +173,6 @@ class EventActivity : AppCompatActivity() {
 
             refreshPulledTime = System.currentTimeMillis()
         }
-
-
 
         viewModel.getAllParticipants().addValueEventListener(object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
@@ -277,8 +281,6 @@ class EventActivity : AppCompatActivity() {
         )
     }
 
-
-
     private fun setViewText() {
         val locale =
             resources.configuration.locales.get(0)
@@ -307,12 +309,15 @@ class EventActivity : AppCompatActivity() {
                     val participant = item.getValue(Participant::class.java)
                     val participantKey = item.key
                     participantList.add(Alternative(participant?.name))
+                    participantSize++
 
                     viewModel.getResult(eventKey).get().addOnSuccessListener {
                         var data = Result()
                         if(it.hasChild(participantKey!!)){
                             if (participant != null) {
                                 Log.d("CHECKPART",it.toString())
+                                var countedWall = 0
+                                val listOfWall = ArrayList<Int>()
 
                                 result[participant.name + " ("+ participant.group + ")"] =
                                     it.child("$participantKey/Total").getValue(Result::class.java)!!
@@ -320,21 +325,41 @@ class EventActivity : AppCompatActivity() {
                                 resultParticipantKey.add(participantKey)
 
                                 if ( it.child("$participantKey/Dinding 1").exists() ){
+                                    countedWall++
+                                    listOfWall.add(1)
                                     resultWall1.add(it.child("$participantKey/Dinding 1").getValue(Result::class.java)!!)
                                 } else resultWall1.add(Result())
                                 if ( it.child("$participantKey/Dinding 2").exists() ){
+                                    countedWall++
+                                    listOfWall.add(2)
                                     resultWall2.add(it.child("$participantKey/Dinding 2").getValue(Result::class.java)!!)
                                 } else resultWall2.add(Result())
                                 if ( it.child("$participantKey/Dinding 3").exists() ){
+                                    countedWall++
+                                    listOfWall.add(3)
                                     resultWall3.add(it.child("$participantKey/Dinding 3").getValue(Result::class.java)!!)
                                 } else resultWall3.add(Result())
                                 if ( it.child("$participantKey/Dinding 4").exists() ){
+                                    countedWall++
+                                    listOfWall.add(4)
                                     resultWall4.add(it.child("$participantKey/Dinding 4").getValue(Result::class.java)!!)
                                 } else resultWall4.add(Result())
                                 if ( it.child("$participantKey/Dinding 5").exists() ){
+                                    countedWall++
+                                    listOfWall.add(5)
                                     resultWall5.add(it.child("$participantKey/Dinding 5").getValue(Result::class.java)!!)
                                 } else resultWall5.add(Result())
 
+                                wallHasBeenCount[participantKey] = listOfWall
+                                if (event.judges?.size == 5){
+                                    if (countedWall == 5){
+                                        participantHasBeenCount++
+                                    }
+                                } else {
+                                    if (countedWall >= 4){
+                                        participantHasBeenCount++
+                                    }
+                                }
                             }
                         } else if (participant != null) {
                             result[participant.name + " ("+ participant.group + ")"] = Result()
@@ -360,17 +385,6 @@ class EventActivity : AppCompatActivity() {
             } else showView()
 
         }
-
-//        viewModel.getParticipant(event.name).addListenerForSingleValueEvent(
-//            object : ValueEventListener {
-//                override fun onDataChange(snapshot: DataSnapshot) {
-//
-//                }
-//
-//                override fun onCancelled(error: DatabaseError) {
-//                    Log.w("TAG", "loadPost:onCancelled", error.toException())
-//                }
-//            })
     }
 
     private fun clearList() {
@@ -415,13 +429,37 @@ class EventActivity : AppCompatActivity() {
             bind.txtEventStatus.text = "Event Sedang Berlangsung"
             bind.eventName.setTextColor(Color.GREEN)
             run stop@{
-                event.judges?.forEach { (_, value) ->
-                    if (value.name == userName && userType == "Juri Lapangan"){
-                        bind.btnEventEdit.visibility = View.VISIBLE
-                        return@stop
-                    } else bind.btnEventEdit.visibility = View.GONE
+                if (!event.judges.isNullOrEmpty()){
+                    val size = event.judges?.size
+                    var count = 1
+                    event.judges?.forEach { (key, value) ->
+                        if (value.name == userName && userType == "Juri Lapangan"){
+                            val intent = Intent(this, GradingActivity::class.java)
+                            intent.putExtra(GradingActivity.EXTRA_EVENT_KEY, eventKey)
+                            intent.putExtra(GradingActivity.EXTRA_EVENT, event)
+                            intent.putExtra(GradingActivity.EXTRA_NAME, userName)
+
+                            startActivity(intent)
+                            //ARTIFACT
+                            bind.btnEventEdit.visibility = View.VISIBLE
+//                            return@stop
+                        } else if (size == count){
+                            Toast.makeText(this, "Anda Tidak Memiliki Hak Untuk Melihat Event", Toast.LENGTH_SHORT).show()
+                            finish()
+                            //ARTIFACT
+                            bind.btnEventEdit.visibility = View.GONE
+                        }
+                        count++
+                    }
                 }
             }
+            if (participantSize == participantHasBeenCount && participantSize != 0){
+                if (this::menu.isInitialized){
+                    val menuFinish = menu.findItem(R.id.menu_finish_event)
+                    menuFinish.isVisible = true
+                }
+            }
+
         } else bind.txtEventStatus.text = "Event Telah Selesai"
     }
 
@@ -504,8 +542,8 @@ class EventActivity : AppCompatActivity() {
                         Log.d("SETPOST", "CHECKNULLDATA")
                         notCountKeys.add(resultParticipantKey[index])
                         resultNotCount.add(SortedResult(item, resultTopsis[index], result[item],
-                            resultWall1[index], resultWall2[index], resultWall3[index], resultWall4[index], null, null, resultParticipantKey[index]))
-                    } else if (event.round == "KUALIFIKASI") {
+                            resultWall1[index], resultWall2[index], resultWall3[index], resultWall4[index], null, null, ""))
+                    } else if (event.round == "Kualifikasi") {
                         sortedResult.add(SortedResult(item, resultTopsis[index], result[item],
                             resultWall1[index], resultWall2[index], resultWall3[index], resultWall4[index], null, null, resultParticipantKey[index]))
                     } else {
@@ -531,6 +569,10 @@ class EventActivity : AppCompatActivity() {
 
                 firstOpen++
                 swipeRefreshLayout.isRefreshing = false
+//
+//                if (notCountKeys.size == 0 && statusEvent == "PERLOMBAAN"){
+//
+//                }
             }
         }
         Toast.makeText(this, "View Tampil", Toast.LENGTH_SHORT).show()
@@ -540,6 +582,15 @@ class EventActivity : AppCompatActivity() {
     private fun prepareDataToShow() {
         var position = 1
         var setPosition = position
+
+        wallHasBeenCount.forEach { key, list ->
+            sortedResult.forEachIndexed{ index, item ->
+                if (key == item.key){
+                    sortedResult[index].listOfWall = list
+                }
+            }
+        }
+
         sortedResult.forEachIndexed { index, item ->
             if (index == 0){
                 setParticipantPosition(setPosition, index, item.key)
@@ -547,13 +598,15 @@ class EventActivity : AppCompatActivity() {
             } else if (sortedResult[index].preferenceValue == sortedResult[index - 1].preferenceValue){
                 setParticipantPosition(setPosition, index, item.key)
                 position++
-            } else {
+            } else{
                 setPosition = position
                 setParticipantPosition(setPosition, index, item.key)
                 position++
             }
+            Log.d("PREPARE", item.position.toString())
         }
         adapter.addAll(sortedResult)
+
     }
 
     private fun setParticipantPosition(position: Int, index: Int, key: String) {
@@ -565,8 +618,10 @@ class EventActivity : AppCompatActivity() {
                 return
             }
         }
-        database.child("result/$eventKey/$key/position").setValue(position).addOnSuccessListener {
-            Log.d("setParticipantPosition", "SUCCESS")
+        if (sortedResult[index].listOfWall.size != 0){
+            database.child("result/$eventKey/$key/position").setValue(position).addOnSuccessListener {
+                Log.d("setParticipantPosition", "SUCCESS")
+            }
         }
     }
 
@@ -687,6 +742,16 @@ class EventActivity : AppCompatActivity() {
                 startActivity(intent)
                 true
             }
+            R.id.menu_ubah_juri_lapangan ->{
+                val intent = Intent(this, AddJudgesActivity::class.java)
+                intent.putExtra("EXTRA_EVENT_KEY", eventKey)
+                intent.putExtra("EXTRA_EVENT", event)
+                startActivity(intent)
+                true
+            }
+            R.id.menu_finish_event -> {
+                true
+            }
             else -> super.onOptionsItemSelected(item)
         }
     }
@@ -783,9 +848,11 @@ class EventActivity : AppCompatActivity() {
             val menuUbah = menu.findItem(R.id.menu_edit_event)
             val menuHapus = menu.findItem(R.id.menu_hapus_event)
             val menuMulai = menu.findItem(R.id.menu_start_event)
+            val menuStop = menu.findItem(R.id.menu_finish_event)
             val menuHapusPeserta = menu.findItem(R.id.menu_hapus_peserta)
             val menuTambahPeserta = menu.findItem(R.id.menu_tambah_peserta)
             val menuJuriLapangan = menu.findItem(R.id.menu_nama_juri_lapangan)
+            val menuUbahJuriLapangan = menu.findItem(R.id.menu_ubah_juri_lapangan)
             val menuPrint = menu.findItem(R.id.menu_print_hasil)
 //
 //            if (userType != "Admin") {
@@ -799,7 +866,10 @@ class EventActivity : AppCompatActivity() {
             menuMulai?.isVisible = false
 
             if (userType != "Presiden Juri"){
+                menuUbah?.isVisible = false
+                menuHapus?.isVisible = false
                 menuJuriLapangan?.isVisible = false
+                menuUbahJuriLapangan?.isVisible = false
                 menuHapusPeserta?.isVisible = false
                 menuTambahPeserta?.isVisible = false
             }
@@ -822,7 +892,6 @@ class EventActivity : AppCompatActivity() {
         }
         return bool
     }
-
 
     private fun checkPermission(): Boolean {
         return if (SDK_INT >= Build.VERSION_CODES.R) {

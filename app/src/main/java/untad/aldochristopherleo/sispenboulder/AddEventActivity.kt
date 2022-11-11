@@ -90,14 +90,12 @@ class AddEventActivity : AppCompatActivity() {
             val location = bind.edtLocation.editText?.text
             val president = bind.edtPresident.editText?.text
             val coordinator = bind.edtCoordinator.editText?.text
-            val reviewer = bind.edtReviewer.editText?.text
             if (name.isNullOrEmpty()) bind.edtName.editText?.error = getString(R.string.txt_error, "Nama")
             else if (date.isNullOrEmpty()) bind.edtName.editText?.error = getString(R.string.txt_error, "Tanggal")
             else if (time.isNullOrEmpty()) bind.edtName.editText?.error = getString(R.string.txt_error, "Waktu")
             else if (location.isNullOrEmpty()) bind.edtName.editText?.error = getString(R.string.txt_error, "Lokasi")
             else if (president.isNullOrEmpty()) bind.edtName.editText?.error = getString(R.string.txt_error, "Presiden")
             else if (coordinator.isNullOrEmpty()) bind.edtName.editText?.error = getString(R.string.txt_error, "Panitia Pelaksana")
-            else if (reviewer.isNullOrEmpty()) bind.edtName.editText?.error = getString(R.string.txt_error, "Utusan")
             else {
                 MaterialAlertDialogBuilder(this)
                     .setTitle("Apakah Anda Yakin Telah Benar?")
@@ -107,8 +105,7 @@ class AddEventActivity : AppCompatActivity() {
                                 "Waktu: ${time}\n" +
                                 "Lokasi: ${location}\n"+
                                 "Presiden Juri: ${president}\n"+
-                                "Panpel: ${coordinator}\n"+
-                                "Utusan: ${reviewer}\n")
+                                "Panpel: ${coordinator}\n")
                     .setPositiveButton("Ya"){ _, _ ->
                         setEventDb()
                     }
@@ -135,7 +132,6 @@ class AddEventActivity : AppCompatActivity() {
         var dateStr = bind.edtDate.editText?.text.toString().trim()
         val president = bind.edtPresident.editText?.text.toString().trim()
         val coordinator = bind.edtCoordinator.editText?.text.toString().trim()
-        val reviewer = bind.edtReviewer.editText?.text.toString().trim()
 
         dateStr = "$dateStr $time"
 
@@ -144,7 +140,7 @@ class AddEventActivity : AppCompatActivity() {
         val date = l.toInstant(ZoneId.systemDefault().rules.getOffset(l)).toEpochMilli()
         val key = database.child("events").push().key.toString()
 
-        val event = Event(name, date, location, false, 0, president, status = "PERSIAPAN", null, null, coordinator, reviewer)
+        val event = Event(name, date, location, false, 0, president, status = "PERSIAPAN", null, null, coordinator)
 
         database.child("events").child(key).setValue(event).addOnSuccessListener {
             Toast.makeText(this, "Lomba Berhasil Ditambahkan", Toast.LENGTH_SHORT).show()

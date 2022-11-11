@@ -76,59 +76,18 @@ class GradingActivity : AppCompatActivity() {
                   listOfWalls.add(key)
             }
         }
+        listOfWalls.sortBy { it }
         wallList = listOfWalls.toTypedArray()
         if (wallList.size > 1) {
              userWallKey = pickDialog()
-        } else userWallKey = wallList[0]
-
-        if (userWallKey.isEmpty()){
-            MaterialAlertDialogBuilder(this)
-                .setTitle("Event Bermasalah.")
-                .setMessage("Mohon Laporkan Kepada Administrator")
-                .setPositiveButton("Ok"){_,_ ->
-                    finish()
-                }
-                .show()
-        } else title = userWallKey
+        } else {
+            userWallKey = wallList[0]
+            setWall()
+        }
 
         selectedKeyParticipant = ""
 
-        if (event != null) {
-            viewModel.getParticipant(eventKey).addValueEventListener(object : ValueEventListener {
-                override fun onDataChange(snapshot: DataSnapshot) {
-                    val nameList = ArrayList<String>()
-                    val keyList = ArrayList<String>()
-                    for (item in snapshot.children){
-                        nameList.add(item.child("name").value.toString())
-                        item.key?.let {
-                            keyList.add(it)
-                        }
-                    }
-                    val checkList = ArrayList<String>()
-                    keyParticipant = ArrayList()
-                    database.child("result/$eventKey").get().addOnSuccessListener {
-                        for (index in keyList.indices){
-                            if (!it.hasChild(keyList[index])){
-                                checkList.add(nameList[index])
-                                keyParticipant.add(keyList[index])
-                            }
-                        }
-                        if (checkList.size == 0 && nameList.size == 0){
-                            closeDialog()
-                        } else {
-                            populateSpinner(checkList)
-                            total = Result()
-                            setResultValue()
-                        }
-                    }
 
-                }
-
-                override fun onCancelled(error: DatabaseError) {
-                    Log.w("TAG", "loadPost:onCancelled", error.toException())
-                }
-            })
-        }
 
         setValue()
 
@@ -153,17 +112,82 @@ class GradingActivity : AppCompatActivity() {
 
         val builder = MaterialAlertDialogBuilder(this)
             .setTitle("Silahkan Pilih Dinding")
-            .setSingleChoiceItems(wallList,-1) { _, which ->
+            .setSingleChoiceItems(wallList,0) { _, which ->
                 result = wallList[which]
+                userWallKey = result
+            }
+            .setPositiveButton("OK"){_,_ ->
+                setWall()
             }
         if (dialogOpen != 0){
             builder.setNeutralButton("Cancel"){dialog,_ -> dialog.cancel()}
         }
         dialogOpen++
         val dialog = builder.create()
+        dialog.setCancelable(false)
         dialog.setCanceledOnTouchOutside(false)
         dialog.show()
         return result
+    }
+
+    private fun setWall() {
+        if (userWallKey.isEmpty()){
+            MaterialAlertDialogBuilder(this)
+                .setTitle("Event Bermasalah.")
+                .setMessage("Mohon Laporkan Kepada Administrator")
+                .setPositiveButton("Ok"){_,_ ->
+                    finish()
+                }
+                .show()
+        } else {
+            title = userWallKey
+            setListParticipant()
+        }
+    }
+
+    private fun setListParticipant() {
+        if (event != null) {
+            viewModel.getParticipant(eventKey).addValueEventListener(object : ValueEventListener {
+                override fun onDataChange(snapshot: DataSnapshot) {
+                    val nameList = ArrayList<String>()
+                    val keyList = ArrayList<String>()
+                    for (item in snapshot.children){
+                        nameList.add(item.child("name").value.toString())
+                        item.key?.let {
+                            keyList.add(it)
+                        }
+                    }
+                    val checkList = ArrayList<String>()
+                    keyParticipant = ArrayList()
+                    database.child("result/$eventKey").get().addOnSuccessListener {
+                        for (index in keyList.indices){
+                            if (!it.hasChild(keyList[index])){
+                                checkList.add(nameList[index])
+                                keyParticipant.add(keyList[index])
+                            } else {
+                                val value = it.child(keyList[index])
+                                if (!it.child(keyList[index]).hasChild(userWallKey)){
+                                    checkList.add(nameList[index])
+                                    keyParticipant.add(keyList[index])
+                                }
+                            }
+                        }
+                        if (checkList.size == 0 && nameList.size == 0){
+                            closeDialog()
+                        } else {
+                            populateSpinner(checkList)
+                            total = Result()
+                            setResultValue()
+                        }
+                    }
+
+                }
+
+                override fun onCancelled(error: DatabaseError) {
+                    Log.w("TAG", "loadPost:onCancelled", error.toException())
+                }
+            })
+        }
     }
 
     private fun setResultValue() {
@@ -193,7 +217,9 @@ class GradingActivity : AppCompatActivity() {
         val resultTotal =
             Result(result.top + total.top, result.at + total.at, result.bonus + total.bonus, result.ab + total.ab)
         database.child("result/$eventKey/$selectedKeyParticipant/$userWallKey").setValue(result).addOnSuccessListener {
+            Log.d("SETRESULTGRADING", "OK")
             database.child("result/$eventKey/$selectedKeyParticipant/Total").setValue(resultTotal).addOnSuccessListener {
+                Log.d("SETRESULTGRADING", "OK")
                 Toast.makeText(this, "Data Berhasil Diinput", Toast.LENGTH_SHORT).show()
                 finish()
             }
