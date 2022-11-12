@@ -28,6 +28,7 @@ class GradingActivity : AppCompatActivity() {
         const val EXTRA_EVENT = "extra_event"
         const val EXTRA_EVENT_KEY = "extra_event_key"
         const val EXTRA_NAME = "extra_name"
+        const val EXTRA_ACTIVITY_FROM = "extra_activity_from"
     }
 
     private var _bind : ActivityGradingBinding? = null
@@ -50,6 +51,10 @@ class GradingActivity : AppCompatActivity() {
     private lateinit var keyParticipant: ArrayList<String>
     private lateinit var stringArray: Array<String>
     private lateinit var database: DatabaseReference
+    private lateinit var resultSend: Result
+    private var activitySender : String? = null
+    private var gradeRankOrder = 0
+    private var alreadyGraded = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -59,35 +64,68 @@ class GradingActivity : AppCompatActivity() {
         bind.layoutHide.visibility = View.GONE
         bind.btnConfirmGrading.visibility = View.GONE
 
+        activitySender = intent.getStringExtra(EXTRA_ACTIVITY_FROM)
         eventKey = intent.getStringExtra(EXTRA_EVENT_KEY).toString()
         userName = intent.getStringExtra(EXTRA_NAME).toString()
-        userWallKey = ""
+
         if (Build.VERSION.SDK_INT >= 33){
             event = intent.getParcelableExtra(EXTRA_EVENT, Event::class.java)!!
         } else {
             event = intent.getParcelableExtra<Event>(EXTRA_EVENT) as Event
         }
-//        val event = intent.getParcelableExtra<Event>("EXTRA_EVENT") as Event
+
         database = Firebase.database.reference
 
-        val listOfWalls = ArrayList<String>()
-        event.judges?.forEach { (key, value) ->
-            if (value.name == userName){
-                  listOfWalls.add(key)
+        if (activitySender != null && activitySender != ""){
+            if (activitySender == "EVENT" || activitySender == "MAIN"){
+                userWallKey = ""
+
+                val listOfWalls = ArrayList<String>()
+                event.judges?.forEach { (key, value) ->
+                    if (value.name == userName){
+                        listOfWalls.add(key)
+                    }
+                }
+                listOfWalls.sortBy { it }
+                wallList = listOfWalls.toTypedArray()
+                if (wallList.size > 1) {
+                    userWallKey = pickDialog()
+                } else {
+                    userWallKey = wallList[0]
+                    setWall()
+                }
+
+                selectedKeyParticipant = ""
+            } else if (activitySender == "ADAPTER"){
+                selectedKeyParticipant = intent.getStringExtra("EXTRA_EDIT_PARTICIPANT_KEY").toString()
+                userWallKey = intent.getStringExtra("EXTRA_EDIT_WALL_PICKED").toString()
+                val editResultName = intent.getStringExtra("EXTRA_EDIT_NAME").toString()
+                if (Build.VERSION.SDK_INT >= 33){
+                    resultSend = intent.getParcelableExtra("EXTRA_EDIT_RESULT", Result::class.java)!!
+                } else {
+                    resultSend = intent.getParcelableExtra<Result>("EXTRA_EDIT_RESULT") as Result
+                }
+
+                setTitle(userWallKey)
+                bind.txtParticipantChoose.editText?.setText(editResultName)
+                bind.txtParticipantChoose.isEnabled = false
+
+                topValue = resultSend.top.toInt()
+                atValue = resultSend.at.toInt()
+                bonusValue = resultSend.bonus.toInt()
+                abValue = resultSend.ab.toInt()
+
+                bind.txtTop.text = topValue.toString()
+                bind.txtAt.text = atValue.toString()
+                bind.txtBonus.text = bonusValue.toString()
+                bind.txtAb.text = abValue.toString()
+
+                setResultValue()
+
+                bind.layoutHide.visibility = View.VISIBLE
+                bind.btnConfirmGrading.visibility = View.VISIBLE
             }
         }
-        listOfWalls.sortBy { it }
-        wallList = listOfWalls.toTypedArray()
-        if (wallList.size > 1) {
-             userWallKey = pickDialog()
-        } else {
-            userWallKey = wallList[0]
-            setWall()
-        }
-
-        selectedKeyParticipant = ""
-
-
 
         setValue()
 
@@ -100,7 +138,7 @@ class GradingActivity : AppCompatActivity() {
                 .setNegativeButton("Tidak"){ _, _ -> }
                 .setPositiveButton("Yakin"){ _, _ ->
                     if (event != null) {
-                        setResult(participant)
+                        setResult()
                     }
                 }
                 .show()
@@ -112,7 +150,7 @@ class GradingActivity : AppCompatActivity() {
 
         val builder = MaterialAlertDialogBuilder(this)
             .setTitle("Silahkan Pilih Dinding")
-            .setSingleChoiceItems(wallList,0) { _, which ->
+            .setSingleChoiceItems(wallList,-1) { _, which ->
                 result = wallList[which]
                 userWallKey = result
             }
@@ -177,7 +215,7 @@ class GradingActivity : AppCompatActivity() {
                         } else {
                             populateSpinner(checkList)
                             total = Result()
-                            setResultValue()
+//                            setResultValue()
                         }
                     }
 
@@ -199,6 +237,20 @@ class GradingActivity : AppCompatActivity() {
         }.addOnFailureListener{
             Toast.makeText(this, total.ab.toString(), Toast.LENGTH_SHORT).show()
         }
+
+
+        database.child("result/$eventKey/GradedCount").get().addOnSuccessListener { gradedCount ->
+            if (gradedCount.exists()){
+                database.child("result/$eventKey/$selectedKeyParticipant/order").get().addOnSuccessListener {
+                    if (!it.exists()){
+                        gradeRankOrder = (gradedCount.value as Long).toInt()
+                        gradeRankOrder++
+                    } else {
+                        alreadyGraded = true
+                    }
+                }
+            } else gradeRankOrder++
+        }
     }
 
     private fun setValue() {
@@ -212,16 +264,38 @@ class GradingActivity : AppCompatActivity() {
         bind.btnAbPlus.setOnClickListener { setAbValue(it) }
     }
 
-    private fun setResult(participant: String) {
+    private fun setResult() {
         val result = Result(topValue.toDouble(), atValue.toDouble(), bonusValue.toDouble(), abValue.toDouble())
-        val resultTotal =
+        val resultTotal: Result
+        if (activitySender == "ADAPTER"){
+            val totalTop = result.top - resultSend.top
+            val totalAt = result.at - resultSend.at
+            val totalBonus = result.bonus - resultSend.bonus
+            val totalAb = result.ab - resultSend.ab
+
+            resultTotal =
+                Result(totalTop + total.top, totalAt + total.at, totalBonus + total.bonus, totalAb + total.ab)
+
+        } else resultTotal =
             Result(result.top + total.top, result.at + total.at, result.bonus + total.bonus, result.ab + total.ab)
+
         database.child("result/$eventKey/$selectedKeyParticipant/$userWallKey").setValue(result).addOnSuccessListener {
             Log.d("SETRESULTGRADING", "OK")
             database.child("result/$eventKey/$selectedKeyParticipant/Total").setValue(resultTotal).addOnSuccessListener {
                 Log.d("SETRESULTGRADING", "OK")
-                Toast.makeText(this, "Data Berhasil Diinput", Toast.LENGTH_SHORT).show()
-                finish()
+                if (!alreadyGraded){
+                    database.child("result/$eventKey/GradedCount").setValue(gradeRankOrder).addOnSuccessListener {
+                        Log.d("SETRESULTGRADING", "OK")
+                        database.child("result/$eventKey/$selectedKeyParticipant/order").setValue(gradeRankOrder).addOnSuccessListener {
+                            Log.d("SETRESULTGRADING", "OK")
+                            Toast.makeText(this, "Data Berhasil Diinput", Toast.LENGTH_SHORT).show()
+                            finish()
+                        }
+                    }
+                } else {
+                    Toast.makeText(this, "Data Berhasil Diinput", Toast.LENGTH_SHORT).show()
+                    finish()
+                }
             }
         }
     }

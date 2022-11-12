@@ -99,11 +99,20 @@ class ListFragment : Fragment() {
                 listDone.clear()
                 listUpcoming.clear()
                 snapshot.children.forEach { item ->
-                    item.key
                     if (item.child("finished").value == true){
+                        if (userType == "Presiden Juri"){
+                            if (item.child("president").value != userName){
+                                return@forEach
+                            }
+                        }
                         eventKeysDone.add(item.key.toString())
                         listDone.add(item.getValue(Event::class.java)!!)
                     } else {
+                        if (userType == "Presiden Juri"){
+                            if (item.child("president").value != userName){
+                                return@forEach
+                            }
+                        }
                         eventKeysUpcoming.add(item.key.toString())
                         listUpcoming.add(item.getValue(Event::class.java)!!)
                     }

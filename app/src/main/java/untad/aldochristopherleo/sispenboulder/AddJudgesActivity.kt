@@ -32,6 +32,7 @@ class AddJudgesActivity : AppCompatActivity() {
     private lateinit var alertBuilder : AlertDialog.Builder
     private var eventData: Event? = null
     private var eventKey : String? = null
+    private var status: String? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -45,11 +46,56 @@ class AddJudgesActivity : AppCompatActivity() {
         }
 
         eventKey = intent.getStringExtra("EXTRA_EVENT_KEY")
-
-        setEventList()
+        status = intent.getStringExtra("EXTRA_STATUS")
 
         wallsList = ArrayList()
         judges = ArrayList()
+
+        val wall1 = bind.edtWall1
+        val wall2 = bind.edtWall2
+        val wall3 = bind.edtWall3
+        val wall4 = bind.edtWall4
+        val wall5 = bind.edtWall5
+
+        Collections.addAll(wallsList, wall1, wall2, wall3, wall4, wall5)
+
+        if (status == "EDIT"){
+            var wall1 = ""
+            var wall2 = ""
+            var wall3 = ""
+            var wall4 = ""
+            var wall5 = ""
+            if (!eventData?.judges.isNullOrEmpty()){
+                eventData?.judges?.forEach{ (key, value) ->
+                    if (key == "Dinding 1") wall1 = value.name.toString()
+                    else if (key == "Dinding 2") wall2 = value.name.toString()
+                    else if (key == "Dinding 3") wall3 = value.name.toString()
+                    else if (key == "Dinding 4") wall4 = value.name.toString()
+                    else if (key == "Dinding 5") wall5 = value.name.toString()
+                }
+            }
+            var size = eventData?.judges?.size.toString()
+            if (size == "") size = "0"
+            bind.edtEntrynumber.editText?.setText(size)
+
+            if (wall1.isNotEmpty()){
+                bind.edtWall1.editText?.setText(wall1)
+            }
+            if (wall2.isNotEmpty()){
+                bind.edtWall2.editText?.setText(wall2)
+            }
+            if (wall3.isNotEmpty()){
+                bind.edtWall3.editText?.setText(wall3)
+            }
+            if (wall4.isNotEmpty()){
+                bind.edtWall4.editText?.setText(wall4)
+            }
+            if (wall5.isNotEmpty()){
+                bind.edtWall5.editText?.setText(wall5)
+            }
+
+            showTextBox()
+        }
 
         alertBuilder = AlertDialog.Builder(this)
 
@@ -78,30 +124,13 @@ class AddJudgesActivity : AppCompatActivity() {
             }
         )
 
-        val wall1 = bind.edtWall1
-        val wall2 = bind.edtWall2
-        val wall3 = bind.edtWall3
-        val wall4 = bind.edtWall4
-        val wall5 = bind.edtWall5
-
-        Collections.addAll(wallsList, wall1, wall2, wall3, wall4, wall5)
-
         bind.btnWalls.setOnClickListener {
-            addJudges()
+            showTextBox()
 
         }
 
         bind.btnConfirmJudges.setOnClickListener {
             confirmJudges()
-        }
-    }
-// Hapus FUNGSI SETEVENTLIST!
-    private fun setEventList() {
-        Log.d("ADDJUDGE", eventData?.judges.isNullOrEmpty().toString())
-        if (!eventData?.judges.isNullOrEmpty()){
-            eventData?.judges?.forEach{ (key, value) ->
-                Log.d("ADDJUDGE", key + " + " + value.name)
-            }
         }
     }
 
@@ -158,10 +187,10 @@ class AddJudgesActivity : AppCompatActivity() {
 
     }
 
-    private fun addJudges(){
+    private fun showTextBox(){
 
         if (bind.edtEntrynumber.editText?.text.isNullOrBlank()) {
-            bind.edtEntrynumber.hint = "Input Tidak Boleh Kosong"
+            bind.edtEntrynumber.error = "Input Tidak Boleh Kosong"
             return
         }
 

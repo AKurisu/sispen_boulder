@@ -67,7 +67,15 @@
                 android:layout_width="0dp"
                 android:layout_weight="14"
                 android:textStyle="bold"
+                android:maxLines="1"
                 tools:text="Nama" />
+
+            <ImageView
+                android:id="@+id/btn_edit_result"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:src="@drawable/ic_baseline_edit_24_black" />
 
             <TextView
                 android:id="@+id/txt_attempt_total"
@@ -93,6 +101,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:padding="4dp">
+
             <TextView
                 android:visibility="invisible"
                 android:textStyle="bold"
@@ -190,7 +199,15 @@
                 android:layout_width="0dp"
                 android:layout_weight="14"
                 android:textStyle="bold"
+                android:maxLines="1"
                 tools:text="Nama" />
+
+            <ImageView
+                android:id="@+id/btn_edit_result_five"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:src="@drawable/ic_baseline_edit_24_black" />
 
             <TextView
                 android:id="@+id/txt_attempt_total_five"

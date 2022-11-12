@@ -3,13 +3,15 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:padding="12dp"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:layout_margin="8dp">
 
         <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/edt_entrynumber"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:hint="Jumlah Dinding"
+            app:errorEnabled="true"
             app:layout_constraintEnd_toStartOf="@+id/btn_walls"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
@@ -22,15 +24,16 @@
 
         </com.google.android.material.textfield.TextInputLayout>
 
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/btn_walls"
-            android:layout_width="wrap_content"
-            android:layout_height="0dp"
-            app:icon="@drawable/ic_baseline_add_24"
-            app:iconPadding="0dp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="@+id/edt_entrynumber"
-            style="@style/Widget.AppCompat.Button.Small"/>
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btn_walls"
+        style="@style/Widget.AppCompat.Button.Small"
+        android:layout_width="wrap_content"
+        android:layout_height="0dp"
+        android:contentDescription="@string/btn_total_wall"
+        app:icon="@drawable/ic_baseline_add_24"
+        app:iconPadding="0dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/edt_entrynumber" />
 
         <LinearLayout android:orientation="vertical"
             android:id="@+id/linearLayout"

@@ -47,24 +47,46 @@ private val userName: String, private val userType: String):
 
         holder.itemView.setOnClickListener {
 
-            if (event[position].status == "PERSIAPAN"){
-                Toast.makeText(holder.cardView.context, "Lomba Belum Dimulai", Toast.LENGTH_SHORT).show()
-            } else if (event[position].status == "LOMBA"){
-                if (userType == "Juri Lapangan"){
-
-                    val intent = Intent(holder.itemView.context, GradingActivity::class.java)
-                    intent.putExtra(GradingActivity.EXTRA_EVENT_KEY, eventKeys[position])
-                    intent.putExtra(GradingActivity.EXTRA_EVENT, event[position])
-                    intent.putExtra(GradingActivity.EXTRA_NAME, userName)
-                    holder.cardView.context.startActivity(intent)
+            if (userType == "Juri Lapangan"){
+                if (event[position].status == "PERSIAPAN"){
+                    Toast.makeText(holder.cardView.context, "Lomba Belum Dimulai", Toast.LENGTH_SHORT).show()
+                } else if (event[position].status == "LOMBA"){
+                    var judging = false
+                    if (event[position].judges != null){
+                        event[position].judges?.forEach { _, judge ->
+                            if (judge.name == userName){
+                                judging = true
+                            }
+                        }
+                    }
+                    if (judging){
+                        val intent = Intent(holder.itemView.context, GradingActivity::class.java)
+                        intent.putExtra(GradingActivity.EXTRA_EVENT_KEY, eventKeys[position])
+                        intent.putExtra(GradingActivity.EXTRA_EVENT, event[position])
+                        intent.putExtra(GradingActivity.EXTRA_NAME, userName)
+                        intent.putExtra(GradingActivity.EXTRA_ACTIVITY_FROM, "EVENT")
+                        holder.cardView.context.startActivity(intent)
+                    } else {
+                        Toast.makeText(holder.cardView.context, "Anda Tidak Menilai Pada Perlombaan Ini", Toast.LENGTH_SHORT).show()
+                    }
+                }
+            } else {
+                if (userType == "Presiden Juri"){
+                    if (event[position].president != userName){
+                        Toast.makeText(holder.cardView.context, "Anda Tidak Memiliki Hak Untuk Mengakses Perlombaan Ini", Toast.LENGTH_SHORT).show()
+                    } else {
+                        val intent = Intent(holder.itemView.context, EventActivity::class.java)
+                        intent.putExtra(EventActivity.EXTRA_EVENT_KEY, eventKeys[position])
+                        intent.putExtra(EventActivity.EXTRA_EVENT, event[position])
+                        holder.itemView.context.startActivity(intent)
+                    }
                 } else {
-
                     val intent = Intent(holder.itemView.context, EventActivity::class.java)
                     intent.putExtra(EventActivity.EXTRA_EVENT_KEY, eventKeys[position])
                     intent.putExtra(EventActivity.EXTRA_EVENT, event[position])
                     holder.itemView.context.startActivity(intent)
                 }
-            } else holder.cardView.setCardBackgroundColor(Color.RED)
+            }
         }
     }
 

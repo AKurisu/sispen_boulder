@@ -33,7 +33,6 @@ import com.google.android.material.datepicker.MaterialDatePicker
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.timepicker.MaterialTimePicker
 import com.google.android.material.timepicker.TimeFormat
-import com.google.firebase.database.ChildEventListener
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.ValueEventListener
@@ -47,8 +46,12 @@ import untad.aldochristopherleo.sispenboulder.util.MainViewModel
 import untad.aldochristopherleo.sispenboulder.util.PrintData
 import untad.aldochristopherleo.sispenboulder.util.Topsis
 import java.text.SimpleDateFormat
+import java.time.LocalDateTime
+import java.time.ZoneId
+import java.time.format.DateTimeFormatter
 import java.util.*
 import kotlin.collections.ArrayList
+import kotlin.collections.HashMap
 import kotlin.collections.LinkedHashMap
 
 
@@ -98,6 +101,7 @@ class EventActivity : AppCompatActivity() {
     private val participantList = ArrayList<Alternative>()
     private val allParticipantList = ArrayList<String>()
     private val checkedItems = ArrayList<Boolean>()
+    private val gradedOrderList = ArrayList<Int>()
     private val choosenParticipant = ArrayList<Participant>()
     private val choosenKey = ArrayList<String>()
     private val wallHasBeenCount = LinkedHashMap<String, ArrayList<Int>>()
@@ -156,7 +160,7 @@ class EventActivity : AppCompatActivity() {
 
         rv = bind.participantRv
         rv.layoutManager = LinearLayoutManager(this)
-        adapter = ListParticipantAdapter(sortedResult)
+        adapter = ListParticipantAdapter(sortedResult, eventKey, event)
         checkEventParticipant()
 
         refreshListener = SwipeRefreshLayout.OnRefreshListener {
@@ -245,6 +249,7 @@ class EventActivity : AppCompatActivity() {
                     intent.putExtra(GradingActivity.EXTRA_EVENT_KEY, eventKey)
                     intent.putExtra(GradingActivity.EXTRA_EVENT, event)
                     intent.putExtra(GradingActivity.EXTRA_NAME, userName)
+                    intent.putExtra(GradingActivity.EXTRA_ACTIVITY_FROM, "EVENT")
                     activityResult.launch(intent)
                 }
                 "Presiden Juri" -> {
@@ -319,6 +324,14 @@ class EventActivity : AppCompatActivity() {
                                 var countedWall = 0
                                 val listOfWall = ArrayList<Int>()
 
+
+                                val order = if (it.child("$participantKey/order").exists()){
+                                    (it.child("$participantKey/order").value as Long).toInt()
+                                } else -1
+
+                                gradedOrderList.add(order)
+                                Log.d("CHECKEVENT", order.toString())
+
                                 result[participant.name + " ("+ participant.group + ")"] =
                                     it.child("$participantKey/Total").getValue(Result::class.java)!!
                                 data = it.child("$participantKey/Total").getValue(Result::class.java)!!
@@ -363,6 +376,7 @@ class EventActivity : AppCompatActivity() {
                             }
                         } else if (participant != null) {
                             result[participant.name + " ("+ participant.group + ")"] = Result()
+                            gradedOrderList.add(-1)
                             resultParticipantKey.add(participantKey)
                             resultWall1.add(Result())
                             resultWall2.add(Result())
@@ -428,28 +442,30 @@ class EventActivity : AppCompatActivity() {
         } else if (statusEvent == "LOMBA"){
             bind.txtEventStatus.text = "Event Sedang Berlangsung"
             bind.eventName.setTextColor(Color.GREEN)
-            run stop@{
-                if (!event.judges.isNullOrEmpty()){
-                    val size = event.judges?.size
-                    var count = 1
-                    event.judges?.forEach { (key, value) ->
-                        if (value.name == userName && userType == "Juri Lapangan"){
-                            val intent = Intent(this, GradingActivity::class.java)
-                            intent.putExtra(GradingActivity.EXTRA_EVENT_KEY, eventKey)
-                            intent.putExtra(GradingActivity.EXTRA_EVENT, event)
-                            intent.putExtra(GradingActivity.EXTRA_NAME, userName)
+            if (userType == "Juri Lapangan"){
+                run stop@{
+                    if (!event.judges.isNullOrEmpty()){
+                        val size = event.judges?.size
+                        var count = 1
+                        event.judges?.forEach { (key, value) ->
+                            if (value.name == userName && userType == "Juri Lapangan"){
+                                val intent = Intent(this, GradingActivity::class.java)
+                                intent.putExtra(GradingActivity.EXTRA_EVENT_KEY, eventKey)
+                                intent.putExtra(GradingActivity.EXTRA_EVENT, event)
+                                intent.putExtra(GradingActivity.EXTRA_NAME, userName)
 
-                            startActivity(intent)
-                            //ARTIFACT
-                            bind.btnEventEdit.visibility = View.VISIBLE
+                                startActivity(intent)
+                                //ARTIFACT
+                                bind.btnEventEdit.visibility = View.VISIBLE
 //                            return@stop
-                        } else if (size == count){
-                            Toast.makeText(this, "Anda Tidak Memiliki Hak Untuk Melihat Event", Toast.LENGTH_SHORT).show()
-                            finish()
-                            //ARTIFACT
-                            bind.btnEventEdit.visibility = View.GONE
+                            } else if (size == count){
+                                Toast.makeText(this, "Anda Tidak Memiliki Hak Untuk Melihat Event", Toast.LENGTH_SHORT).show()
+                                finish()
+                                //ARTIFACT
+                                bind.btnEventEdit.visibility = View.GONE
+                            }
+                            count++
                         }
-                        count++
                     }
                 }
             }
@@ -545,13 +561,13 @@ class EventActivity : AppCompatActivity() {
                             resultWall1[index], resultWall2[index], resultWall3[index], resultWall4[index], null, null, ""))
                     } else if (event.round == "Kualifikasi") {
                         sortedResult.add(SortedResult(item, resultTopsis[index], result[item],
-                            resultWall1[index], resultWall2[index], resultWall3[index], resultWall4[index], null, null, resultParticipantKey[index]))
+                            resultWall1[index], resultWall2[index], resultWall3[index], resultWall4[index], null, null, resultParticipantKey[index], ArrayList(), gradedOrderList[index]))
                     } else {
                         sortedResult.add(SortedResult(item, resultTopsis[index], result[item],
-                            resultWall1[index], resultWall2[index], resultWall3[index], resultWall4[index], resultWall5[index], null, resultParticipantKey[index]))
+                            resultWall1[index], resultWall2[index], resultWall3[index], resultWall4[index], resultWall5[index], null, resultParticipantKey[index], ArrayList(), gradedOrderList[index]))
                     }
                     sortedResultSend.add(SortedResult(item, resultTopsis[index], result[item],
-                        resultWall1[index], resultWall2[index], resultWall3[index], resultWall4[index], resultWall5[index], null, resultParticipantKey[index]))
+                        resultWall1[index], resultWall2[index], resultWall3[index], resultWall4[index], resultWall5[index], null, resultParticipantKey[index], ArrayList(), gradedOrderList[index]))
                 }
 
                 sortedResult.sortByDescending { it.preferenceValue }
@@ -604,6 +620,20 @@ class EventActivity : AppCompatActivity() {
                 position++
             }
             Log.d("PREPARE", item.position.toString())
+        }
+
+        sortedResult.forEachIndexed { index, items ->
+            if (items.order != -1){
+                if (items.preferenceValue == sortedResult[index+1].preferenceValue){
+                    if (items.order > sortedResult[index+1].order){
+                        if (sortedResult[index+1].order != -1){
+                            val before = items
+                            sortedResult[index] = sortedResult[index+1]
+                            sortedResult[index+1] = before
+                        }
+                    }
+                }
+            }
         }
         adapter.addAll(sortedResult)
 
@@ -715,6 +745,14 @@ class EventActivity : AppCompatActivity() {
                 MaterialAlertDialogBuilder(this)
                     .setTitle("Juri Lapangan yang bertugas")
                     .setMessage(message)
+                    .setNeutralButton("Edit") { _,_ ->
+                        val intent = Intent(this, AddJudgesActivity::class.java)
+                        intent.putExtra("EXTRA_EVENT_KEY", eventKey)
+                        intent.putExtra("EXTRA_EVENT", event)
+                        intent.putExtra("EXTRA_STATUS", "EDIT")
+                        startActivity(intent)
+                        true
+                    }
                     .setPositiveButton("OK") { _, _ ->
                     }
                     .show()
@@ -742,17 +780,68 @@ class EventActivity : AppCompatActivity() {
                 startActivity(intent)
                 true
             }
-            R.id.menu_ubah_juri_lapangan ->{
-                val intent = Intent(this, AddJudgesActivity::class.java)
-                intent.putExtra("EXTRA_EVENT_KEY", eventKey)
-                intent.putExtra("EXTRA_EVENT", event)
-                startActivity(intent)
-                true
-            }
             R.id.menu_finish_event -> {
+                MaterialAlertDialogBuilder(this)
+                    .setTitle("Apakah Anda Yakin Ingin Menyelesaikan Perlombaan?")
+                    .setMessage("")
+                    .setPositiveButton("YA") { _, _ ->
+                        setNextEvent()
+                    }
+                    .setNegativeButton("TIDAK") { _, _ ->
+
+                    }
+                    .show()
+
                 true
             }
             else -> super.onOptionsItemSelected(item)
+        }
+    }
+
+    private fun setNextEvent() {
+        if (event.round != "Final"){
+            var participantListSize = 0
+            val nextRound: String
+            if (event.round == "Kualifikasi"){
+                nextRound = "Semi Final"
+                participantListSize = 20
+            } else {
+                nextRound = "Final"
+                participantListSize = 6
+            }
+
+            val nextEventParticipant = HashMap<String, Participant>()
+
+            sortedResultSend.forEachIndexed { index, item ->
+                if (item.position!! <= participantListSize){
+                    event.participant?.forEach { s, participant ->
+                        if (s == sortedResultSend[index].key){
+                            nextEventParticipant[sortedResultSend[index].key] = participant
+                        }
+                    }
+                }
+            }
+
+            val dateStr = bind.eventDate.text.toString().trim()
+            val l = LocalDateTime.parse(dateStr, DateTimeFormatter.ofPattern("EEEE, d MMMM yyyy HH:mm"))
+            LocalDateTime.from(l).plusDays(1)
+
+            val date = l.toInstant(ZoneId.systemDefault().rules.getOffset(l)).toEpochMilli()
+
+            val newEvent = Event(event.name, date, event.location, false,
+                nextEventParticipant.size, event.president, "PERSIAPAN", null,
+                nextEventParticipant, event.coordinator, nextRound)
+
+            val key = database.child("events").push().key.toString()
+            database.child("events").child(key).setValue(event).addOnSuccessListener{
+                database.child("events/$eventKey/finished").setValue(true).addOnSuccessListener {
+                    Toast.makeText(this, "Event Telah Selesai", Toast.LENGTH_SHORT).show()
+                }
+            }
+        } else {
+            database.child("events/$eventKey/finished").setValue(true).addOnSuccessListener {
+                Toast.makeText(this, "Event Telah Selesai", Toast.LENGTH_SHORT).show()
+            }
         }
     }
 
@@ -821,24 +910,6 @@ class EventActivity : AppCompatActivity() {
         }
     }
 
-    override fun onPrepareOptionsMenu(menu: Menu?): Boolean {
-//        val menuAhp = menu?.findItem(R.id.menu_ahp)
-//        val menuTopsis = menu?.findItem(R.id.menu_topsis)
-//
-//        val menuUbah = menu?.findItem(R.id.menu_edit_event)
-//        val menuHapus = menu?.findItem(R.id.menu_hapus_event)
-//
-//        if (userType != "Admin") {
-//            menuAhp?.isVisible = false
-//            menuTopsis?.isVisible = false
-//        }
-//        if (userType != "Panitia"){
-//            menuUbah?.isVisible = false
-//            menuHapus?.isVisible = false
-//        }
-        return super.onPrepareOptionsMenu(menu)
-    }
-
     private fun showMenuOptions() {
         if (this::menu.isInitialized){
 
@@ -852,7 +923,6 @@ class EventActivity : AppCompatActivity() {
             val menuHapusPeserta = menu.findItem(R.id.menu_hapus_peserta)
             val menuTambahPeserta = menu.findItem(R.id.menu_tambah_peserta)
             val menuJuriLapangan = menu.findItem(R.id.menu_nama_juri_lapangan)
-            val menuUbahJuriLapangan = menu.findItem(R.id.menu_ubah_juri_lapangan)
             val menuPrint = menu.findItem(R.id.menu_print_hasil)
 //
 //            if (userType != "Admin") {
@@ -869,7 +939,6 @@ class EventActivity : AppCompatActivity() {
                 menuUbah?.isVisible = false
                 menuHapus?.isVisible = false
                 menuJuriLapangan?.isVisible = false
-                menuUbahJuriLapangan?.isVisible = false
                 menuHapusPeserta?.isVisible = false
                 menuTambahPeserta?.isVisible = false
             }
@@ -935,7 +1004,7 @@ class EventActivity : AppCompatActivity() {
                 if (Environment.isExternalStorageManager()) {
                     // perform action when allow permission success
                 } else {
-                    Toast.makeText(this, "Allow permission for storage access!", Toast.LENGTH_SHORT)
+                    Toast.makeText(this, "Akses Penyimpanan External Ditolak", Toast.LENGTH_SHORT)
                         .show()
                 }
             }
@@ -955,7 +1024,7 @@ class EventActivity : AppCompatActivity() {
                 if (READ_EXTERNAL_STORAGE && WRITE_EXTERNAL_STORAGE) {
                     // perform action when allow permission success
                 } else {
-                    Toast.makeText(this, "Allow permission for storage access!", Toast.LENGTH_SHORT)
+                    Toast.makeText(this, "Akses Penyimpanan External Ditolak", Toast.LENGTH_SHORT)
                         .show()
                 }
             }

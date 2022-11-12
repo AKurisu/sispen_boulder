@@ -12,5 +12,6 @@ class SortedResult(val name: String? = null, val preferenceValue: Double? = null
                    val wall5: Result? = null,
                    var position: Int? = null,
                    val key: String = "",
-                   var listOfWall: ArrayList<Int> = ArrayList()
+                   var listOfWall: ArrayList<Int> = ArrayList(),
+                   val order: Int= -1
 )  : Parcelable
