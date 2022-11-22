@@ -220,6 +220,8 @@ class EventActivity : AppCompatActivity() {
             userType = it.type
             userName = it.name
             checkEventStatus()
+
+            showMenuOptions()
         }
 
         if (event.finished){
@@ -253,10 +255,7 @@ class EventActivity : AppCompatActivity() {
                     activityResult.launch(intent)
                 }
                 "Presiden Juri" -> {
-                    val intent = Intent(this, AddJudgesActivity::class.java)
-                    intent.putExtra("EXTRA_EVENT_KEY", eventKey)
-                    intent.putExtra("EXTRA_EVENT", event)
-                    startActivity(intent)
+                    setParticipantEvent(choosenParticipant, choosenKey)
                 }
             }
         }
@@ -397,7 +396,6 @@ class EventActivity : AppCompatActivity() {
                     }
                 }
             } else showView()
-
         }
     }
 
@@ -427,48 +425,23 @@ class EventActivity : AppCompatActivity() {
         } else if (statusEvent == "PERSIAPAN") {
             bind.txtEventStatus.text = "Event Belum Dimulai"
             bind.eventName.setTextColor(Color.YELLOW)
-            if (userType == "Juri Lapangan") {
-                bind.btnEventEdit.visibility = View.GONE
-            } else if (userType == "Panitia" || userType == "Juri Lapangan") {
-                if (!event.judges.isNullOrEmpty()){
-                    if (event.judges!!.size == 4 && participantList.size >= 8){
+            if (!event.judges.isNullOrEmpty()){
+                if (event.judges!!.size >= 4 && participantList.size >= 6){
+
+                    if (this::menu.isInitialized){
                         val menuMulai = menu.findItem(R.id.menu_start_event)
                         menuMulai.isVisible = true
-                        Toast.makeText(this, "Perlombaan Sudah Siap Dimulai", Toast.LENGTH_SHORT).show()
-                        checkEventStatus()
-                    } else bind.btnEventEdit.text = "Tambah Peserta"
-                } else bind.btnEventEdit.text = "Tambah Peserta"
-            }
+                        invalidateOptionsMenu()
+                    }
+                    Toast.makeText(this, "Perlombaan Sudah Siap Dimulai", Toast.LENGTH_SHORT).show()
+                } else {
+                    bind.btnEventEdit.text = "Tambah Peserta"
+                }
+            } else bind.btnEventEdit.text = "Tambah Peserta"
         } else if (statusEvent == "LOMBA"){
+            bind.btnEventEdit.visibility = View.GONE
             bind.txtEventStatus.text = "Event Sedang Berlangsung"
             bind.eventName.setTextColor(Color.GREEN)
-            if (userType == "Juri Lapangan"){
-                run stop@{
-                    if (!event.judges.isNullOrEmpty()){
-                        val size = event.judges?.size
-                        var count = 1
-                        event.judges?.forEach { (key, value) ->
-                            if (value.name == userName && userType == "Juri Lapangan"){
-                                val intent = Intent(this, GradingActivity::class.java)
-                                intent.putExtra(GradingActivity.EXTRA_EVENT_KEY, eventKey)
-                                intent.putExtra(GradingActivity.EXTRA_EVENT, event)
-                                intent.putExtra(GradingActivity.EXTRA_NAME, userName)
-
-                                startActivity(intent)
-                                //ARTIFACT
-                                bind.btnEventEdit.visibility = View.VISIBLE
-//                            return@stop
-                            } else if (size == count){
-                                Toast.makeText(this, "Anda Tidak Memiliki Hak Untuk Melihat Event", Toast.LENGTH_SHORT).show()
-                                finish()
-                                //ARTIFACT
-                                bind.btnEventEdit.visibility = View.GONE
-                            }
-                            count++
-                        }
-                    }
-                }
-            }
             if (participantSize == participantHasBeenCount && participantSize != 0){
                 if (this::menu.isInitialized){
                     val menuFinish = menu.findItem(R.id.menu_finish_event)
@@ -477,24 +450,6 @@ class EventActivity : AppCompatActivity() {
             }
 
         } else bind.txtEventStatus.text = "Event Telah Selesai"
-    }
-
-    private fun pickDialog() : String {
-        var result = ""
-
-        val wallList = arrayOf("Semi Final", "Final")
-
-        val builder = MaterialAlertDialogBuilder(this)
-            .setTitle("Silahkan Pilih Dinding")
-            .setSingleChoiceItems(wallList,-1) { _, which ->
-                result = wallList[which]
-            }
-
-        builder.setNeutralButton("Cancel"){dialog,_ -> dialog.cancel()}
-        val dialog = builder.create()
-        dialog.setCanceledOnTouchOutside(false)
-        dialog.show()
-        return result
     }
 
     private fun setParticipantEvent(
@@ -710,23 +665,28 @@ class EventActivity : AppCompatActivity() {
                 true
             }
             R.id.menu_start_event -> {
-                MaterialAlertDialogBuilder(this)
-                    .setTitle("Apakah Lomba Siap Dimulai")
-                    .setMessage("Jumlah Peserta" + participantList.size.toString())
-                    .setPositiveButton("Ya"){_,_ ->
-                        val round = if (participantList.size <= 6){
-                            pickDialog()
-                        } else if (participantList.size <= 20) {
-                            "Semi Final"
-                        } else "Kualifikasi"
+                if (participantList.size > 20 && judgesList.size < 5){
+                    Toast.makeText(this, "Jumlah Juri Kurang. Mohon Ditambah", Toast.LENGTH_SHORT).show()
+                } else {
+                    MaterialAlertDialogBuilder(this)
+                        .setTitle("Apakah Lomba Siap Dimulai")
+                        .setMessage("Jumlah Peserta" + participantList.size.toString())
+                        .setPositiveButton("Ya"){_,_ ->
+                            val round = if (participantList.size <= 6){
+                                "Final"
+                            } else if (participantList.size <= 20) {
+                                "Semi Final"
+                            } else "Kualifikasi"
 
-                        database.child("events/$eventKey/round").setValue(round).addOnSuccessListener {
-                            database.child("events/$eventKey/status").setValue("LOMBA").addOnSuccessListener {
-                                checkEventStatus()
+                            database.child("events/$eventKey/round").setValue(round).addOnSuccessListener {
+                                database.child("events/$eventKey/status").setValue("LOMBA").addOnSuccessListener {
+                                    checkEventStatus()
+                                }
                             }
                         }
-                    }
-                    .show()
+                        .show()
+                }
+
                 true
             }
             R.id.menu_hapus_peserta -> {
@@ -742,10 +702,21 @@ class EventActivity : AppCompatActivity() {
                 } else message = "Juri lapangan belum dipilih"
 
 
-                MaterialAlertDialogBuilder(this)
-                    .setTitle("Juri Lapangan yang bertugas")
+                val builder = MaterialAlertDialogBuilder(this)
+                    .setTitle("Juri Lapangan yang bertugas:")
                     .setMessage(message)
-                    .setNeutralButton("Edit") { _,_ ->
+                    .setPositiveButton("OK") { _, _ ->
+                    }
+                if (message == "Juri lapangan belum dipilih"){
+                    builder.setNeutralButton("TAMBAH") { _,_ ->
+                            val intent = Intent(this, AddJudgesActivity::class.java)
+                            intent.putExtra("EXTRA_EVENT_KEY", eventKey)
+                            intent.putExtra("EXTRA_EVENT", event)
+                            startActivity(intent)
+                            true
+                    }
+                } else {
+                    builder.setNeutralButton("UBAH") { _,_ ->
                         val intent = Intent(this, AddJudgesActivity::class.java)
                         intent.putExtra("EXTRA_EVENT_KEY", eventKey)
                         intent.putExtra("EXTRA_EVENT", event)
@@ -753,9 +724,9 @@ class EventActivity : AppCompatActivity() {
                         startActivity(intent)
                         true
                     }
-                    .setPositiveButton("OK") { _, _ ->
-                    }
-                    .show()
+                }
+
+                builder.show()
                 true
             }
             R.id.menu_print_hasil -> {
@@ -924,28 +895,49 @@ class EventActivity : AppCompatActivity() {
             val menuTambahPeserta = menu.findItem(R.id.menu_tambah_peserta)
             val menuJuriLapangan = menu.findItem(R.id.menu_nama_juri_lapangan)
             val menuPrint = menu.findItem(R.id.menu_print_hasil)
-//
-//            if (userType != "Admin") {
-//                menuAhp?.isVisible = false
-//                menuTopsis?.isVisible = false
-//            }
+
+            if (userType != "Admin") {
+                menuAhp?.isVisible = false
+                menuTopsis?.isVisible = false
+            }
+
             if (userType != "Panitia"){
                 menuUbah?.isVisible = false
                 menuHapus?.isVisible = false
             }
+
+            if (event.status == "PERSIAPAN"){
+                menuHapusPeserta.isVisible = false
+            }
+
             menuMulai?.isVisible = false
+            menuStop?.isVisible = false
+            menuPrint.isVisible = false
 
             if (userType != "Presiden Juri"){
-                menuUbah?.isVisible = false
-                menuHapus?.isVisible = false
                 menuJuriLapangan?.isVisible = false
                 menuHapusPeserta?.isVisible = false
                 menuTambahPeserta?.isVisible = false
             }
 
+            if (userType == "Presiden Juri"){
+                menuUbah?.isVisible = true
+                menuHapus?.isVisible = true
+            }
+
             if (userType == "Presiden Juri" || userType == "Panitia"){
-                if (event.participant?.size == 0){
-                    menuPrint.isVisible = true
+                val size = event.participant?.size
+                if (size != null){
+                    if (size > 0){
+                        menuPrint.isVisible = true
+                    }
+                }
+            }
+            Log.d("EventNull", event.toString())
+
+            if (event.judges != null){
+                if (event.judges!!.size >= 4 && participantList.size >= 6) {
+                    menuMulai.isVisible = true
                 }
             }
         }

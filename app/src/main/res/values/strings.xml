@@ -30,4 +30,5 @@
     <string name="txt_btn_add_participant">Tambah Peserta</string>
     <string name="txt_error">Mohon Masukkan %s</string>
     <string name="btn_total_wall">Tombol Konfirmasi Jumlah Dinding</string>
+    <string name="tambah_event">Tambah Event</string>
 </resources>

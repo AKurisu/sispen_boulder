@@ -52,19 +52,10 @@ class ProfileFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        val acct = GoogleSignIn.getLastSignedInAccount(requireContext())
-        if (acct != null) {
-            val personPhoto: Uri? = acct.photoUrl // this line to get  profile picture
-            Picasso.get().load(personPhoto).into(binding.imgProfil)
-        }
-
         viewModel.user.observe(viewLifecycleOwner) { user ->
-            binding.profileName.text = user.name
-            binding.profileType.text = user.type
 
             if(user.type == "Juri Lapangan"){
                 binding.btnAddParticipant.visibility = View.GONE
-                binding.txtAddParticipant.visibility = View.VISIBLE
             }
 
             if (user.type == "Manajer" || user.type == "Presiden Juri" ) {

@@ -17,7 +17,7 @@
     <item android:id="@+id/menu_hapus_peserta"
         android:title="Ubah Peserta"/>
     <item android:id="@+id/menu_nama_juri_lapangan"
-        android:title="Nama Juri Lapangan"/>
+        android:title="Juri Lapangan"/>
     <item android:id="@+id/menu_print_hasil"
         android:title="Print Hasil Event"/>
 

@@ -4,8 +4,11 @@ import android.content.Context
 import android.content.Context.CONNECTIVITY_SERVICE
 import android.net.ConnectivityManager
 import android.net.Network
+import android.net.NetworkCapabilities
 import android.net.NetworkCapabilities.NET_CAPABILITY_INTERNET
+import android.net.NetworkCapabilities.NET_CAPABILITY_VALIDATED
 import android.net.NetworkRequest
+import android.os.Build
 import android.util.Log
 import androidx.lifecycle.LiveData
 import kotlinx.coroutines.CoroutineScope
@@ -23,63 +26,48 @@ val TAG = "C-Manager"
  * Inspired by:
  * https://github.com/AlexSheva-mason/Rick-Morty-Database/blob/master/app/src/main/java/com/shevaalex/android/rickmortydatabase/utils/networking/ConnectionLiveData.kt
  */
-class ConnectionLiveData(context: Context) : LiveData<Boolean>() {
+class ConnectionLiveData(private val context: Context) : LiveData<Boolean>() {
 
 
     private lateinit var networkCallback: ConnectivityManager.NetworkCallback
-    private val cm = context.getSystemService(CONNECTIVITY_SERVICE) as ConnectivityManager
-    private val validNetworks: MutableSet<Network> = HashSet()
-
-    private fun checkValidNetworks() {
-            postValue(validNetworks.size > 0)
-    }
 
     override fun onActive() {
+        val cm = context.getSystemService(CONNECTIVITY_SERVICE) as ConnectivityManager
         networkCallback = createNetworkCallback()
-        val networkRequest = NetworkRequest.Builder()
-            .addCapability(NET_CAPABILITY_INTERNET)
-            .build()
-        cm.registerNetworkCallback(networkRequest, networkCallback)
+        cm.registerDefaultNetworkCallback(networkCallback)
     }
 
     override fun onInactive() {
+        val cm = context.getSystemService(CONNECTIVITY_SERVICE) as ConnectivityManager
+        Log.w("CONNECTION","ConnectionLiveData onInactive()")
         cm.unregisterNetworkCallback(networkCallback)
     }
 
     private fun createNetworkCallback() = object : ConnectivityManager.NetworkCallback() {
 
-        /*
-          Called when a network is detected. If that network has internet, save it in the Set.
-          Source: https://developer.android.com/reference/android/net/ConnectivityManager.NetworkCallback#onAvailable(android.net.Network)
-         */
         override fun onAvailable(network: Network) {
-            Log.d(TAG, "onAvailable: $network")
-            val networkCapabilities = cm.getNetworkCapabilities(network)
-            val hasInternetCapability = networkCapabilities?.hasCapability(NET_CAPABILITY_INTERNET)
-            Log.d(TAG, "onAvailable: ${network}, $hasInternetCapability")
-            if (hasInternetCapability == true) {
-                // check if this network actually has internet
-                CoroutineScope(Dispatchers.IO).launch {
-                    val hasInternet = DoesNetworkHaveInternet.execute(network.socketFactory)
-                    if (hasInternet) {
-                        withContext(Dispatchers.Main) {
-                            Log.d(TAG, "onAvailable: adding network. $network")
-                            validNetworks.add(network)
-                            checkValidNetworks()
-                        }
-                    }
-                }
+            /* only starting from version Build.VERSION_CODES.O onAvailable() will always immediately
+             be followed by a call to onCapabilitiesChanged.
+             On versions below Build.VERSION_CODES.O when app is started with internet connection
+             nothing apart from onAvailable() is being called, thus we need to pass postValue(true)
+             here (although in some cases it could be false positive)
+             */
+            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
+                postValue(true)
             }
         }
 
-        /*
-          If the callback was registered with registerNetworkCallback() it will be called for each network which no longer satisfies the criteria of the callback.
-          Source: https://developer.android.com/reference/android/net/ConnectivityManager.NetworkCallback#onLost(android.net.Network)
-         */
+        override fun onCapabilitiesChanged(
+            network: Network,
+            networkCapabilities: NetworkCapabilities
+        ) {
+            val isInternet = networkCapabilities.hasCapability(NET_CAPABILITY_INTERNET)
+            val isValidated = networkCapabilities.hasCapability(NET_CAPABILITY_VALIDATED)
+            postValue(isInternet && isValidated)
+        }
+
         override fun onLost(network: Network) {
-            Log.d(TAG, "onLost: $network")
-            validNetworks.remove(network)
-            checkValidNetworks()
+            postValue(false)
         }
 
     }

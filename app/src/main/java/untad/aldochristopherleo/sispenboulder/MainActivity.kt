@@ -46,11 +46,11 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
 
         setContentView(activityMainBinding.root)
 
-
-
         viewModel.user.observe(this){ user ->
             userName = user.name.toString()
             userType = user.type.toString()
+            activityMainBinding.bottomNavView.menu.removeItem(R.id.placeholder)
+
             fabIntent = if (user.type == "Panitia"){
                 Intent(this@MainActivity, AddEventActivity::class.java)
             } else if (user.type == "Manajer") {
@@ -58,18 +58,24 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
             } else {
                 Intent(this@MainActivity, AddEventActivity::class.java)
             }
-            if (user.type == "Juri Lapangan"){
-                activityMainBinding.fab.visibility = View.GONE
-                activityMainBinding.txtFab.visibility = View.GONE
+//            if (user.type == "Juri Lapangan"){
+//                activityMainBinding.fab.visibility = View.GONE
+//                activityMainBinding.txtFab.visibility = View.GONE
+//            }
+
+
+            if (userType == "Juri Lapangan"){
+                activityMainBinding.bottomNavView.menu.removeItem(R.id.profileFragment)
+                activityMainBinding.bottomNavView.postInvalidate()
             }
         }
 
-        connectionLiveData = ConnectionLiveData(this)
+//        connectionLiveData = ConnectionLiveData(this)
 //        connectionLiveData.observe(this){ status ->
 //            if (status == false){
-////                Toast.makeText(this, "hola",Toast.LENGTH_SHORT).show()
+//                Toast.makeText(this, "hola",Toast.LENGTH_SHORT).show()
 //            } else {
-////                Toast.makeText(this, "hello",Toast.LENGTH_SHORT).show()
+//                Toast.makeText(this, "hello",Toast.LENGTH_SHORT).show()
 //            }
 //        }
         supportActionBar?.hide()
@@ -83,7 +89,6 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
             .setExitAnim(R.anim.exit_to_left)
             .setPopEnterAnim(R.anim.enter_from_left)
             .setPopExitAnim(R.anim.exit_to_right)
-            .setPopUpTo(navController.graph.startDestinationId, false)
             .build()
         activityMainBinding.bottomNavView.setOnItemSelectedListener{ item ->
             when(item.itemId){
@@ -108,16 +113,11 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
 //        activityMainBinding.bottomNavView.setupWithNavController(navController)
 //        val appBarConfiguration = AppBarConfiguration(setOf(R.id.homeFragment, R.id.listFragment ,R.id.profileFragment, R.id.settingFragment))
 //        setupActionBarWithNavController(navController, appBarConfiguration)
-        activityMainBinding.fab.setOnClickListener(this)
+//        activityMainBinding.fab.setOnClickListener(this)
 
     }
 
     override fun onClick(v: View?){
-        when (v?.id){
-            R.id.fab -> {
-                startActivity(fabIntent)
-            }
-        }
     }
 
     @Deprecated("Deprecated in Java")

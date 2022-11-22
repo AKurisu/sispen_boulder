@@ -9,6 +9,8 @@ import androidx.preference.PreferenceFragmentCompat
 import androidx.preference.PreferenceScreen
 import com.firebase.ui.auth.AuthUI
 import com.google.firebase.auth.ktx.auth
+import com.google.firebase.database.DatabaseReference
+import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.ktx.Firebase
 import untad.aldochristopherleo.sispenboulder.util.MainViewModel
 
@@ -37,6 +39,21 @@ class SettingFragment : PreferenceFragmentCompat(){
                 activity?.finish()
             }.addOnFailureListener {
                 Toast.makeText(preference.context, "Failed", Toast.LENGTH_SHORT).show()
+            }
+        } else if (preference.key.toString() == "delete_account"){
+            val user = Firebase.auth.currentUser
+            if (user != null) {
+                FirebaseDatabase.getInstance().reference.child("users/${user.uid}").removeValue().addOnSuccessListener {
+                    user.delete().addOnSuccessListener {
+                        Toast.makeText(preference.context, "Akun Berhasil Dihapus", Toast.LENGTH_SHORT).show()
+                        activity?.finish()
+                    }.addOnFailureListener {
+                        Toast.makeText(preference.context, "Failed", Toast.LENGTH_SHORT).show()
+                    }
+
+                }.addOnFailureListener {
+                    Toast.makeText(preference.context, "Failed", Toast.LENGTH_SHORT).show()
+                }
             }
         }
         return super.onPreferenceTreeClick(preference)

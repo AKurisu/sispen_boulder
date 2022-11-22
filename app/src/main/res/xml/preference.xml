@@ -20,6 +20,13 @@
     </Preference>
 
     <Preference
+        android:icon="@drawable/ic_baseline_delete_forever_24"
+        app:key="delete_account"
+        app:title="Hapus Akun">
+        <intent android:action="untad.aldochristopher.sispenboulder.startactivity"/>
+    </Preference>
+
+    <Preference
         android:icon="@drawable/ic_baseline_log_out_24"
         app:key="logout"
         app:title="Log Out">

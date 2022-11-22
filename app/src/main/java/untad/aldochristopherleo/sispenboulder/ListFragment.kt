@@ -1,5 +1,6 @@
 package untad.aldochristopherleo.sispenboulder
 
+import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -82,6 +83,15 @@ class ListFragment : Fragment() {
                 TransitionManager.beginDelayedTransition(rvUpcoming, transition)
                 rvUpcoming.visibility = View.VISIBLE
                 binding.btnListDone.setIconResource(R.drawable.ic_baseline_arrow_drop_up_24)
+            }
+        }
+
+        if (userType == "Juri Lapangan"){
+            binding.btnAddEvent.visibility = View.GONE
+        } else {
+            binding.btnAddEvent.setOnClickListener {
+                val intent = Intent(context, AddEventActivity::class.java)
+                startActivity(intent)
             }
         }
     }

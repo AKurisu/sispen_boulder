@@ -28,9 +28,9 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="32dp"
-                android:layout_marginTop="4dp"
+                android:layout_marginTop="28dp"
                 android:text="@string/main_welcome"
-                android:textSize="30sp"
+                android:textSize="34sp"
                 android:textStyle="bold"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
@@ -39,34 +39,30 @@
                 android:id="@+id/main_username"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="32dp"
+                android:layout_marginStart="8dp"
                 android:text="User"
-                android:textSize="18sp"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/main_welcome" />
+                android:textSize="22sp"
+                android:textStyle="bold"
+                app:layout_constraintStart_toEndOf="@+id/img_profil"
+                app:layout_constraintTop_toTopOf="@+id/img_profil" />
 
             <TextView
-                android:id="@+id/main_event_title"
+                android:id="@+id/main_user_type"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="32dp"
-                android:layout_marginTop="8dp"
-                android:text="Perlombaan:"
-                android:textSize="14sp"
-                android:textStyle="bold"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/main_username" />
+                android:textSize="16sp"
+                app:layout_constraintStart_toStartOf="@+id/main_username"
+                app:layout_constraintTop_toBottomOf="@+id/main_username"
+                tools:text="TYPE" />
 
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/main_rv"
-                android:layout_width="match_parent"
-                android:layout_height="0dp"
-                android:layout_marginStart="32dp"
-                android:layout_marginEnd="32dp"
-                android:scrollbars="horizontal"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/main_event_title"
-                tools:listitem="@layout/item_event_list" />
+            <de.hdodenhof.circleimageview.CircleImageView
+                android:id="@+id/img_profil"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:layout_marginTop="16dp"
+                app:layout_constraintStart_toStartOf="@+id/main_welcome"
+                app:layout_constraintTop_toBottomOf="@+id/main_welcome" />
+
 
         </androidx.constraintlayout.widget.ConstraintLayout>
     </ScrollView>
