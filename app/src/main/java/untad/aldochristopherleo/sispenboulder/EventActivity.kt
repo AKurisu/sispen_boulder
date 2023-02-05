@@ -503,7 +503,7 @@ class EventActivity : AppCompatActivity() {
             val priority = viewModel.ahpPriority.value
             if (priority!!.isNotEmpty()){
                 val ahp = Ahp(priority)
-                topsis = Topsis(ahp.getConsistencySum(), resultArray)
+                topsis = Topsis(ahp.getPrioritySum(), resultArray)
                 val resultTopsis = topsis.getPreference()
                 val resultNotCount = ArrayList<SortedResult>()
 
@@ -578,13 +578,15 @@ class EventActivity : AppCompatActivity() {
         }
 
         sortedResult.forEachIndexed { index, items ->
-            if (items.order != -1){
-                if (items.preferenceValue == sortedResult[index+1].preferenceValue){
-                    if (items.order > sortedResult[index+1].order){
-                        if (sortedResult[index+1].order != -1){
-                            val before = items
-                            sortedResult[index] = sortedResult[index+1]
-                            sortedResult[index+1] = before
+            if (index != (sortedResult.size - 1)){
+                if (items.order != -1){
+                    if (items.preferenceValue == sortedResult[index+1].preferenceValue){
+                        if (items.order > sortedResult[index+1].order){
+                            if (sortedResult[index+1].order != -1){
+                                val before = items
+                                sortedResult[index] = sortedResult[index+1]
+                                sortedResult[index+1] = before
+                            }
                         }
                     }
                 }
@@ -896,7 +898,8 @@ class EventActivity : AppCompatActivity() {
             val menuJuriLapangan = menu.findItem(R.id.menu_nama_juri_lapangan)
             val menuPrint = menu.findItem(R.id.menu_print_hasil)
 
-            if (userType != "Admin") {
+            //change to admin
+            if (userType != "Presiden Juri") {
                 menuAhp?.isVisible = false
                 menuTopsis?.isVisible = false
             }

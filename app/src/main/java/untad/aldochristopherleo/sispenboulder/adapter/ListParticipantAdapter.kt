@@ -1,5 +1,6 @@
 package untad.aldochristopherleo.sispenboulder.adapter
 
+import android.content.Context
 import android.content.Intent
 import android.util.Log
 import android.view.LayoutInflater
@@ -23,6 +24,13 @@ class ListParticipantAdapter(
     private var event: Event
 ): RecyclerView.Adapter<ListParticipantAdapter.ListViewHolder>() {
     private var refreshCount = 0
+
+    var wall1: Result = Result()
+    var wall2: Result = Result()
+    var wall3: Result = Result()
+    var wall4: Result = Result()
+    var wall5: Result = Result()
+
     class ListViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         var numberPosition : TextView = itemView.findViewById(R.id.txt_position)
         var layoutName : LinearLayout = itemView.findViewById(R.id.layout_name)
@@ -76,11 +84,13 @@ class ListParticipantAdapter(
             else if (item == 4) wall4IsAvailable = true
             else if (item == 5) wall5IsAvailable = true
         }
-        val wall1 = result.wall1
-        val wall2 = result.wall2
-        val wall3 = result.wall3
-        val wall4 = result.wall4
-        val wall5 = result.wall5
+        wall1 = result.wall1
+        wall2 = result.wall2
+        wall3 = result.wall3
+        wall4 = result.wall4
+        if (wall5IsAvailable){
+            wall5 = result.wall5!!
+        }
         val wallList = ArrayList<String>()
 
         val name = result.name.toString()
@@ -151,7 +161,7 @@ class ListParticipantAdapter(
                         choosenWall = list[which]
                     }
                     .setPositiveButton("OK"){_,_ ->
-
+                        ubahData(choosenWall, holder.itemView.context, position, result.name.toString())
                     }
                     .show()
             }
@@ -172,31 +182,32 @@ class ListParticipantAdapter(
                 val thisList = wallList.toTypedArray()
                 var choosenWall = ""
                 MaterialAlertDialogBuilder(holder.tableLayout.context)
-                    .setTitle("Silahkan Pilih Dinding Yang Akan Diubah")
+                    .setTitle("Ubah Data Penilaian")
                     .setSingleChoiceItems(thisList,-1) { _, which ->
                         choosenWall = thisList[which]
                     }
                     .setPositiveButton("OK"){_,_ ->
-                        val intent = Intent(holder.itemView.context, GradingActivity::class.java)
-                        var wallSend = Result()
-                        when (choosenWall) {
-                            "Dinding 1" -> wallSend = wall1
-                            "Dinding 2" -> wallSend = wall2
-                            "Dinding 3" -> wallSend = wall3
-                            "Dinding 4" -> wallSend = wall4
-                            "Dinding 5" -> wallSend = wall5
-                        }
-
-                        intent.putExtra(GradingActivity.EXTRA_EVENT_KEY, eventKey)
-                        intent.putExtra(GradingActivity.EXTRA_EVENT, event)
-                        intent.putExtra(GradingActivity.EXTRA_NAME, "PRESIDEN")
-                        intent.putExtra(GradingActivity.EXTRA_ACTIVITY_FROM, "ADAPTER")
-                        intent.putExtra("EXTRA_EDIT_PARTICIPANT_KEY", list[position].key)
-                        intent.putExtra("EXTRA_EDIT_WALL_PICKED", choosenWall)
-                        intent.putExtra("EXTRA_EDIT_RESULT", wallSend)
-                        intent.putExtra("EXTRA_EDIT_NAME", result.name.toString())
-
-                        holder.tableLayout.context.startActivity(intent)
+                        ubahData(choosenWall, holder.itemView.context, position, result.name.toString())
+//                        val intent = Intent(holder.itemView.context, GradingActivity::class.java)
+//                        var wallSend = Result()
+//                        when (choosenWall) {
+//                            "Dinding 1" -> wallSend = wall1
+//                            "Dinding 2" -> wallSend = wall2
+//                            "Dinding 3" -> wallSend = wall3
+//                            "Dinding 4" -> wallSend = wall4
+//                            "Dinding 5" -> wallSend = wall5
+//                        }
+//
+//                        intent.putExtra(GradingActivity.EXTRA_EVENT_KEY, eventKey)
+//                        intent.putExtra(GradingActivity.EXTRA_EVENT, event)
+//                        intent.putExtra(GradingActivity.EXTRA_NAME, "PRESIDEN")
+//                        intent.putExtra(GradingActivity.EXTRA_ACTIVITY_FROM, "ADAPTER")
+//                        intent.putExtra("EXTRA_EDIT_PARTICIPANT_KEY", list[position].key)
+//                        intent.putExtra("EXTRA_EDIT_WALL_PICKED", choosenWall)
+//                        intent.putExtra("EXTRA_EDIT_RESULT", wallSend)
+//                        intent.putExtra("EXTRA_EDIT_NAME", result.name.toString())
+//
+//                        holder.tableLayout.context.startActivity(intent)
                     }
                     .show()
             }
@@ -237,5 +248,28 @@ class ListParticipantAdapter(
         } else if (ab == 0.0){
             "t${at.toInt()}"
         } else "t${at.toInt()} z${ab.toInt()}"
+    }
+
+    private fun ubahData(choosenWall: String, con: Context, position: Int, name: String) {
+        val intent = Intent(con, GradingActivity::class.java)
+        var wallSend = Result()
+        when (choosenWall) {
+            "Dinding 1" -> wallSend = wall1
+            "Dinding 2" -> wallSend = wall2
+            "Dinding 3" -> wallSend = wall3
+            "Dinding 4" -> wallSend = wall4
+            "Dinding 5" -> wallSend = wall5
+        }
+
+        intent.putExtra(GradingActivity.EXTRA_EVENT_KEY, eventKey)
+        intent.putExtra(GradingActivity.EXTRA_EVENT, event)
+        intent.putExtra(GradingActivity.EXTRA_NAME, "PRESIDEN")
+        intent.putExtra(GradingActivity.EXTRA_ACTIVITY_FROM, "ADAPTER")
+        intent.putExtra("EXTRA_EDIT_PARTICIPANT_KEY", list[position].key)
+        intent.putExtra("EXTRA_EDIT_WALL_PICKED", choosenWall)
+        intent.putExtra("EXTRA_EDIT_RESULT", wallSend)
+        intent.putExtra("EXTRA_EDIT_NAME", name)
+
+        con.startActivity(intent)
     }
 }

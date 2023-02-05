@@ -39,6 +39,7 @@ class Ahp(value: ArrayList<Double>){
 
     private fun countAlgorithm(valueList: ArrayList<Double>) {
 
+        //Input Nilai Awal
         valueList.indices.forEach { index ->
             if (index % 4 != 0){
                 list.add(valueList[index])
@@ -50,6 +51,7 @@ class Ahp(value: ArrayList<Double>){
             }
         }
 
+        //Cari Nilai Pembagi
         list.indices.forEach { index ->
             when {
                 index % 4 == 0 -> {
@@ -70,6 +72,7 @@ class Ahp(value: ArrayList<Double>){
         println(sum1.toString() + ' ' + sum2.toString() + ' ' + sum3.toString() + ' ' + sum4.toString())
 
 
+        //Normalisasi Nilai
         list.indices.forEach { index ->
             when {
                 index % 4 == 0 -> {
@@ -166,6 +169,12 @@ class Ahp(value: ArrayList<Double>){
         val list = ArrayList<Double>()
         Collections.addAll(list, sumNormalize1, sumNormalize2, sumNormalize3, sumNormalize4,
             priority1, priority2, priority3, priority4)
+        return list
+    }
+
+    fun getPrioritySum():ArrayList<Double>{
+        val list = ArrayList<Double>()
+        Collections.addAll(list, priority1, priority2, priority3, priority4)
         return list
     }
 
